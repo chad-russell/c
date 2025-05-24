@@ -57,6 +57,13 @@
           age
           ssh-to-age
         ];
+        
+        # Set SOPS AGE key file location automatically
+        SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
+        
+        shellHook = ''
+          echo "🔐 SOPS environment configured - AGE key file: $SOPS_AGE_KEY_FILE"
+        '';
       };
     };
 }
