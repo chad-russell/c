@@ -50,7 +50,10 @@ class HomeDeployer:
     def __init__(self):
         self.setup_logging()
         self.console = Console() if RICH_AVAILABLE else None
-        self.script_dir = Path(__file__).parent.parent.absolute()
+        # Use current working directory instead of script's directory
+        # When running via 'nix run', the script is in the Nix store but
+        # we need to work with files in the user's current directory
+        self.project_dir = Path.cwd().absolute()
         
         # Node configurations
         self.nodes = {
@@ -144,7 +147,7 @@ class HomeDeployer:
         errors = []
         
         # Check if we're in the right directory
-        if not (self.script_dir / "flake.nix").exists():
+        if not (self.project_dir / "flake.nix").exists():
             errors.append("flake.nix not found. Run from the project root.")
         
         # Check for SOPS age key
@@ -153,7 +156,7 @@ class HomeDeployer:
             errors.append(f"SOPS age key not found at {age_key_path}")
         
         # Check if secrets are encrypted
-        secrets_path = self.script_dir / "secrets/secrets.yaml"
+        secrets_path = self.project_dir / "secrets/secrets.yaml"
         if not secrets_path.exists():
             errors.append(f"Secrets file not found at {secrets_path}")
         else:
@@ -207,7 +210,7 @@ class HomeDeployer:
         try:
             # Decrypt secrets
             result = self.run_command(
-                ["sops", "-d", str(self.script_dir / "secrets/secrets.yaml")],
+                ["sops", "-d", str(self.project_dir / "secrets/secrets.yaml")],
                 "Decrypting secrets"
             )
             

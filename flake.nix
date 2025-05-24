@@ -115,8 +115,6 @@
               echo "  nix run .#deploy       - Deploy to all nodes"
               echo "  nix run .#deploy c1    - Deploy to specific node"
               echo "  python3 scripts/deploy.py --help  - See all options"
-              echo ""
-              echo "Or use the old script: ./deploy.sh"
             '';
           };
         }
