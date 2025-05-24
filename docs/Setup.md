@@ -1,6 +1,6 @@
-# 🚀 Homelab Cluster Setup Guide
+# 🚀 Home Cluster Setup Guide
 
-This guide walks you through setting up your 4-node NixOS homelab cluster with SeaweedFS and high availability.
+This guide walks you through setting up your 4-node NixOS home cluster with SeaweedFS and high availability.
 
 ## 📋 Prerequisites
 
@@ -220,4 +220,4 @@ sops secrets/secrets.yaml
 ./deploy.sh
 ```
 
-That's it! Your homelab cluster should now be running with high availability SeaweedFS storage and automatic failover via Keepalived. 🎉
+That's it! Your home cluster should now be running with high availability SeaweedFS storage and automatic failover via Keepalived. 🎉

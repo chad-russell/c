@@ -1,18 +1,23 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [ ];
+  imports = [ 
+    ../../modules/seaweedfs.nix
+  ];
 
-  # SeaweedFS configuration for c4
+  # SeaweedFS cluster configuration for c4
   # c4 will run: Volume only (no master or filer)
-  services.seaweedfs = {
-    volume = {
-      enable = true;
-      ip = "192.168.68.74";
-      port = 8080;
-      mserver = "192.168.68.71:9333,192.168.68.72:9333,192.168.68.73:9333";
-      dir = "/var/lib/seaweedfs/volume";
-    };
+  services.seaweedfs-cluster = {
+    enable = true;
+    nodeIp = "192.168.68.74";
+    masterPeers = [
+      "192.168.68.71:9333"  # c1
+      "192.168.68.72:9333"  # c2  
+      "192.168.68.73:9333"  # c3
+    ];
+    enableMaster = false;
+    enableVolume = true;
+    enableFiler = false;
   };
 
   # Keepalived configuration for HA

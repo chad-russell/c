@@ -40,6 +40,10 @@
           ./hosts/${hostName}/disko.nix
         ];
       };
+
+      # Package sets for different systems
+      forAllSystems = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-darwin"];
+      pkgsFor = system: import nixpkgs { inherit system; };
     in
     {
       nixosConfigurations = {
@@ -49,21 +53,73 @@
         c4 = mkHost "c4" 4;
       };
 
+      # Apps for deployment and management
+      apps = forAllSystems (system:
+        let
+          pkgs = pkgsFor system;
+          
+          # Python deployment script with dependencies
+          deployScript = pkgs.writeShellApplication {
+            name = "home-deploy";
+            
+            runtimeInputs = with pkgs; [
+              nixos-anywhere
+              sops
+              age
+              ssh-to-age
+              (python3.withPackages (ps: with ps; [
+                pyyaml
+                rich
+              ]))
+            ];
+            
+            text = ''
+              exec python3 ${./scripts/deploy.py} "$@"
+            '';
+          };
+          
+        in {
+          deploy = {
+            type = "app";
+            program = "${deployScript}/bin/home-deploy";
+          };
+          
+          # Alias for the default app
+          default = {
+            type = "app";
+            program = "${deployScript}/bin/home-deploy";
+          };
+        }
+      );
+
       # Development shell for managing the cluster
-      devShells.${system}.default = nixpkgs.legacyPackages.${system}.mkShell {
-        buildInputs = with nixpkgs.legacyPackages.${system}; [
-          nixos-anywhere
-          sops
-          age
-          ssh-to-age
-        ];
-        
-        # Set SOPS AGE key file location automatically
-        SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
-        
-        shellHook = ''
-          echo "🔐 SOPS environment configured - AGE key file: $SOPS_AGE_KEY_FILE"
-        '';
-      };
+      devShells = forAllSystems (system:
+        let
+          pkgs = pkgsFor system;
+        in {
+          default = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              nixos-anywhere
+              sops
+              age
+              ssh-to-age
+              (python3.withPackages (ps: with ps; [
+                pyyaml
+                rich
+              ]))
+            ];
+            
+            shellHook = ''
+              echo "🚀 Home Cluster Development Environment"
+              echo "Available commands:"
+              echo "  nix run .#deploy       - Deploy to all nodes"
+              echo "  nix run .#deploy c1    - Deploy to specific node"
+              echo "  python3 scripts/deploy.py --help  - See all options"
+              echo ""
+              echo "Or use the old script: ./deploy.sh"
+            '';
+          };
+        }
+      );
     };
 }

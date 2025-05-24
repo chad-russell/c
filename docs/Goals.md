@@ -1,6 +1,6 @@
-## Homelab Compute Cluster Bootstrap: Project Goals for Nix Flake
+## Home Compute Cluster Bootstrap: Project Goals for Nix Flake
 
-**Project Objective:** To bootstrap and configure a 4-node highly available compute cluster using NixOS and a declarative Nix Flake. The primary goal is to deploy and manage various homelab applications (e.g., Mealie, Open WebUI, Paperless-ngx) ensuring high availability through automated failover.
+**Project Objective:** To bootstrap and configure a 4-node highly available compute cluster using NixOS and a declarative Nix Flake. The primary goal is to deploy and manage various self-hosted applications (e.g., Mealie, Open WebUI, Paperless-ngx) ensuring high availability through automated failover.
 
 **Hardware Configuration (per node, 4 nodes total):**
 * RAM: 16GB
