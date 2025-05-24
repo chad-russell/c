@@ -27,10 +27,9 @@
       interface = "eno1";
       virtualRouterId = 1;
       priority = 100;  # Third priority for c3
-      virtualIps = [{
-        addr = "192.168.68.70";
-        prefixLen = 24;
-      }];
+      virtualIps = [
+        "192.168.68.70/24"
+      ];
     };
   };
 
