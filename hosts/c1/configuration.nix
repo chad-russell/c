@@ -29,7 +29,7 @@
       virtualRouterId = 1;
       priority = 120;  # Highest priority for c1
       virtualIps = [
-        "192.168.68.70/24"
+        { addr = "192.168.68.70/24"; }
       ];
     };
   };
