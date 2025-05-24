@@ -176,7 +176,7 @@ ssh crussell@192.168.68.72 "ip addr show | grep 192.168.68.70"
 
 ### Storage
 - **System Storage**: Btrfs on /dev/nvme0n1 (with subvolumes)
-- **SeaweedFS Storage**: ext4 on /dev/nvme1n1 mounted at /var/lib/seaweedfs
+- **SeaweedFS Storage**: xfs on /dev/nvme1n1 mounted at /var/lib/seaweedfs
 
 ## 🛠️ Troubleshooting
 

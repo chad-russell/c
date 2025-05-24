@@ -64,7 +64,7 @@ See [SETUP.md](./SETUP.md) for complete setup instructions.
 
 ### Storage
 - **System**: Btrfs on /dev/nvme0n1 with subvolumes
-- **Data**: ext4 on /dev/nvme1n1 for SeaweedFS volumes
+- **Data**: xfs on /dev/nvme1n1 for SeaweedFS volumes
 
 ## 🔐 Security
 

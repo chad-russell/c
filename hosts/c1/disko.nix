@@ -52,7 +52,7 @@
         };
       };
 
-      # Data disk (ext4 for SeaweedFS volume storage) - the 2TB SSD
+      # Data disk (xfs for SeaweedFS volume storage) - the 2TB SSD
       data = {
         device = "/dev/nvme1n1";
         type = "disk";
@@ -64,7 +64,7 @@
               type = "8300";
               content = {
                 type = "filesystem";
-                format = "ext4";
+                format = "xfs";
                 mountpoint = "/var/lib/seaweedfs";
                 mountOptions = [ "noatime" "defaults" ];
               };
