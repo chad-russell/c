@@ -42,6 +42,7 @@
     extraGroups = [ "wheel" "networkmanager" ];
     # SSH keys are managed via nixos-anywhere extra-files
     uid = 1000;  # Ensure consistent UID across nodes
+    hashedPassword = "$6$NrcWIXntX/mytgFj$9Sa/VuZGCapVG2mzoRv5lyGyVT3b49CkHFpU0iqa6LpcoR6Sj5SPAzd7TQO76N6wBhIjbf9LtTOWe.35SJayG/";
   };
 
   # SSH configuration
