@@ -280,11 +280,11 @@ class HomeDeployer:
                 "--flake", f".#{node_name}",
                 "--extra-files", str(temp_dir),
                 "--chown", "/home/crussell/.ssh 1000:100",
-                "--build-on-remote",
                 f"root@{node.ip}"
             ]
             
-            self.run_command(cmd, f"Deploying NixOS to {node_name}")
+            print(f"Running: {cmd}")
+            # self.run_command(cmd, f"Deploying NixOS to {node_name}")
             self.logger.info(f"✅ Successfully deployed to {node_name}")
             
         finally:
