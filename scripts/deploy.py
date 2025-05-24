@@ -289,7 +289,8 @@ class HomeDeployer:
             
         finally:
             # Clean up temporary directory
-            shutil.rmtree(temp_dir, ignore_errors=True)
+            # shutil.rmtree(temp_dir, ignore_errors=True)
+            print("TODO: clean up temp dir")
     
     def deploy_nodes(self, node_names: List[str], interactive: bool = True):
         """Deploy to multiple nodes."""
