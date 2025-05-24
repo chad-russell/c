@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """
-Home Cluster Deployment Tool
+Home Cluster Deployment Preparation Tool
 
-A robust Python script for deploying NixOS configurations to home cluster nodes
-using nixos-anywhere with proper secrets management.
+A robust Python script for preparing NixOS configurations and generating
+deployment commands for home cluster nodes using nixos-anywhere with 
+proper secrets management.
+
+This tool prepares the required extra files and generates copy-paste ready
+nixos-anywhere commands, allowing you to maintain full control over the
+deployment process while automating the preparation steps.
 """
 
 import argparse
@@ -85,14 +90,14 @@ class HomeDeployer:
         """Print a welcome banner."""
         if self.console:
             banner = Panel.fit(
-                "[bold blue]🚀 Home Cluster Deployment Tool[/bold blue]\n"
-                "[dim]Deploying NixOS configurations with SeaweedFS & HA[/dim]",
+                "[bold blue]🚀 Home Cluster Deployment Preparation Tool[/bold blue]\n"
+                "[dim]Preparing NixOS configurations with SeaweedFS & HA[/dim]",
                 border_style="blue"
             )
             self.console.print(banner)
         else:
-            print("🚀 Home Cluster Deployment Tool")
-            print("Deploying NixOS configurations with SeaweedFS & HA")
+            print("🚀 Home Cluster Deployment Preparation Tool")
+            print("Preparing NixOS configurations with SeaweedFS & HA")
     
     def show_cluster_info(self):
         """Display cluster architecture information."""
@@ -233,8 +238,8 @@ class HomeDeployer:
         """Prepare extra files directory for nixos-anywhere."""
         self.logger.info("Preparing extra files for deployment...")
         
-        # Create temporary directory
-        temp_dir = Path(tempfile.mkdtemp())
+        # Create temporary directory with a predictable name for easier cleanup
+        temp_dir = Path(tempfile.mkdtemp(prefix="nixos-anywhere-extra-"))
         
         try:
             # Set up SOPS age key
@@ -262,40 +267,77 @@ class HomeDeployer:
             shutil.rmtree(temp_dir, ignore_errors=True)
             raise DeploymentError(f"Failed to prepare extra files: {e}")
     
-    def deploy_node(self, node_name: str, ssh_key: str):
-        """Deploy configuration to a single node."""
-        if node_name not in self.nodes:
-            raise DeploymentError(f"Unknown node: {node_name}")
+    def generate_deployment_commands(self, node_names: List[str], extra_files_dir: Path) -> List[str]:
+        """Generate nixos-anywhere commands for the specified nodes."""
+        commands = []
         
-        node = self.nodes[node_name]
-        self.logger.info(f"Deploying to {node_name} ({node.ip})...")
-        
-        # Prepare extra files
-        temp_dir = self.prepare_extra_files(ssh_key)
-        
-        try:
-            # Run nixos-anywhere
+        for node_name in node_names:
+            if node_name not in self.nodes:
+                self.logger.warning(f"Unknown node: {node_name}, skipping...")
+                continue
+                
+            node = self.nodes[node_name]
             cmd = [
                 "nixos-anywhere",
                 "--flake", f".#{node_name}",
-                "--extra-files", str(temp_dir),
+                "--extra-files", str(extra_files_dir),
                 "--chown", "/home/crussell/.ssh 1000:100",
                 f"root@{node.ip}"
             ]
-            
-            print(f"Running: {cmd}")
-            # self.run_command(cmd, f"Deploying NixOS to {node_name}")
-            self.logger.info(f"✅ Successfully deployed to {node_name}")
-            
-        finally:
-            # Clean up temporary directory
-            # shutil.rmtree(temp_dir, ignore_errors=True)
-            print("TODO: clean up temp dir")
+            commands.append(" ".join(cmd))
+        
+        return commands
     
+    def print_deployment_guide(self, node_names: List[str], extra_files_dir: Path):
+        """Print deployment commands and cleanup instructions."""
+        commands = self.generate_deployment_commands(node_names, extra_files_dir)
+        
+        if self.console:
+            # Print deployment commands
+            self.console.print("\n[bold green]🚀 Deployment Commands[/bold green]")
+            self.console.print("[dim]Copy and paste these commands to deploy:[/dim]\n")
+            
+            for i, cmd in enumerate(commands, 1):
+                self.console.print(f"[bold cyan]# Deploy node {node_names[i-1]}[/bold cyan]")
+                self.console.print(f"[yellow]{cmd}[/yellow]\n")
+            
+            # Print cleanup command
+            self.console.print("[bold red]🧹 Cleanup Command[/bold red]")
+            self.console.print("[dim]Run this when all deployments are complete:[/dim]\n")
+            self.console.print(f"[red]rm -rf {extra_files_dir}[/red]\n")
+            
+            # Print helpful info
+            self.console.print("[bold blue]ℹ️  Additional Information[/bold blue]")
+            self.console.print(f"[dim]Virtual IP:[/dim] [cyan]{self.vip}[/cyan]")
+            self.console.print(f"[dim]SSH after deployment:[/dim] [cyan]ssh crussell@<node-ip>[/cyan] or [cyan]ssh crussell@{self.vip}[/cyan]")
+            self.console.print(f"[dim]Extra files directory:[/dim] [yellow]{extra_files_dir}[/yellow]")
+            
+        else:
+            print("\n🚀 Deployment Commands")
+            print("Copy and paste these commands to deploy:\n")
+            
+            for i, cmd in enumerate(commands, 1):
+                print(f"# Deploy node {node_names[i-1]}")
+                print(cmd)
+                print()
+            
+            print("🧹 Cleanup Command")
+            print("Run this when all deployments are complete:")
+            print(f"rm -rf {extra_files_dir}")
+            print()
+            
+            print("ℹ️  Additional Information")
+            print(f"Virtual IP: {self.vip}")
+            print(f"SSH after deployment: ssh crussell@<node-ip> or ssh crussell@{self.vip}")
+            print(f"Extra files directory: {extra_files_dir}")
+
     def deploy_nodes(self, node_names: List[str], interactive: bool = True):
-        """Deploy to multiple nodes."""
+        """Prepare deployment and print commands for multiple nodes."""
         # Extract SSH key once
         ssh_key = self.extract_ssh_key()
+        
+        # Prepare extra files once (reused for all nodes)
+        extra_files_dir = self.prepare_extra_files(ssh_key)
         
         # Show what will be deployed
         if self.console:
@@ -311,60 +353,40 @@ class HomeDeployer:
             
             self.console.print(table)
         
-        # Confirm deployment
+        # Confirm preparation
         if interactive:
             if self.console:
-                if not Confirm.ask(f"Deploy to {len(node_names)} node(s)?"):
-                    self.logger.info("Deployment cancelled by user")
+                if not Confirm.ask(f"Prepare deployment for {len(node_names)} node(s)?"):
+                    self.logger.info("Deployment preparation cancelled by user")
+                    # Clean up the extra files directory
+                    shutil.rmtree(extra_files_dir, ignore_errors=True)
                     return
             else:
-                response = input(f"Deploy to {len(node_names)} node(s)? [y/N]: ")
+                response = input(f"Prepare deployment for {len(node_names)} node(s)? [y/N]: ")
                 if response.lower() not in ['y', 'yes']:
-                    self.logger.info("Deployment cancelled by user")
+                    self.logger.info("Deployment preparation cancelled by user")
+                    # Clean up the extra files directory
+                    shutil.rmtree(extra_files_dir, ignore_errors=True)
                     return
         
-        # Deploy each node
-        failed_nodes = []
-        for node_name in node_names:
-            try:
-                self.deploy_node(node_name, ssh_key)
-            except DeploymentError as e:
-                self.logger.error(f"Failed to deploy {node_name}: {e}")
-                failed_nodes.append(node_name)
-                
-                if interactive:
-                    if self.console:
-                        if not Confirm.ask("Continue with remaining nodes?"):
-                            break
-                    else:
-                        response = input("Continue with remaining nodes? [y/N]: ")
-                        if response.lower() not in ['y', 'yes']:
-                            break
-        
-        # Summary
-        successful_nodes = [n for n in node_names if n not in failed_nodes]
-        if successful_nodes:
-            self.logger.info(f"✅ Successfully deployed: {', '.join(successful_nodes)}")
-        if failed_nodes:
-            self.logger.error(f"❌ Failed deployments: {', '.join(failed_nodes)}")
-        
-        if not failed_nodes:
-            self.logger.info(f"🎉 Deployment completed successfully!")
-            self.logger.info(f"Virtual IP: {self.vip}")
-            self.logger.info("You can now SSH using: ssh crussell@<node-ip> or ssh crussell@192.168.68.70")
+        # Print the deployment guide
+        self.print_deployment_guide(node_names, extra_files_dir)
 
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Deploy NixOS configurations to home cluster nodes",
+        description="Prepare NixOS deployment commands for home cluster nodes",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s                    # Deploy to all nodes (interactive)
-  %(prog)s c1                 # Deploy only to c1
-  %(prog)s c1 c2 c3          # Deploy to specific nodes
-  %(prog)s --all --yes       # Deploy to all nodes (non-interactive)
+  %(prog)s                    # Prepare deployment for all nodes (interactive)
+  %(prog)s c1                 # Prepare deployment only for c1
+  %(prog)s c1 c2 c3          # Prepare deployment for specific nodes
+  %(prog)s --all --yes       # Prepare deployment for all nodes (non-interactive)
   %(prog)s --check-only      # Only run prerequisite checks
+  
+This tool prepares the extra files and generates nixos-anywhere commands
+for you to copy and paste. It does not execute the deployment directly.
         """
     )
     
@@ -372,13 +394,13 @@ Examples:
         "nodes", 
         nargs="*", 
         choices=["c1", "c2", "c3", "c4"],
-        help="Nodes to deploy to (default: all nodes)"
+        help="Nodes to prepare deployment for (default: all nodes)"
     )
     
     parser.add_argument(
         "--all", 
         action="store_true",
-        help="Deploy to all nodes"
+        help="Prepare deployment for all nodes"
     )
     
     parser.add_argument(
@@ -426,15 +448,15 @@ Examples:
             deployer.logger.info("✅ All checks passed. Ready for deployment.")
             return 0
         
-        # Deploy
+        # Prepare deployment
         deployer.deploy_nodes(nodes_to_deploy, interactive=not args.yes)
         return 0
         
     except DeploymentError as e:
-        deployer.logger.error(f"Deployment failed: {e}")
+        deployer.logger.error(f"Deployment preparation failed: {e}")
         return 1
     except KeyboardInterrupt:
-        deployer.logger.info("Deployment cancelled by user")
+        deployer.logger.info("Deployment preparation cancelled by user")
         return 1
     except Exception as e:
         deployer.logger.error(f"Unexpected error: {e}")
