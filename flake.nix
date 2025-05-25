@@ -15,7 +15,7 @@
         format = "proxmox";
         modules = [
           ({ pkgs, ... }: {
-            networking.hostName = "vmtest";
+            networking.hostName = "vm-p2-103";
             networking.firewall.allowedTCPPorts = [ 22 80 ];
 
             services.openssh.enable = true;
@@ -37,7 +37,7 @@
               password = "password";
             };
 
-            system.stateVersion = "24.05";
+            system.stateVersion = "25.05";
           })
         ];
       };
