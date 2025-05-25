@@ -25,7 +25,6 @@
               enable = true;
               adminAddr = "you@example.com";
               documentRoot = "/var/www";
-              enableUserDirs = false;
             };
 
             systemd.tmpfiles.rules = [
