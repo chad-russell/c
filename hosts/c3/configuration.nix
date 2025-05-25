@@ -24,7 +24,6 @@
           NGINX_PORT = "80";
         };
         extraOptions = [
-          "--restart=unless-stopped"
           "--pull=newer"
         ];
       };
