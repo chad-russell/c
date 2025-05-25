@@ -59,14 +59,14 @@
         content = {
           type = "gpt";
           partitions = {
-            root = {
+            storage = {
               size = "100%";
               content = {
                 type = "btrfs";
                 extraArgs = [ "-f" ];
                 subvolumes = {
                   "@" = {
-                    mountpoint = "/";
+                    mountpoint = "/storage";
                     mountOptions = [ "compress=zstd" "noatime" ];
                   };
                 };
