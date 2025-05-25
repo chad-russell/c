@@ -24,7 +24,11 @@
             services.httpd = {
               enable = true;
               adminAddr = "you@example.com";
-              documentRoot = "/var/www";
+              virtualHosts = {
+                "default" = {
+                  documentRoot = "/var/www";
+                };
+              };
             };
 
             systemd.tmpfiles.rules = [
