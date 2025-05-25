@@ -15,33 +15,29 @@
         format = "proxmox";
         modules = [
           ({ pkgs, ... }: {
-            networking.firewall.allowedTCPPorts = [ 22 80 8080 ];
-
-            networking.hostName = "vm-p2-1";
+            networking.hostName = "vmtest";
+            networking.firewall.allowedTCPPorts = [ 22 80 ];
 
             services.openssh.enable = true;
 
-            services.httpd = {
+            services.nginx = {
               enable = true;
-              adminAddr = "you@example.com";
-              virtualHosts = {
-                "default" = {
-                  documentRoot = "/var/www";
-                  serverName = "localhost";
-                };
+              virtualHosts."localhost" = {
+                root = "/var/www";
+                default = true;
               };
             };
 
             systemd.tmpfiles.rules = [
               "d /var/www 0755 root root -"
-              "f /var/www/index.html 0644 root root - <h1>Hello from NixOS VM!</h1>"
+              "f /var/www/index.html 0644 root root - <h1>Hello from NixOS + nginx!</h1>"
             ];
 
             users.users.root = {
-              password = "password";  # NOTE: insecure; use a hash for real deployments
+              password = "password";
             };
 
-            system.stateVersion = "25.05";
+            system.stateVersion = "24.05";
           })
         ];
       };
