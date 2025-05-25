@@ -27,6 +27,7 @@
               virtualHosts = {
                 "default" = {
                   documentRoot = "/var/www";
+                  serverName = "localhost";
                 };
               };
             };
