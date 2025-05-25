@@ -39,7 +39,7 @@
   # User accounts
   users.users.crussell = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [ "wheel" "networkmanager" "podman" ];
     # SSH keys are managed via nixos-anywhere extra-files
     uid = 1000;  # Ensure consistent UID across nodes
     hashedPassword = "$6$NrcWIXntX/mytgFj$9Sa/VuZGCapVG2mzoRv5lyGyVT3b49CkHFpU0iqa6LpcoR6Sj5SPAzd7TQO76N6wBhIjbf9LtTOWe.35SJayG/";
@@ -103,4 +103,18 @@
 
   # Locale
   i18n.defaultLocale = "en_US.UTF-8";
+
+  # Podman and container support
+  virtualisation = {
+    podman = {
+      enable = true;
+      # Docker compatibility
+      dockerCompat = true;
+      dockerSocket.enable = true;
+      # Required for container networking
+      defaultNetwork.settings.dns_enabled = true;
+    };
+    
+    containers.enable = true;
+  };
 } 
