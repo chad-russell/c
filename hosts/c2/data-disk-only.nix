@@ -4,7 +4,7 @@
     disk = {
       # Data disk - the 2TB SSD
       data = {
-        device = "/dev/nvme1n1";
+        device = "/dev/sda";
         type = "disk";
         content = {
           type = "gpt";
