@@ -91,13 +91,13 @@ class HomeDeployer:
         if self.console:
             banner = Panel.fit(
                 "[bold blue]🚀 Home Cluster Deployment Preparation Tool[/bold blue]\n"
-                "[dim]Preparing NixOS configurations with SeaweedFS & HA[/dim]",
+                "[dim]Preparing NixOS configurations[/dim]",
                 border_style="blue"
             )
             self.console.print(banner)
         else:
             print("🚀 Home Cluster Deployment Preparation Tool")
-            print("Preparing NixOS configurations with SeaweedFS & HA")
+            print("Preparing NixOS configurations")
     
     def show_cluster_info(self):
         """Display cluster architecture information."""

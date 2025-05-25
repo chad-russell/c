@@ -52,21 +52,24 @@
         };
       };
 
-      # Data disk (xfs for SeaweedFS volume storage) - the 2TB SSD
+      # Data disk - the 2TB SSD
       data = {
         device = "/dev/sda";
         type = "disk";
         content = {
           type = "gpt";
           partitions = {
-            seaweedfs = {
+            root = {
               size = "100%";
-              type = "8300";
               content = {
-                type = "filesystem";
-                format = "xfs";
-                mountpoint = "/var/lib/seaweedfs";
-                mountOptions = [ "noatime" "defaults" ];
+                type = "btrfs";
+                extraArgs = [ "-f" ];
+                subvolumes = {
+                  "@" = {
+                    mountpoint = "/";
+                    mountOptions = [ "compress=zstd" "noatime" ];
+                  };
+                };
               };
             };
           };

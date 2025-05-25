@@ -1,5 +1,5 @@
 {
-  description = "Home Compute Cluster - multi-node HA setup with SeaweedFS";
+  description = "Home Compute Cluster";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";

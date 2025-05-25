@@ -1,143 +1,68 @@
 # 🏠 Home Compute Cluster
 
-A 4-node highly available NixOS cluster with SeaweedFS distributed storage and Keepalived failover.
+**Project Objective:** Establish a resilient, maintainable home compute cluster using NixOS and a declarative Nix Flake approach. Prioritize simplicity, fast recovery, and progressive automation over traditional "true high availability". Ensure services can be recovered within hours using backup and configuration tooling.
 
-## 🚀 Quick Start
+**Hardware Configuration:**
 
-### Deploy to all nodes
-```bash
-nix run .#deploy
-```
+* **Compute Nodes (4 total):**
 
-### Deploy to specific nodes
-```bash
-nix run .#deploy c1 c2    # Deploy to c1 and c2
-nix run .#deploy c1       # Deploy only to c1
-```
+  * RAM: 16GB
+  * Storage: 1x 2TB SSD per node
+  * Networking: 1GbE
+* **NAS:**
 
-### Non-interactive deployment
-```bash
-nix run .#deploy -- --all --yes
-```
+  * RAM: 8GB
+  * Storage: 4x 12TB drives (Btrfs/SnapRAID/Mergerfs up)
 
-### Check prerequisites only
-```bash
-nix run .#deploy -- --check-only
-```
+**Cluster Design Philosophy:**
 
-### See all options
-```bash
-nix run .#deploy -- --help
-```
+* Independent, stateful workloads run on each compute node.
+* No complex HA orchestration; focus on backup + rapid restoration.
+* Backups are automated to NAS and optionally cloud (e.g., S3).
+* High-value services can be restored via scripts or Nix Flake automation.
+* Eventually introduce scripted recovery triggered by uptime monitoring.
 
-## 🛠️ Development
+**Core Infrastructure & Software Stack:**
 
-### Enter development shell
-```bash
-nix develop
-```
+* **Operating System:** NixOS, declaratively managed with a unified Flake.
+* **Storage:**
 
-### Alternative: Use the legacy bash script
-```bash
-./deploy.sh
-```
+  * **Primary App Storage:** Local per-node volumes
+  * **Backups:** NAS with Btrfs or SnapRAID
+* **Backup Strategy:**
 
-## 📖 Setup Guide
+  * Use tools like `btrbk` or `restic` for scheduled backups.
+  * Snapshots for rapid rollback on compute nodes and NAS.
+  * Offsite backups for critical data (e.g., S3 Glacier).
+* **Monitoring & Recovery:**
 
-See [SETUP.md](./SETUP.md) for complete setup instructions.
+  * Use tools like Uptime Kuma to monitor service health.
+  * Define and script recovery actions (e.g., Nix deploy + restore volume).
+* **Service Deployment:**
 
-## 🏗️ Architecture
+  * Mix of Podman containers and native Nix systemd services.
+  * Each service has a designated primary node.
+  * No active-active HA — instead, rely on simple failover scripts or reboots.
 
-### Cluster Nodes
-- **c1** (192.168.68.71): Master, Volume, Filer, Keepalived (Priority 120)
-- **c2** (192.168.68.72): Master, Volume, Filer, Keepalived (Priority 110)  
-- **c3** (192.168.68.73): Master, Volume, Keepalived (Priority 100)
-- **c4** (192.168.68.74): Volume, Keepalived (Priority 90)
+**Goals for Nix Flake Configuration:**
 
-### Virtual IP
-- **192.168.68.70**: Managed by Keepalived for high availability
+* Declarative configuration for all nodes.
+* Reproducible setup of base services (Podman, logging, SSH, etc.).
+* Scripts or modules for backup/restore of services.
+* Optional: support future integration of Ceph and Keepalived.
 
-### Services
-- **SeaweedFS Masters**: Port 9333 on c1, c2, c3
-- **SeaweedFS Volumes**: Port 8080 on all nodes  
-- **SeaweedFS Filers**: Port 8888 on c1, c2
+**Out of Scope (initially):**
 
-### Storage
-- **System**: Btrfs on /dev/nvme0n1 with subvolumes
-- **Data**: xfs on /dev/nvme1n1 for SeaweedFS volumes
+* Full distributed storage setup (e.g., Ceph/SeaweedFS HA config).
+* Full HA with automatic failover.
+* Kubernetes or similar orchestrators.
 
-## 🔐 Security
+**Future Enhancements (Not immediate):**
 
-- Secrets managed with sops-nix and age encryption
-- SSH key deployment via nixos-anywhere extra-files
-- No passwords - key-based authentication only
-
-## 🎯 Features
-
-### Deployment Tool
-- ✅ Interactive deployment with confirmations
-- ✅ Beautiful terminal output with tables and progress
-- ✅ Comprehensive prerequisite checking
-- ✅ Robust error handling and logging
-- ✅ Parallel deployment support
-- ✅ Colored output and progress indicators
-- ✅ Verbose debugging mode
-
-### Infrastructure
-- ✅ High availability with automatic failover
-- ✅ Distributed storage with SeaweedFS
-- ✅ Declarative configuration with NixOS
-- ✅ Secrets management with sops-nix
-- ✅ Automated deployment with nixos-anywhere
-
-## 📁 Project Structure
-
-```
-.
-├── flake.nix                 # Main flake configuration
-├── .sops.yaml               # SOPS encryption config
-├── deploy.sh                # Legacy bash deployment script
-├── scripts/
-│   └── deploy.py            # Python deployment tool
-├── modules/
-│   └── common.nix           # Shared configuration
-├── hosts/
-│   ├── c1/
-│   │   ├── configuration.nix
-│   │   └── disko.nix
-│   ├── c2/...
-│   ├── c3/...
-│   └── c4/...
-├── secrets/
-│   └── secrets.yaml         # Encrypted secrets
-├── SETUP.md                 # Detailed setup guide
-└── README.md                # This file
-```
-
-## 🔧 Troubleshooting
-
-### Check deployment status
-```bash
-nix run .#deploy -- --check-only
-```
-
-### Verbose logging
-```bash
-nix run .#deploy -- --verbose
-```
-
-### Manual verification
-```bash
-# SSH to nodes
-ssh crussell@192.168.68.71
-
-# Check services
-systemctl status seaweedfs-master
-systemctl status keepalived
-
-# Check SeaweedFS cluster
-curl http://192.168.68.71:9333/cluster/status
-```
+* Declarative Ceph or distributed FS config (opt-in per service).
+* Restore automation via systemd timers or monitoring hooks.
+* Load balancing and failover via Keepalived (eventual)
+* GitOps and Colmena/Deploy-RS pipeline for multi-node updates.
 
 ---
 
