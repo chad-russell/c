@@ -71,15 +71,15 @@
           }];
         };
 
-        fileSystems."/" = {
-          device = "/dev/vda1";
-          fsType = "ext4";
-        };
-        boot.loader.grub.enable = true;
-        boot.loader.grub.devices = [ "/dev/vda" ];
+        # fileSystems."/" = {
+        #   device = "/dev/vda1";
+        #   fsType = "ext4";
+        # };
+        # boot.loader.grub.enable = true;
+        # boot.loader.grub.devices = [ "/dev/vda" ];
 
-        boot.initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
-        boot.initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
+        # boot.initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
+        # boot.initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
 
         services.openssh.enable = true;
 
