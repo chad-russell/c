@@ -26,6 +26,10 @@
         };
 
         services.openssh.enable = true;
+        services.openssh.settings = {
+          PermitRootLogin = "yes";
+          PasswordAuthentication = true;
+        };
 
         services.nginx = {
           enable = true;
@@ -54,7 +58,7 @@
         system.stateVersion = "25.05";
       };
 
-      traefikModule = { pkgs, config, ... }: {
+      makeTraefikModule = { includeBootConfig ? false }: { pkgs, config, lib, ... }: {
         imports = [ sops-nix.nixosModules.sops ];
         
         networking.hostName = "vm-reverse-proxy";
@@ -71,17 +75,24 @@
           }];
         };
 
-        # fileSystems."/" = {
-        #   device = "/dev/vda1";
-        #   fsType = "ext4";
-        # };
-        # boot.loader.grub.enable = true;
-        # boot.loader.grub.devices = [ "/dev/vda" ];
-
-        # boot.initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
-        # boot.initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
+        # Boot and filesystem configuration - only included for nixosSystem builds
+        fileSystems."/" = lib.mkIf includeBootConfig {
+          device = "/dev/vda1";
+          fsType = "ext4";
+        };
+        
+        boot = lib.mkIf includeBootConfig {
+          loader.grub.enable = true;
+          loader.grub.devices = [ "/dev/vda" ];
+          initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
+          initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
+        };
 
         services.openssh.enable = true;
+        services.openssh.settings = {
+          PermitRootLogin = "yes";
+          PasswordAuthentication = true;
+        };
 
         services.resolved.enable = false;
 
@@ -210,7 +221,7 @@
         traefik = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          modules = [ traefikModule ];
+          modules = [ (makeTraefikModule { }) ];
         };
 
         # Helper script for deploying the age key
@@ -238,7 +249,7 @@
 
       nixosConfigurations.traefik = nixpkgs.lib.nixosSystem {
         inherit system;
-        modules = [ traefikModule ];
+        modules = [ (makeTraefikModule { includeBootConfig = true; }) ];
       };
       nixosConfigurations.nginx = nixpkgs.lib.nixosSystem {
         inherit system;

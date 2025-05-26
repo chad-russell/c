@@ -17,7 +17,7 @@ qm set 101 --memory 4096
 qm set 101 --cores 2
 
 # Expand the main disk (if needed)
-qm resize 101 virito0 +50G
+qm resize 101 virtio0 +50G
 ```
 
 ## Key Configuration Details & Troubleshooting Notes
