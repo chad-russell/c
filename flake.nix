@@ -46,6 +46,11 @@
           password = "password";
         };
 
+        environment.systemPackages = [ pkgs.git ];
+        nix.extraOptions = ''
+          experimental-features = nix-command flakes
+        '';
+
         system.stateVersion = "25.05";
       };
 
@@ -125,6 +130,11 @@
         users.users.root = {
           password = "password";
         };
+
+        environment.systemPackages = [ pkgs.git ];
+        nix.extraOptions = ''
+          experimental-features = nix-command flakes
+        '';
 
         system.stateVersion = "25.05";
       };
