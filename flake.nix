@@ -17,13 +17,26 @@
           ({ pkgs, ... }: {
             networking.hostName = "vm-p2-103";
             networking.firewall.allowedTCPPorts = [ 22 80 ];
+            networking.useDHCP = false;
+            networking.defaultGateway = "192.168.68.1";
+            networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+
+            networking.interfaces.ens18 = {
+              ipv4.addresses = [{
+                address = "192.168.68.211";
+                prefixLength = 22;
+              }];
+            };
 
             services.openssh.enable = true;
 
             services.nginx = {
               enable = true;
-              virtualHosts."localhost" = {
+              virtualHosts."default" = {
                 root = "/var/www";
+                listen = [
+                  { addr = "0.0.0.0"; port = 80; }
+                ];
                 default = true;
               };
             };
