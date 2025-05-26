@@ -94,11 +94,13 @@
                 "1.1.1.1"
                 "8.8.8.8"
               ];
+            };
+            filtering = {
+              enabled = true;
               rewrites = [
                 { domain = "test.internal.crussell.io"; answer = "192.168.68.212"; }
               ];
             };
-            filtering.enabled = true;
           };
         };
 
