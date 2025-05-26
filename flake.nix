@@ -51,6 +51,10 @@
           experimental-features = nix-command flakes
         '';
 
+        boot.loader.grub.enable = true;
+        boot.loader.grub.device = "/dev/vda";
+        boot.growPartition = true;
+
         system.stateVersion = "25.05";
       };
 
@@ -136,6 +140,10 @@
           experimental-features = nix-command flakes
         '';
 
+        boot.loader.grub.enable = true;
+        boot.loader.grub.device = "/dev/vda";
+        boot.growPartition = true;
+
         system.stateVersion = "25.05";
       };
 
@@ -144,12 +152,22 @@
         nginx = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
+          formatConfigs.proxmox = {
+            cores = 2;
+            memory = 4096; # 4GB in MiB
+            onboot = true; # Optional: tells Proxmox to start VM on host boot
+          };
           modules = [ nginxModule ];
         };
 
         traefik = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
+          formatConfigs.proxmox = {
+            cores = 2;
+            memory = 4096; # 4GB in MiB
+            onboot = true; # Optional: tells Proxmox to start VM on host boot
+          };
           modules = [ traefikModule ];
         };
       };
