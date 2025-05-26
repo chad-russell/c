@@ -8,6 +8,19 @@ nix build .#proxmoxImage
 qmrestore /var/lib/vz/dump/vzdump-qemu-nixos-*.vma.zst 103 --storage vmstore --force
 ```
 
+## More useful commands:
+```bash
+# Increase RAM to 2048 MB
+qm set 101 --memory 2048
+
+# Set CPU cores
+qm set 101 --cores 2
+
+# Expand the main disk (if needed)
+qm resize 101 scsi0 +8G
+```
+
+
 # 🛠️ Final Master Plan: Task List
 
 ## 🔧 Set Up Public Reverse Proxy (VPS)
