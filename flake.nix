@@ -77,6 +77,8 @@
 
               services.openssh.enable = true;
 
+              services.systemd-resolved.enable = false;
+
               services.adguardhome = {
                 enable = true;
                 settings = {
