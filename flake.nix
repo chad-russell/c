@@ -61,7 +61,7 @@
         modules = [
           ({ pkgs, ... }: {
             networking.hostName = "vm-reverse-proxy";
-            networking.firewall.allowedTCPPorts = [ 80 443 22 3000 ];
+            networking.firewall.allowedTCPPorts = [ 80 443 22 3000 8080 ];
             networking.firewall.allowedUDPPorts = [ 53 ];
             networking.useDHCP = false;
             networking.defaultGateway = "192.168.68.1";
