@@ -150,6 +150,9 @@
         traefik = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
+          diskSize = 51200;        # In MB (50 GiB)
+          memSize = 4096;          # In MB (4 GiB RAM)
+          cores = 2;               # Optional: number of CPU cores
           modules = [ traefikModule ];
         };
       };
