@@ -105,7 +105,10 @@
                     web.address = ":80";
                     websecure.address = ":443";
                   };
-                  api.dashboard = true;
+                  api = {
+                    dashboard = true;
+                    insecure = true;
+                  };
                 };
 
                 dynamicConfigOptions = {
