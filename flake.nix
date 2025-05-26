@@ -152,7 +152,7 @@
         nginx = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          formatConfigs.proxmox = {
+          formatConfig = {
             cores = 2;
             memory = 4096; # 4GB in MiB
             onboot = true; # Optional: tells Proxmox to start VM on host boot
@@ -163,7 +163,7 @@
         traefik = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          formatConfigs.proxmox = {
+          formatConfig = {
             cores = 2;
             memory = 4096; # 4GB in MiB
             onboot = true; # Optional: tells Proxmox to start VM on host boot
