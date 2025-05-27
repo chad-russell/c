@@ -214,11 +214,26 @@
         };
 
         # Configure Traefik with AWS credentials for Route53
-        systemd.services.traefik.environment = {
-          AWS_REGION = "us-east-1";
-          AWS_ACCESS_KEY_ID = "$(cat ${config.sops.secrets.aws-access-key-id.path})";
-          AWS_SECRET_ACCESS_KEY = "$(cat ${config.sops.secrets.aws-secret-access-key.path})";
-          LETSENCRYPT_EMAIL = "$(cat ${config.sops.secrets.letsencrypt-email.path})";
+        systemd.services.traefik = {
+          environment = {
+            AWS_REGION = "us-east-1";
+          };
+          serviceConfig = {
+            ExecStartPre = pkgs.writeShellScript "load-traefik-secrets" ''
+              export AWS_ACCESS_KEY_ID="$(cat ${config.sops.secrets.aws-access-key-id.path})"
+              export AWS_SECRET_ACCESS_KEY="$(cat ${config.sops.secrets.aws-secret-access-key.path})"
+              export LETSENCRYPT_EMAIL="$(cat ${config.sops.secrets.letsencrypt-email.path})"
+              
+              # Write environment file for traefik
+              cat > /run/traefik-env << EOF
+              AWS_REGION=us-east-1
+              AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+              LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL
+              EOF
+            '';
+            EnvironmentFile = "/run/traefik-env";
+          };
         };
 
         systemd.tmpfiles.rules = [
