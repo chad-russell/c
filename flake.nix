@@ -219,19 +219,9 @@
             AWS_REGION = "us-east-1";
           };
           serviceConfig = {
-            ExecStartPre = pkgs.writeShellScript "load-traefik-secrets" ''
-              export AWS_ACCESS_KEY_ID="$(cat ${config.sops.secrets.aws-access-key-id.path})"
-              export AWS_SECRET_ACCESS_KEY="$(cat ${config.sops.secrets.aws-secret-access-key.path})"
-              export LETSENCRYPT_EMAIL="$(cat ${config.sops.secrets.letsencrypt-email.path})"
-              
-              # Write environment file for traefik
-              cat > /run/traefik-env << EOF
-              AWS_REGION=us-east-1
-              AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-              LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL
-              EOF
-            '';
+            ExecStartPre = [
+              "${pkgs.bash}/bin/bash -c 'cat > /run/traefik-env << EOF\nAWS_REGION=us-east-1\nAWS_ACCESS_KEY_ID=$(cat ${config.sops.secrets.aws-access-key-id.path})\nAWS_SECRET_ACCESS_KEY=$(cat ${config.sops.secrets.aws-secret-access-key.path})\nLETSENCRYPT_EMAIL=$(cat ${config.sops.secrets.letsencrypt-email.path})\nEOF'"
+            ];
             EnvironmentFile = "/run/traefik-env";
           };
         };
