@@ -156,7 +156,6 @@
             };
             # Add certificate resolver for Let's Encrypt with Route53
             certificatesResolvers.letsencrypt.acme = {
-              email = builtins.readFile config.sops.secrets.letsencrypt-email.path;
               storage = "/var/lib/traefik/acme.json";
               dnsChallenge = {
                 provider = "route53";
@@ -166,6 +165,8 @@
             };
             log.level = "DEBUG";
           };
+
+          dynamicConfigFile = config.sops.templates."traefik-dynamic.yaml".path;
 
           dynamicConfigOptions = {
             http = {
@@ -231,6 +232,19 @@
             AWS_ACCESS_KEY_ID=${config.sops.placeholder.aws-access-key-id}
             AWS_SECRET_ACCESS_KEY=${config.sops.placeholder.aws-secret-access-key}
             LETSENCRYPT_EMAIL=${config.sops.placeholder.letsencrypt-email}
+            AWS_HOSTED_ZONE_ID=${config.sops.placeholder.aws-hosted-zone-id}
+          '';
+          owner = "root";
+          group = "root";
+          mode = "0444";
+        };
+
+        sops.templates."traefik-dynamic.yaml" = {
+          content = ''
+            certificatesResolvers:
+              letsencrypt:
+                acme:
+                  email: ${config.sops.placeholder.letsencrypt-email}
           '';
           owner = "root";
           group = "root";
@@ -282,6 +296,11 @@
               mode = "0400";
             };
             letsencrypt-email = {
+              owner = "traefik";
+              group = "traefik";
+              mode = "0400";
+            };
+            aws-hosted-zone-id = { # Add if you want to manage via SOPS
               owner = "traefik";
               group = "traefik";
               mode = "0400";
