@@ -155,7 +155,6 @@
               dashboard = true;
               insecure = true;
             };
-            # Add certificate resolver for Let's Encrypt with Route53
             certificatesResolvers.letsencrypt.acme = {
               storage = "/var/lib/traefik/acme.json";
               caServer = "https://acme-staging-v02.api.letsencrypt.org/directory";
@@ -166,9 +165,13 @@
               };
             };
             log.level = "DEBUG";
+            providers.file = {
+              filename = config.sops.templates."traefik-dynamic.yaml".path;
+              watch = true;
+            };
           };
 
-          dynamicConfigFile = config.sops.templates."traefik-dynamic.yaml".path;
+          # dynamicConfigFile = config.sops.templates."traefik-dynamic.yaml".path;
 
           # dynamicConfigOptions = { # THIS WILL BE REMOVED
           # };
