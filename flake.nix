@@ -198,11 +198,6 @@
 
         sops.templates."traefik-dynamic.yaml" = {
           content = ''
-            certificatesResolvers:
-              letsencrypt:
-                acme:
-                  email: ${config.sops.placeholder.letsencrypt-email}
-
             http:
               routers:
                 test:
