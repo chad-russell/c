@@ -160,7 +160,7 @@
               caServer = "https://acme-staging-v02.api.letsencrypt.org/directory";
               dnsChallenge = {
                 provider = "route53";
-                delayBeforeCheck = 60;
+                delayBeforeCheck = 180;
                 resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
               };
             };
