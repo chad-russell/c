@@ -137,7 +137,7 @@
               enabled = true;
               rewrites = [
                 { domain = "*.internal.crussell.io"; answer = "192.168.68.212"; }
-                # { domain = "homeassistant.crussell.io"; answer = "192.168.68.51"; }
+                { domain = "homeassistant.crussell.io"; answer = "192.168.68.51"; }
               ];
             };
           };
