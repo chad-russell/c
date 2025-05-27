@@ -205,47 +205,11 @@
                   service: "test"
                   entryPoints:
                     - "web"
-                homeassistant:
-                  rule: "Host(`homeassistant.crussell.io`)"
-                  service: "homeassistant-svc"
-                  entryPoints:
-                    - "websecure"
-                  tls:
-                    certResolver: "letsencrypt"
-                homeassistant-http-redirect:
-                  rule: "Host(`homeassistant.crussell.io`)"
-                  entryPoints:
-                    - "web"
-                  middlewares:
-                    - "https-redirect"
-                  service: "noop@internal"
-                ssltesthost:
-                  rule: "Host(`ssltest.crussell.io`)"
-                  service: "test"
-                  entryPoints:
-                    - "websecure"
-                  tls:
-                    certResolver: "letsencrypt"
-
-              middlewares:
-                https-redirect:
-                  redirectScheme:
-                    scheme: "https"
-                    permanent: true
-                homeassistant-headers:
-                  headers:
-                    customRequestHeaders:
-                      "X-Forwarded-Proto": "https"
-
               services:
                 test:
                   loadBalancer:
                     servers:
                       - url: "http://192.168.68.211:80"
-                homeassistant-svc:
-                  loadBalancer:
-                    servers:
-                      - url: "http://192.168.68.51:8123"
           '';
           owner = "root";
           group = "traefik";
