@@ -154,10 +154,15 @@
               dashboard = true;
               insecure = true;
             };
-            # Certificate resolver will be configured via file provider
-            providers.file = {
-              filename = "/var/lib/traefik/dynamic-config.yaml";
-              watch = true;
+            # Add certificate resolver for Let's Encrypt with Route53
+            certificatesResolvers.letsencrypt.acme = {
+              email = "$(LETSENCRYPT_EMAIL)";
+              storage = "/var/lib/traefik/acme.json";
+              dnsChallenge = {
+                provider = "route53";
+                delayBeforeCheck = 60;
+                resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
+              };
             };
           };
 
@@ -213,40 +218,7 @@
           AWS_REGION = "us-east-1";
           AWS_ACCESS_KEY_ID = "$(cat ${config.sops.secrets.aws-access-key-id.path})";
           AWS_SECRET_ACCESS_KEY = "$(cat ${config.sops.secrets.aws-secret-access-key.path})";
-        };
-
-        # Service to generate Traefik dynamic configuration with secrets
-        systemd.services.traefik-config-generator = {
-          description = "Generate Traefik dynamic configuration with secrets";
-          wantedBy = [ "traefik.service" ];
-          before = [ "traefik.service" ];
-          serviceConfig = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            User = "traefik";
-            Group = "traefik";
-          };
-          script = ''
-            mkdir -p /var/lib/traefik
-            
-            EMAIL=$(cat ${config.sops.secrets.letsencrypt-email.path})
-            
-            cat > /var/lib/traefik/dynamic-config.yaml << EOF
-            certificatesResolvers:
-              letsencrypt:
-                acme:
-                  email: "$EMAIL"
-                  storage: /var/lib/traefik/acme.json
-                  dnsChallenge:
-                    provider: route53
-                    delayBeforeCheck: 60
-                    resolvers:
-                      - "1.1.1.1:53"
-                      - "8.8.8.8:53"
-            EOF
-            
-            chmod 644 /var/lib/traefik/dynamic-config.yaml
-          '';
+          LETSENCRYPT_EMAIL = "$(cat ${config.sops.secrets.letsencrypt-email.path})";
         };
 
         systemd.tmpfiles.rules = [
