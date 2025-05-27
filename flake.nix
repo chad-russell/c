@@ -156,7 +156,6 @@
             };
             # Add certificate resolver for Let's Encrypt with Route53
             certificatesResolvers.letsencrypt.acme = {
-              email = "$(LETSENCRYPT_EMAIL)";
               storage = "/var/lib/traefik/acme.json";
               dnsChallenge = {
                 provider = "route53";
