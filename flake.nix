@@ -219,11 +219,21 @@
             AWS_REGION = "us-east-1";
           };
           serviceConfig = {
-            ExecStartPre = [
-              "${pkgs.bash}/bin/bash -c 'cat > /run/traefik-env << EOF\nAWS_REGION=us-east-1\nAWS_ACCESS_KEY_ID=$(cat ${config.sops.secrets.aws-access-key-id.path})\nAWS_SECRET_ACCESS_KEY=$(cat ${config.sops.secrets.aws-secret-access-key.path})\nLETSENCRYPT_EMAIL=$(cat ${config.sops.secrets.letsencrypt-email.path})\nEOF'"
-            ];
-            EnvironmentFile = "/run/traefik-env";
+            EnvironmentFile = config.sops.templates."traefik-env".path;
           };
+        };
+
+        # Create template for Traefik environment file
+        sops.templates."traefik-env" = {
+          content = ''
+            AWS_REGION=us-east-1
+            AWS_ACCESS_KEY_ID=${config.sops.placeholder.aws-access-key-id}
+            AWS_SECRET_ACCESS_KEY=${config.sops.placeholder.aws-secret-access-key}
+            LETSENCRYPT_EMAIL=${config.sops.placeholder.letsencrypt-email}
+          '';
+          owner = "traefik";
+          group = "traefik";
+          mode = "0400";
         };
 
         systemd.tmpfiles.rules = [
