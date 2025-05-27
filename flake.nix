@@ -137,7 +137,7 @@
               enabled = true;
               rewrites = [
                 { domain = "*.internal.crussell.io"; answer = "192.168.68.212"; }
-                { domain = "homeassistant.crussell.io"; answer = "192.168.68.51"; }
+                { domain = "homeassistant.crussell.io"; answer = "192.168.68.212"; }
                 { domain = "ssltest.crussell.io"; answer = "192.168.68.212"; }
               ];
             };
@@ -214,19 +214,18 @@
                     - "web"
                 homeassistant:
                   rule: "Host(`homeassistant.crussell.io`)"
-                  service: "homeassistant"
+                  service: "homeassistant-svc"
                   entryPoints:
-                    - "web"
                     - "websecure"
                   tls:
                     certResolver: "letsencrypt"
-                homeassistant-redirect:
+                homeassistant-http-redirect:
                   rule: "Host(`homeassistant.crussell.io`)"
                   entryPoints:
                     - "web"
                   middlewares:
                     - "https-redirect"
-                  service: "homeassistant"
+                  service: "noop@internal"
                 ssltesthost:
                   rule: "Host(`ssltest.crussell.io`)"
                   service: "test"
@@ -244,14 +243,13 @@
                   headers:
                     customRequestHeaders:
                       "X-Forwarded-Proto": "https"
-                      "X-Forwarded-For": "{http.request.header.x-forwarded-for}"
 
               services:
                 test:
                   loadBalancer:
                     servers:
                       - url: "http://192.168.68.211:80"
-                homeassistant:
+                homeassistant-svc:
                   loadBalancer:
                     servers:
                       - url: "http://192.168.68.51:8123"
