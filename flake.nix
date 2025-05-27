@@ -180,7 +180,6 @@
                   rule = "Host(`homeassistant.crussell.io`)";
                   service = "homeassistant";
                   entryPoints = [ "web" "websecure" ];
-                  # Uncomment the next line if you want automatic HTTPS with Let's Encrypt
                   tls.certResolver = "letsencrypt";
                 };
                 # Add HTTP to HTTPS redirect for Home Assistant
@@ -189,6 +188,12 @@
                   entryPoints = [ "web" ];
                   middlewares = [ "https-redirect" ];
                   service = "homeassistant";
+                };
+                ssltesthost = {
+                  rule = "Host(`ssltest.crussell.io`)";
+                  service = "test";
+                  entryPoints = [ "websecure" ];
+                  tls.certResolver = "letsencrypt";
                 };
               };
               middlewares = {
