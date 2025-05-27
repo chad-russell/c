@@ -170,12 +170,6 @@
               watch = true;
             };
           };
-
-          # dynamicConfigFile = config.sops.templates."traefik-dynamic.yaml".path;
-
-          # dynamicConfigOptions = { # THIS WILL BE REMOVED
-          # };
-
         };
 
         # Configure Traefik with AWS credentials for Route53
