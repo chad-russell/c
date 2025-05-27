@@ -168,56 +168,9 @@
 
           dynamicConfigFile = config.sops.templates."traefik-dynamic.yaml".path;
 
-          dynamicConfigOptions = {
-            http = {
-              routers = {
-                test = {
-                  rule = "Host(`test.internal.crussell.io`)";
-                  service = "test";
-                  entryPoints = [ "web" ];
-                };
-                homeassistant = {
-                  rule = "Host(`homeassistant.crussell.io`)";
-                  service = "homeassistant";
-                  entryPoints = [ "web" "websecure" ];
-                  tls.certResolver = "letsencrypt";
-                };
-                # Add HTTP to HTTPS redirect for Home Assistant
-                homeassistant-redirect = {
-                  rule = "Host(`homeassistant.crussell.io`)";
-                  entryPoints = [ "web" ];
-                  middlewares = [ "https-redirect" ];
-                  service = "homeassistant";
-                };
-                ssltesthost = {
-                  rule = "Host(`ssltest.crussell.io`)";
-                  service = "test";
-                  entryPoints = [ "websecure" ];
-                  tls.certResolver = "letsencrypt";
-                };
-              };
-              middlewares = {
-                https-redirect.redirectScheme = {
-                  scheme = "https";
-                  permanent = true;
-                };
-                homeassistant-headers.headers = {
-                  customRequestHeaders = {
-                    "X-Forwarded-Proto" = "https";
-                    "X-Forwarded-For" = "{http.request.header.x-forwarded-for}";
-                  };
-                };
-              };
-              services = {
-                test.loadBalancer.servers = [
-                  { url = "http://192.168.68.211:80"; }
-                ];
-                homeassistant.loadBalancer.servers = [
-                  { url = "http://192.168.68.51:8123"; }
-                ];
-              };
-            };
-          };
+          # dynamicConfigOptions = { # THIS WILL BE REMOVED
+          # };
+
         };
 
         # Configure Traefik with AWS credentials for Route53
@@ -250,6 +203,57 @@
               letsencrypt:
                 acme:
                   email: ${config.sops.placeholder.letsencrypt-email}
+
+            http:
+              routers:
+                test:
+                  rule: "Host(`test.internal.crussell.io`)"
+                  service: "test"
+                  entryPoints:
+                    - "web"
+                homeassistant:
+                  rule: "Host(`homeassistant.crussell.io`)"
+                  service: "homeassistant"
+                  entryPoints:
+                    - "web"
+                    - "websecure"
+                  tls:
+                    certResolver: "letsencrypt"
+                homeassistant-redirect:
+                  rule: "Host(`homeassistant.crussell.io`)"
+                  entryPoints:
+                    - "web"
+                  middlewares:
+                    - "https-redirect"
+                  service: "homeassistant"
+                ssltesthost:
+                  rule: "Host(`ssltest.crussell.io`)"
+                  service: "test"
+                  entryPoints:
+                    - "websecure"
+                  tls:
+                    certResolver: "letsencrypt"
+
+              middlewares:
+                https-redirect:
+                  redirectScheme:
+                    scheme: "https"
+                    permanent: true
+                homeassistant-headers:
+                  headers:
+                    customRequestHeaders:
+                      "X-Forwarded-Proto": "https"
+                      "X-Forwarded-For": "{http.request.header.x-forwarded-for}"
+
+              services:
+                test:
+                  loadBalancer:
+                    servers:
+                      - url: "http://192.168.68.211:80"
+                homeassistant:
+                  loadBalancer:
+                    servers:
+                      - url: "http://192.168.68.51:8123"
           '';
           owner = "root";
           group = "root";
@@ -259,6 +263,7 @@
         systemd.tmpfiles.rules = [
           "d /var/lib/traefik 0755 traefik traefik -"
           "f /var/lib/traefik/acme.json 0600 traefik traefik -"
+          # "f /var/lib/traefik/dynamic-config.yaml 0600 traefik traefik -" # We use sops-nix for this now
           "d /etc/sops 0755 root root -"
           "d /etc/sops/age 0755 root root -"
         ];
