@@ -137,7 +137,7 @@
               enabled = true;
               rewrites = [
                 { domain = "*.internal.crussell.io"; answer = "192.168.68.212"; }
-                { domain = "homeassistant.crussell.io"; answer = "192.168.68.51"; }
+                # { domain = "homeassistant.crussell.io"; answer = "192.168.68.51"; }
               ];
             };
           };
@@ -154,6 +154,12 @@
               dashboard = true;
               insecure = true;
             };
+            # # Add certificate resolver for Let's Encrypt (optional)
+            # certificatesResolvers.letsencrypt.acme = {
+            #   email = "your-email@example.com";  # Replace with your email
+            #   storage = "/var/lib/traefik/acme.json";
+            #   httpChallenge.entryPoint = "web";
+            # };
           };
 
           dynamicConfigOptions = {
@@ -167,7 +173,28 @@
                 homeassistant = {
                   rule = "Host(`homeassistant.crussell.io`)";
                   service = "homeassistant";
+                  entryPoints = [ "web" "websecure" ];
+                  # Uncomment the next line if you want automatic HTTPS with Let's Encrypt
+                  # tls.certResolver = "letsencrypt";
+                };
+                # Add HTTP to HTTPS redirect for Home Assistant
+                homeassistant-redirect = {
+                  rule = "Host(`homeassistant.crussell.io`)";
                   entryPoints = [ "web" ];
+                  middlewares = [ "https-redirect" ];
+                  service = "homeassistant";
+                };
+              };
+              middlewares = {
+                https-redirect.redirectScheme = {
+                  scheme = "https";
+                  permanent = true;
+                };
+                homeassistant-headers.headers = {
+                  customRequestHeaders = {
+                    "X-Forwarded-Proto" = "https";
+                    "X-Forwarded-For" = "{http.request.header.x-forwarded-for}";
+                  };
                 };
               };
               services = {
@@ -184,6 +211,7 @@
 
         systemd.tmpfiles.rules = [
           "d /var/lib/traefik 0755 traefik traefik -"
+          "f /var/lib/traefik/acme.json 0600 traefik traefik -"
           "d /etc/sops 0755 root root -"
           "d /etc/sops/age 0755 root root -"
         ];
