@@ -86,6 +86,10 @@
           loader.grub.devices = [ "/dev/vda" ];
           initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
           initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
+          kernel.sysctl = {
+            "net.ipv6.conf.all.disable_ipv6" = "1";
+            "net.ipv6.conf.default.disable_ipv6" = "1";
+          };
         };
 
         services.openssh.enable = true;
