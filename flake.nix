@@ -58,10 +58,10 @@
         system.stateVersion = "25.05";
       };
 
-      makeTraefikModule = { includeBootConfig ? false }: { pkgs, config, lib, ... }: {
+      makeGatewayModule = { includeBootConfig ? false }: { pkgs, config, lib, ... }: {
         imports = [ sops-nix.nixosModules.sops ];
         
-        networking.hostName = "vm-reverse-proxy";
+        networking.hostName = "vm-gateway";
         networking.firewall.allowedTCPPorts = [ 80 443 22 3000 8080 ];
         networking.firewall.allowedUDPPorts = [ 53 ];
         networking.useDHCP = false;
@@ -218,10 +218,10 @@
           modules = [ nginxModule ];
         };
 
-        traefik = nixos-generators.nixosGenerate {
+        gateway = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          modules = [ (makeTraefikModule { }) ];
+          modules = [ (makeGatewayModule { }) ];
         };
 
         # Helper script for deploying the age key
@@ -247,10 +247,11 @@
         '';
       };
 
-      nixosConfigurations.traefik = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.gateway = nixpkgs.lib.nixosSystem {
         inherit system;
-        modules = [ (makeTraefikModule { includeBootConfig = true; }) ];
+        modules = [ (makeGatewayModule { includeBootConfig = true; }) ];
       };
+
       nixosConfigurations.nginx = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [ nginxModule ];
