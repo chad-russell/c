@@ -256,8 +256,8 @@
                       - url: "http://192.168.68.51:8123"
           '';
           owner = "root";
-          group = "root";
-          mode = "0444";
+          group = "traefik";
+          mode = "0440";
         };
 
         systemd.tmpfiles.rules = [
