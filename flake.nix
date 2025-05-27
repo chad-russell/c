@@ -165,9 +165,46 @@
               };
             };
             log.level = "DEBUG";
-            providers.file = {
-              filename = config.sops.templates."traefik-dynamic.yaml".path;
-              watch = true;
+          };
+          dynamicConfigOptions = {
+            http = {
+              routers = {
+                test = {
+                  rule = "Host(`test.internal.crussell.io`)";
+                  service = "test";
+                  entryPoints = [ "web" ];
+                };
+                homeassistant = {
+                  rule = "Host(`homeassistant.crussell.io`)";
+                  service = "homeassistant-svc";
+                  entryPoints = [ "websecure" ];
+                  tls.certResolver = "letsencrypt";
+                };
+                homeassistant-http-redirect = {
+                  rule = "Host(`homeassistant.crussell.io`)";
+                  entryPoints = [ "web" ];
+                  middlewares = [ "https-redirect" ];
+                  service = "noop@internal";
+                };
+                ssltesthost = {
+                  rule = "Host(`ssltest.crussell.io`)";
+                  service = "test";
+                  entryPoints = [ "websecure" ];
+                  tls.certResolver = "letsencrypt";
+                };
+              };
+              middlewares = {
+                https-redirect = {
+                  redirectScheme = {
+                    scheme = "https";
+                    permanent = true;
+                  };
+                };
+              };
+              services = {
+                test.loadBalancer.servers = [{ url = "http://192.168.68.211:80"; }];
+                homeassistant-svc.loadBalancer.servers = [{ url = "http://192.168.68.51:8123"; }];
+              };
             };
           };
         };
@@ -194,26 +231,6 @@
           owner = "root";
           group = "root";
           mode = "0444";
-        };
-
-        sops.templates."traefik-dynamic.yaml" = {
-          content = ''
-            http:
-              routers:
-                test:
-                  rule: "Host(`test.internal.crussell.io`)"
-                  service: "test"
-                  entryPoints:
-                    - "web"
-              services:
-                test:
-                  loadBalancer:
-                    servers:
-                      - url: "http://192.168.68.211:80"
-          '';
-          owner = "root";
-          group = "traefik";
-          mode = "0440";
         };
 
         systemd.tmpfiles.rules = [
