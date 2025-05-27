@@ -154,12 +154,11 @@
               dashboard = true;
               insecure = true;
             };
-            # # Add certificate resolver for Let's Encrypt (optional)
-            # certificatesResolvers.letsencrypt.acme = {
-            #   email = "your-email@example.com";  # Replace with your email
-            #   storage = "/var/lib/traefik/acme.json";
-            #   httpChallenge.entryPoint = "web";
-            # };
+            # Certificate resolver will be configured via file provider
+            providers.file = {
+              filename = "/var/lib/traefik/dynamic-config.yaml";
+              watch = true;
+            };
           };
 
           dynamicConfigOptions = {
@@ -175,7 +174,7 @@
                   service = "homeassistant";
                   entryPoints = [ "web" "websecure" ];
                   # Uncomment the next line if you want automatic HTTPS with Let's Encrypt
-                  # tls.certResolver = "letsencrypt";
+                  tls.certResolver = "letsencrypt";
                 };
                 # Add HTTP to HTTPS redirect for Home Assistant
                 homeassistant-redirect = {
@@ -207,6 +206,47 @@
               };
             };
           };
+        };
+
+        # Configure Traefik with AWS credentials for Route53
+        systemd.services.traefik.environment = {
+          AWS_REGION = "us-east-1";
+          AWS_ACCESS_KEY_ID = "$(cat ${config.sops.secrets.aws-access-key-id.path})";
+          AWS_SECRET_ACCESS_KEY = "$(cat ${config.sops.secrets.aws-secret-access-key.path})";
+        };
+
+        # Service to generate Traefik dynamic configuration with secrets
+        systemd.services.traefik-config-generator = {
+          description = "Generate Traefik dynamic configuration with secrets";
+          wantedBy = [ "traefik.service" ];
+          before = [ "traefik.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            User = "traefik";
+            Group = "traefik";
+          };
+          script = ''
+            mkdir -p /var/lib/traefik
+            
+            EMAIL=$(cat ${config.sops.secrets.letsencrypt-email.path})
+            
+            cat > /var/lib/traefik/dynamic-config.yaml << EOF
+            certificatesResolvers:
+              letsencrypt:
+                acme:
+                  email: "$EMAIL"
+                  storage: /var/lib/traefik/acme.json
+                  dnsChallenge:
+                    provider: route53
+                    delayBeforeCheck: 60
+                    resolvers:
+                      - "1.1.1.1:53"
+                      - "8.8.8.8:53"
+            EOF
+            
+            chmod 644 /var/lib/traefik/dynamic-config.yaml
+          '';
         };
 
         systemd.tmpfiles.rules = [
@@ -241,6 +281,21 @@
             tailscale-oauth-client-secret = {
               owner = "root";
               group = "root";
+              mode = "0400";
+            };
+            aws-access-key-id = {
+              owner = "traefik";
+              group = "traefik";
+              mode = "0400";
+            };
+            aws-secret-access-key = {
+              owner = "traefik";
+              group = "traefik";
+              mode = "0400";
+            };
+            letsencrypt-email = {
+              owner = "traefik";
+              group = "traefik";
               mode = "0400";
             };
           };
