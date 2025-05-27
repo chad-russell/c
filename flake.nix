@@ -230,9 +230,9 @@
             AWS_SECRET_ACCESS_KEY=${config.sops.placeholder.aws-secret-access-key}
             LETSENCRYPT_EMAIL=${config.sops.placeholder.letsencrypt-email}
           '';
-          owner = "traefik";
-          group = "traefik";
-          mode = "0400";
+          owner = "root";
+          group = "root";
+          mode = "0444";
         };
 
         systemd.tmpfiles.rules = [
