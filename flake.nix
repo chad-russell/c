@@ -137,6 +137,7 @@
               enabled = true;
               rewrites = [
                 { domain = "*.internal.crussell.io"; answer = "192.168.68.212"; }
+                { domain = "homeassistant.crussell.io"; answer = "192.168.68.51"; }
               ];
             };
           };
@@ -163,10 +164,18 @@
                   service = "test";
                   entryPoints = [ "web" ];
                 };
+                homeassistant = {
+                  rule = "Host(`homeassistant.crussell.io`)";
+                  service = "homeassistant";
+                  entryPoints = [ "web" ];
+                };
               };
               services = {
                 test.loadBalancer.servers = [
                   { url = "http://192.168.68.211:80"; }
+                ];
+                homeassistant.loadBalancer.servers = [
+                  { url = "http://192.168.68.51:8123"; }
                 ];
               };
             };
