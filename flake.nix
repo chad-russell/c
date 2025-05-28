@@ -362,6 +362,7 @@
           echo "Deployment complete! You can now SSH to your server:"
           echo "ssh admin@$SERVER_IP"
         '';
+      };
 
       nixosConfigurations = {
         hetzner-cloud = nixpkgs.lib.nixosSystem {
