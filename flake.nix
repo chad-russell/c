@@ -5,9 +5,11 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixos-generators.url = "github:nix-community/nixos-generators";
     sops-nix.url = "github:Mic92/sops-nix";
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixos-generators, sops-nix, ... }:
+  outputs = { self, nixpkgs, nixos-generators, sops-nix, disko, ... }:
     let
       system = "x86_64-linux";
 
@@ -331,16 +333,54 @@
           echo "Testing secrets access..."
           ssh "root@$VM_IP" "tailscale-api-test"
         '';
-      };
 
-      nixosConfigurations.gateway = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [ (makeGatewayModule { includeBootConfig = true; }) ];
-      };
+        # nixos-anywhere deployment script for Hetzner
+        deploy-hetzner = nixpkgs.legacyPackages.${system}.writeShellScriptBin "deploy-hetzner" ''
+          #!/bin/bash
+          set -e
+          
+          if [ $# -ne 1 ]; then
+            echo "Usage: $0 <server-ip>"
+            echo "Example: $0 1.2.3.4"
+            exit 1
+          fi
+          
+          SERVER_IP="$1"
+          
+          echo "Deploying NixOS to Hetzner server at $SERVER_IP..."
+          echo "Make sure you have added your SSH key to configuration.nix!"
+          
+          # Install nixos-anywhere if not available
+          if ! command -v nixos-anywhere &> /dev/null; then
+            echo "Installing nixos-anywhere..."
+            nix profile install github:nix-community/nixos-anywhere
+          fi
+          
+          # Deploy using nixos-anywhere
+          nixos-anywhere --flake .#hetzner-cloud root@$SERVER_IP
+          
+          echo "Deployment complete! You can now SSH to your server:"
+          echo "ssh admin@$SERVER_IP"
+        '';
 
-      nixosConfigurations.nginx = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [ nginxModule ];
+      nixosConfigurations = {
+        hetzner-cloud = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            disko.nixosModules.disko
+            ./hetzner
+          ];
+        };
+
+        gateway = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ (makeGatewayModule { includeBootConfig = true; }) ];
+        };
+
+        nginx = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ nginxModule ];
+        };
       };
     };
 }
