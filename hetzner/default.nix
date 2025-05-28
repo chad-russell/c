@@ -44,12 +44,6 @@
     tailscale
   ];
 
-  # This is for the installer, will be overridden
-  users.users.root.openssh.authorizedKeys.keys = [
-    # Add your SSH public key here
-    # "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-key-here"
-  ];
-
   # Hetzner-specific disk configuration
   disko.devices = {
     disk = {
