@@ -1,14 +1,19 @@
-# Base configuration for Hetzner deployment
+# User and application configuration
 { config, lib, pkgs, ... }:
 
 {
-  # Additional system packages beyond the basic ones in default.nix
+  # User-level system packages
   environment.systemPackages = with pkgs; [
+    # System utilities
     wget
     rsync
+    htop
+    
+    # Tailscale CLI (service enabled below)
+    tailscale
   ];
 
-  # Enhanced nix settings
+  # Enhanced nix settings (performance and maintenance)
   nix.settings = {
     auto-optimise-store = true;
   };
@@ -20,20 +25,18 @@
     options = "--delete-older-than 30d";
   };
 
-  # Security
+  # Security and user management
   security.sudo.wheelNeedsPassword = false;
 
-  # Add your SSH key here (required for nixos-anywhere)
-  users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsHOYNAog8L5SAhKp551g4oJFSi/GB+Fg38mmBLhwbrCUSfVSFqKeaOuRlLCQVnTWPZYfyp6cTibHBeigky6fjKhQgKnUJgwPdHjxhSvk7m6zgGj71s45bFT918E1J8hysN2wrijoo6oJ1zSeX3FIWOcFZVR4MHxCdYCMr+4mJp8tb1oQRea6GxCFGCms7DoNii+gWL/K2KZTMHKZ6l9Nf5CXq/6+a9Pfog3XuRlpTxLlIVj8YMC8TeRki0m9mG4+gk4OtCzACL/ngY0OxRWN4IN0NhFZOO5FHwytMR9/yNiAzafzaIt2szd69nmPG3DrXSUN1nXZKR78kM5O1kIaEKNeWJjhTXuDF7DtMF61TlXDWmsFxQbF9TAWK7nXJMUzAgXY1vIkTiYV3uwBB9upyKmXD/M5U1cFDvY6sSnINHxaqXp7/IoEHsXzHKmR5yhGLVszMzMlINBTxrWEYbjzNJPEvWeLCt3EbU4LPVffc8MA+l9zujSDjMO78uC7k/Ek= chadrussell@Chads-MacBook-Pro.local"
-  ];
+  # Enable Tailscale VPN
+  services.tailscale.enable = true;
 
-  # Create a regular user (recommended)
+  # Create a regular user (recommended for daily use)
   users.users.admin = {
     isNormalUser = true;
     extraGroups = [ "wheel" "sudo" ];
     openssh.authorizedKeys.keys = [
-      # Same SSH key as root
+      # SSH key for admin user
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsHOYNAog8L5SAhKp551g4oJFSi/GB+Fg38mmBLhwbrCUSfVSFqKeaOuRlLCQVnTWPZYfyp6cTibHBeigky6fjKhQgKnUJgwPdHjxhSvk7m6zgGj71s45bFT918E1J8hysN2wrijoo6oJ1zSeX3FIWOcFZVR4MHxCdYCMr+4mJp8tb1oQRea6GxCFGCms7DoNii+gWL/K2KZTMHKZ6l9Nf5CXq/6+a9Pfog3XuRlpTxLlIVj8YMC8TeRki0m9mG4+gk4OtCzACL/ngY0OxRWN4IN0NhFZOO5FHwytMR9/yNiAzafzaIt2szd69nmPG3DrXSUN1nXZKR78kM5O1kIaEKNeWJjhTXuDF7DtMF61TlXDWmsFxQbF9TAWK7nXJMUzAgXY1vIkTiYV3uwBB9upyKmXD/M5U1cFDvY6sSnINHxaqXp7/IoEHsXzHKmR5yhGLVszMzMlINBTxrWEYbjzNJPEvWeLCt3EbU4LPVffc8MA+l9zujSDjMO78uC7k/Ek= chadrussell@Chads-MacBook-Pro.local"
     ];
   };

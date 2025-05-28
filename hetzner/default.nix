@@ -10,7 +10,7 @@
   networking.useDHCP = false;
   networking.interfaces.enp1s0.useDHCP = true;
 
-  # Enable SSH for remote access
+  # Enable SSH for remote access (critical for deployment)
   services.openssh = {
     enable = true;
     settings = {
@@ -20,28 +20,28 @@
     };
   };
 
-  # Basic security
+  # Basic security (deployment-critical)
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [ 22 80 443 ];
   };
 
-  # Enable Tailscale by default
-  services.tailscale.enable = true;
+  # Root SSH key (required for nixos-anywhere deployment)
+  users.users.root.openssh.authorizedKeys.keys = [
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsHOYNAog8L5SAhKp551g4oJFSi/GB+Fg38mmBLhwbrCUSfVSFqKeaOuRlLCQVnTWPZYfyp6cTibHBeigky6fjKhQgKnUJgwPdHjxhSvk7m6zgGj71s45bFT918E1J8hysN2wrijoo6oJ1zSeX3FIWOcFZVR4MHxCdYCMr+4mJp8tb1oQRea6GxCFGCms7DoNii+gWL/K2KZTMHKZ6l9Nf5CXq/6+a9Pfog3XuRlpTxLlIVj8YMC8TeRki0m9mG4+gk4OtCzACL/ngY0OxRWN4IN0NhFZOO5FHwytMR9/yNiAzafzaIt2szd69nmPG3DrXSUN1nXZKR78kM5O1kIaEKNeWJjhTXuDF7DtMF61TlXDWmsFxQbF9TAWK7nXJMUzAgXY1vIkTiYV3uwBB9upyKmXD/M5U1cFDvY6sSnINHxaqXp7/IoEHsXzHKmR5yhGLVszMzMlINBTxrWEYbjzNJPEvWeLCt3EbU4LPVffc8MA+l9zujSDjMO78uC7k/Ek= chadrussell@Chads-MacBook-Pro.local"
+  ];
 
-  # Enable nix flakes
+  # Enable nix flakes (deployment requirement)
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Set timezone (adjust as needed)
+  # Set timezone
   time.timeZone = "UTC";
 
-  # Basic packages
+  # Basic deployment packages (minimal set needed for deployment/management)
   environment.systemPackages = with pkgs; [
     git
     curl
-    htop
     vim
-    tailscale
   ];
 
   # Hetzner-specific disk configuration
