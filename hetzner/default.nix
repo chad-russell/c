@@ -71,10 +71,10 @@
     };
   };
 
-  # Boot configuration
+  # Boot configuration (let disko handle the device assignment)
   boot.loader.grub = {
     enable = true;
-    device = "/dev/sda";
+    # Don't specify device here - let disko handle it
   };
 
   system.stateVersion = "25.05";
