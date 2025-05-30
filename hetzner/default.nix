@@ -44,7 +44,7 @@
     vim
   ];
 
-  # Hetzner-specific disk configuration
+  # Fixed Hetzner-specific disk configuration
   disko.devices = {
     disk = {
       main = {
@@ -54,8 +54,9 @@
           type = "gpt";
           partitions = {
             boot = {
-              size = "1M";
+              size = "2M";
               type = "EF02"; # for grub MBR
+              priority = 1;
             };
             root = {
               size = "100%";
@@ -63,6 +64,7 @@
                 type = "filesystem";
                 format = "ext4";
                 mountpoint = "/";
+                extraArgs = [ "-L" "nixos" ];
               };
             };
           };
@@ -71,10 +73,10 @@
     };
   };
 
-  # Boot configuration (let disko handle the device assignment)
+  # Boot configuration - use device path directly
   boot.loader.grub = {
     enable = true;
-    # Don't specify device here - let disko handle it
+    device = "/dev/sda";
   };
 
   system.stateVersion = "25.05";
