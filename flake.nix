@@ -13,7 +13,7 @@
     let
       system = "x86_64-linux";
 
-      makeNginxModule = { includeBootConfig ? false }: { pkgs, ... }: {
+      makeNginxModule = { includeBootConfig ? false }: { pkgs, lib, ... }: {
         networking.hostName = "vm-test";
         networking.firewall.allowedTCPPorts = [ 22 80 ];
         networking.useDHCP = false;
@@ -23,7 +23,7 @@
         networking.interfaces.ens18 = {
           ipv4.addresses = [{
             address = "192.168.1.202";
-            prefixLength = 22;
+            prefixLength = 24;
           }];
         };
 
@@ -90,7 +90,7 @@
         networking.interfaces.ens18 = {
           ipv4.addresses = [{
             address = "192.168.1.201";
-            prefixLength = 22;
+            prefixLength = 24;
           }];
         };
 
