@@ -13,7 +13,7 @@
     let
       system = "x86_64-linux";
 
-      nginxModule = { pkgs, ... }: {
+      makeNginxModule = { includeBootConfig ? false }: { pkgs, ... }: {
         networking.hostName = "vm-test";
         networking.firewall.allowedTCPPorts = [ 22 80 ];
         networking.useDHCP = false;
@@ -25,6 +25,23 @@
             address = "192.168.1.202";
             prefixLength = 22;
           }];
+        };
+
+        # Boot and filesystem configuration - only included for nixosSystem builds
+        fileSystems."/" = lib.mkIf includeBootConfig {
+          device = "/dev/vda1";
+          fsType = "ext4";
+        };
+
+        boot = lib.mkIf includeBootConfig {
+          loader.grub.enable = true;
+          loader.grub.devices = [ "/dev/vda" ];
+          initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
+          initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
+          kernel.sysctl = {
+            "net.ipv6.conf.all.disable_ipv6" = "1";
+            "net.ipv6.conf.default.disable_ipv6" = "1";
+          };
         };
 
         services.openssh.enable = true;
@@ -303,7 +320,7 @@
         nginx = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          modules = [ nginxModule ];
+          modules = [ (makeNginxModule { }) ];
         };
 
         gateway = nixos-generators.nixosGenerate {
@@ -380,7 +397,7 @@
 
         nginx = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ nginxModule ];
+          modules = [ (makeNginxModule { includeBootConfig = true; }) ];
         };
       };
     };
