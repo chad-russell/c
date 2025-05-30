@@ -17,12 +17,12 @@
         networking.hostName = "vm-test";
         networking.firewall.allowedTCPPorts = [ 22 80 ];
         networking.useDHCP = false;
-        networking.defaultGateway = "192.168.68.1";
+        networking.defaultGateway = "192.168.1.1";
         networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
         networking.interfaces.ens18 = {
           ipv4.addresses = [{
-            address = "192.168.68.211";
+            address = "192.168.1.202";
             prefixLength = 22;
           }];
         };
@@ -67,12 +67,12 @@
         networking.firewall.allowedTCPPorts = [ 80 443 22 3000 8080 ];
         networking.firewall.allowedUDPPorts = [ 53 ];
         networking.useDHCP = false;
-        networking.defaultGateway = "192.168.68.1";
+        networking.defaultGateway = "192.168.1.1";
         networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
         networking.interfaces.ens18 = {
           ipv4.addresses = [{
-            address = "192.168.68.212";
+            address = "192.168.1.201";
             prefixLength = 22;
           }];
         };
@@ -142,9 +142,9 @@
             filtering = {
               enabled = true;
               rewrites = [
-                { domain = "*.internal.crussell.io"; answer = "192.168.68.212"; }
-                { domain = "homeassistant.crussell.io"; answer = "192.168.68.212"; }
-                { domain = "ssltest.crussell.io"; answer = "192.168.68.212"; }
+                { domain = "*.internal.crussell.io"; answer = "192.168.1.201"; }
+                { domain = "homeassistant.crussell.io"; answer = "192.168.1.201"; }
+                { domain = "ssltest.crussell.io"; answer = "192.168.1.201"; }
               ];
             };
           };
@@ -208,8 +208,8 @@
                 };
               };
               services = {
-                test.loadBalancer.servers = [{ url = "http://192.168.68.211:80"; }];
-                homeassistant-svc.loadBalancer.servers = [{ url = "http://192.168.68.51:8123"; }];
+                test.loadBalancer.servers = [{ url = "http://192.168.1.202:80"; }];
+                homeassistant-svc.loadBalancer.servers = [{ url = "http://192.168.1.51:8123"; }];
               };
             };
           };
@@ -317,7 +317,7 @@
           #!/bin/bash
           set -e
           
-          VM_IP="192.168.68.212"
+          VM_IP="192.168.1.2XX"
           KEY_FILE="age-key.txt"
           
           if [ ! -f "$KEY_FILE" ]; then
