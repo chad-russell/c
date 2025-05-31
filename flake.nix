@@ -61,6 +61,11 @@
           };
         };
 
+        environment.systemPackages = [
+          pkgs.git 
+          pkgs.curl
+        ];
+
         systemd.tmpfiles.rules = [
           "d /var/www 0755 root root -"
           "f /var/www/index.html 0644 root root - <h1>Hello from NixOS + nginx!</h1>"
@@ -110,11 +115,6 @@
             "net.ipv6.conf.default.disable_ipv6" = "1";
           };
         };
-
-        environment.systemPackages = [
-          pkgs.git 
-          pkgs.curl
-        ];
 
         services.openssh.enable = true;
         services.openssh.settings = {
