@@ -111,6 +111,11 @@
           };
         };
 
+        environment.systemPackages = [
+          pkgs.git 
+          pkgs.curl
+        ];
+
         services.openssh.enable = true;
         services.openssh.settings = {
           PermitRootLogin = "yes";
@@ -123,7 +128,7 @@
         services.tailscale.enable = true;
 
         # Example script that uses the OAuth credentials
-        environment.systemPackages = [ 
+        environment.systemPackages = [
           pkgs.git 
           pkgs.tailscale
           pkgs.curl
