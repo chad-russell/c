@@ -261,7 +261,7 @@
                 http.tls = {
                   certResolver = "letsencrypt";
                   domains = [
-                    { main = "crussell.io"; sans = ["*.crussell.io"]; },
+                    { main = "crussell.io"; sans = ["*.crussell.io"]; }
                     { main = "internal.crussell.io"; sans = ["*.internal.crussell.io"]; }
                   ];
                 };
