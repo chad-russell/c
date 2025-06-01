@@ -240,12 +240,36 @@
           enable = true;
           staticConfigOptions = {
             entryPoints = {
-              web.address = ":80";
-              websecure.address = ":443";
+              web = {
+                address = ":80";
+                proxyProtocol = {
+                  trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
+                };
+                http.redirections = {
+                  entryPoint = {
+                    to = "websecure";
+                    scheme = "https";
+                    permanent = true;
+                  };
+                };
+              };
+              websecure = {
+                address = ":443";
+                proxyProtocol = {
+                  trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
+                };
+                http.tls = {
+                  certResolver = "letsencrypt";
+                  domains = [
+                    { main = "crussell.io"; sans = ["*.crussell.io"]; },
+                    { main = "internal.crussell.io"; sans = ["*.internal.crussell.io"]; }
+                  ];
+                };
+              };
             };
             api = {
               dashboard = true;
-              insecure = true;
+              insecure = true; # TODO(chad): Consider securing this, e.g., behind auth or specific hostname
             };
             certificatesResolvers.letsencrypt.acme = {
               storage = "/var/lib/traefik/acme.json";
@@ -261,54 +285,41 @@
           dynamicConfigOptions = {
             http = {
               routers = {
-                test = {
+                "test-internal" = {
                   rule = "Host(`test.internal.crussell.io`)";
-                  service = "test";
-                  entryPoints = [ "web" ];
-                };
-                mealie = {
-                  rule = "Host(`mealie.internal.crussell.io`)";
-                  service = "mealie-svc";
+                  service = "test-svc";
                   entryPoints = [ "websecure" ];
-                  tls.certResolver = "letsencrypt";
                 };
-                mealie-http-redirect = {
-                  rule = "Host(`mealie.internal.crussell.io`)";
-                  entryPoints = [ "web" ];
-                  middlewares = [ "https-redirect" ];
-                  service = "noop@internal";
-                };
-                homeassistant = {
-                  rule = "Host(`homeassistant.crussell.io`)";
+
+                "homeassistant-public" = {
+                  rule = "Host(`homeassistant.crussell.io`) || Host(`hetzner-homeassistant.crussell.io`)";
                   service = "homeassistant-svc";
                   entryPoints = [ "websecure" ];
-                  tls.certResolver = "letsencrypt";
                 };
-                homeassistant-http-redirect = {
-                  rule = "Host(`homeassistant.crussell.io`)";
-                  entryPoints = [ "web" ];
-                  middlewares = [ "https-redirect" ];
-                  service = "noop@internal";
-                };
-                ssltesthost = {
-                  rule = "Host(`ssltest.crussell.io`)";
-                  service = "test";
+
+                "mealie-public" = {
+                  rule = "Host(`mealie.crussell.io`) || Host(`hetzner-mealie.crussell.io`)";
+                  service = "mealie-svc";
                   entryPoints = [ "websecure" ];
-                  tls.certResolver = "letsencrypt";
+                };
+
+                "ssltesthost-public" = {
+                  rule = "Host(`ssltest.crussell.io`)";
+                  service = "test-svc";
+                  entryPoints = [ "websecure" ];
+                };
+
+                "root-domain-public" = {
+                  rule = "Host(`crussell.io`)";
+                  service = "homeassistant-svc";
+                  entryPoints = [ "websecure" ];
                 };
               };
-              middlewares = {
-                https-redirect = {
-                  redirectScheme = {
-                    scheme = "https";
-                    permanent = true;
-                  };
-                };
-              };
+
               services = {
-                test.loadBalancer.servers = [{ url = "http://192.168.1.202:80"; }];
-                mealie-svc.loadBalancer.servers = [{ url = "http://192.168.1.202:9925"; }];
-                homeassistant-svc.loadBalancer.servers = [{ url = "http://192.168.1.51:8123"; }];
+                "test-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:80"; }]; }; # Renamed from 'test'
+                "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:9925"; }]; };
+                "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.51:8123"; }]; };
               };
             };
           };
@@ -401,7 +412,7 @@
         imports = [ sops-nix.nixosModules.sops ./hetzner-bootstrap/configuration.nix ];
         
         networking.hostName = "cloud-proxy";
-        networking.firewall.allowedTCPPorts = [ 80 443 22 8080 ];
+        networking.firewall.allowedTCPPorts = [ 80 443 22 ];
 
         # Use DHCP for cloud deployment
         networking.useDHCP = true;
@@ -412,11 +423,12 @@
         # Install Tailscale
         services.tailscale.enable = true;
 
-        # ample script that uses the OAuth credentials
+        # System packages
         environment.systemPackages = with pkgs; [
           git 
           curl
           jq
+          tailscale # Ensure tailscale CLI is available
         ];
 
         fileSystems."/" = {
@@ -426,176 +438,82 @@
 
         boot.loader.grub.devices = [ "/dev/sda" ];
 
-        # services.traefik = {
-        #   enable = true;
-        #   staticConfigOptions = {
-        #     entryPoints = {
-        #       web.address = ":80";
-        #       websecure.address = ":443";
-        #     };
-        #     api = {
-        #       dashboard = true;
-        #       insecure = true;
-        #     };
-        #     certificatesResolvers.letsencrypt.acme = {
-        #       storage = "/var/lib/traefik/acme.json";
-        #       caServer = "https://acme-v02.api.letsencrypt.org/directory";
-        #       dnsChallenge = {
-        #         provider = "route53";
-        #         delayBeforeCheck = 240;
-        #         resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
-        #       };
-        #     };
-        #     log.level = "INFO";
-        #   };
-        #   dynamicConfigOptions = {
-        #     http = {
-        #       routers = {
-        #         # Main domain redirect to a default service (customize as needed)
-        #         root-domain = {
-        #           rule = "Host(`crussell.io`)";
-        #           service = "homeassistant-svc";
-        #           entryPoints = [ "websecure" ];
-        #           tls.certResolver = "letsencrypt";
-        #         };
-        #         root-domain-http-redirect = {
-        #           rule = "Host(`crussell.io`)";
-        #           entryPoints = [ "web" ];
-        #           middlewares = [ "https-redirect" ];
-        #           service = "noop@internal";
-        #         };
-                
-        #         # Home Assistant
-        #         homeassistant = {
-        #           rule = "Host(`homeassistant.crussell.io`)";
-        #           service = "homeassistant-svc";
-        #           entryPoints = [ "websecure" ];
-        #           tls.certResolver = "letsencrypt";
-        #         };
-        #         homeassistant-http-redirect = {
-        #           rule = "Host(`homeassistant.crussell.io`)";
-        #           entryPoints = [ "web" ];
-        #           middlewares = [ "https-redirect" ];
-        #           service = "noop@internal";
-        #         };
-                
-        #         # Mealie - proxy to tailnet
-        #         mealie = {
-        #           rule = "Host(`mealie.crussell.io`)";
-        #           service = "mealie-svc";
-        #           entryPoints = [ "websecure" ];
-        #           tls.certResolver = "letsencrypt";
-        #         };
-        #         mealie-http-redirect = {
-        #           rule = "Host(`mealie.crussell.io`)";
-        #           entryPoints = [ "web" ];
-        #           middlewares = [ "https-redirect" ];
-        #           service = "noop@internal";
-        #         };
-                
-        #         # Catch-all for other subdomains - customize as needed
-        #         wildcard = {
-        #           rule = "HostRegexp(`{subdomain:[a-z0-9-]+}.crussell.io`)";
-        #           service = "default-backend";
-        #           entryPoints = [ "websecure" ];
-        #           tls.certResolver = "letsencrypt";
-        #           priority = 1;  # Lower priority than specific routes
-        #         };
-        #         wildcard-http-redirect = {
-        #           rule = "HostRegexp(`{subdomain:[a-z0-9-]+}.crussell.io`)";
-        #           entryPoints = [ "web" ];
-        #           middlewares = [ "https-redirect" ];
-        #           service = "noop@internal";
-        #           priority = 1;
-        #         };
-        #       };
-        #       middlewares = {
-        #         https-redirect = {
-        #           redirectScheme = {
-        #             scheme = "https";
-        #             permanent = true;
-        #           };
-        #         };
-        #       };
-        #       services = {
-        #         # These will need to be updated with your actual Tailscale IPs
-        #         homeassistant-svc.loadBalancer.servers = [{ url = "http://100.64.0.2:8123"; }];  # Replace with actual Tailscale IP
-        #         mealie-svc.loadBalancer.servers = [{ url = "http://100.64.0.3:9925"; }];  # Replace with actual Tailscale IP
-        #         default-backend.loadBalancer.servers = [{ url = "http://100.64.0.2:8123"; }];  # Default fallback
-        #       };
-        #     };
-        #   };
-        # };
+        services.traefik = {
+          enable = true;
+          staticConfigOptions = {
+            entryPoints = {
+              web.address = ":80";
+              websecure.address = ":443";
+            };
+            # API and dashboard are removed
+            # api = {}; 
+            log.level = "INFO";
+          };
+          dynamicConfigOptions = {
+            tcp = {
+              routers = {
+                "http-forwarder" = {
+                  rule = "HostSNI(`*`)";
+                  entryPoints = [ "web" ];
+                  service = "gateway-http-svc";
+                };
+                "https-passthrough" = {
+                  rule = "HostSNI(`*`)"; 
+                  entryPoints = [ "websecure" ];
+                  service = "gateway-https-svc";
+                  tls.passthrough = true;
+                };
+              };
+              services = {
+                "gateway-http-svc" = {
+                  loadBalancer.servers = [{ address = "100.67.164.11:80"; }];
+                  # PROXY protocol for original client IP
+                  loadBalancer.proxyProtocol = { version = 2; };
+                };
+                "gateway-https-svc" = {
+                  loadBalancer.servers = [{ address = "100.67.164.11:443"; }];
+                  # PROXY protocol for original client IP
+                  loadBalancer.proxyProtocol = { version = 2; };
+                };
+              };
+            };
+            http = {
+              routers = {};
+              middlewares = {};
+              services = {};
+              # No certificate resolvers needed here
+            };
+          };
+        };
 
-        # # Configure Traefik with AWS credentials for Route53
-        # systemd.services.traefik = {
-        #   environment = {
-        #     AWS_REGION = "us-east-1";
-        #   };
-        #   serviceConfig = {
-        #     EnvironmentFile = config.sops.templates."traefik-env".path;
-        #   };
-        # };
+        # SOPS/AWS related configurations are generally not needed for this simplified proxy.
+        systemd.services.traefik = {
+          # environment = { AWS_REGION = "us-east-1"; }; # Likely not needed
+          # serviceConfig = {}; 
+        };
 
-        # # Create template for Traefik environment file
-        # sops.templates."traefik-env" = {
-        #   content = ''
-        #     AWS_REGION=us-east-1
-        #     AWS_ACCESS_KEY_ID=${config.sops.placeholder.aws-access-key-id}
-        #     AWS_SECRET_ACCESS_KEY=${config.sops.placeholder.aws-secret-access-key}
-        #     LETSENCRYPT_EMAIL=${config.sops.placeholder.letsencrypt-email}
-        #     AWS_HOSTED_ZONE_ID=${config.sops.placeholder.aws-hosted-zone-id}
-        #   '';
-        #   owner = "root";
-        #   group = "root";
-        #   mode = "0444";
-        # };
+        systemd.tmpfiles.rules = [
+          "d /var/lib/traefik 0755 traefik traefik -"
+          # No acme.json managed by this Traefik instance
+          "d /etc/sops 0755 root root -"
+          "d /etc/sops/age 0755 root root -"
+        ];
 
-        # systemd.tmpfiles.rules = [
-        #   "d /var/lib/traefik 0755 traefik traefik -"
-        #   "f /var/lib/traefik/acme.json 0600 traefik traefik -"
-        #   "d /etc/sops 0755 root root -"
-        #   "d /etc/sops/age 0755 root root -"
-        # ];
-
-        # sops = {
-        #   defaultSopsFile = ./secrets.yaml;
-        #   defaultSopsFormat = "yaml";
-        #   age.keyFile = "/etc/sops/age/keys.txt";
-          
-        #   secrets = {
-        #     tailscale-oauth-client-id = {
-        #       owner = "root";
-        #       group = "root";
-        #       mode = "0400";
-        #     };
-        #     tailscale-oauth-client-secret = {
-        #       owner = "root";
-        #       group = "root";
-        #       mode = "0400";
-        #     };
-        #     aws-access-key-id = {
-        #       owner = "traefik";
-        #       group = "traefik";
-        #       mode = "0400";
-        #     };
-        #     aws-secret-access-key = {
-        #       owner = "traefik";
-        #       group = "traefik";
-        #       mode = "0400";
-        #     };
-        #     letsencrypt-email = {
-        #       owner = "traefik";
-        #       group = "traefik";
-        #       mode = "0400";
-        #     };
-        #     aws-hosted-zone-id = {
-        #       owner = "traefik";
-        #       group = "traefik";
-        #       mode = "0400";
-        #     };
-        #   };
-        # };
+        sops = {
+          defaultSopsFile = ./secrets.yaml;
+          defaultSopsFormat = "yaml";
+          age.keyFile = "/etc/sops/age/keys.txt";
+          secrets = {
+            # No Traefik-specific secrets needed for cloud-proxy in this setup.
+            # Keep tailscale secrets if other scripts on cloud-proxy use them, otherwise can be removed.
+             tailscale-oauth-client-id = { 
+               # owner = "root"; group = "root"; mode = "0400"; # Example, if used by other tools
+             };
+             tailscale-oauth-client-secret = {
+               # owner = "root"; group = "root"; mode = "0400"; # Example, if used by other tools
+             };
+          };
+        };
       };
 
     in {
