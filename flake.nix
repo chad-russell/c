@@ -451,16 +451,13 @@
           modules = [ (makeNginxModule { includeBootConfig = true; }) ];
         };
 
-        # NixOS configuration for Hetzner VPS (used by nixos-anywhere)
-        hetzner-vps = nixpkgs.lib.nixosSystem {
+        hetzner-bootstrap = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [
             ./hetzner-bootstrap/configuration.nix
-            # You might want to add other common modules here, e.g. for users, ssh, etc.
-            # disko is already imported in hetzner-bootstrap/configuration.nix via hetzner-bootstrap/disk-config.nix
           ];
           specialArgs = {
-            # You can pass special arguments to your modules here if needed
+            inherit disko;
           };
         };
       };

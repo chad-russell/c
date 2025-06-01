@@ -39,7 +39,7 @@
   };
 
   # Allow nixos-anywhere to rebuild the system
-  system.extraSystemBuilderCmds = ''
+  system.extraSystemBuilderCmds = lib.mkBefore ''
     cp ${config.system.build.toplevel}/sw/bin/nixos-rebuild /run/current-system/sw/bin/
   '';
 
