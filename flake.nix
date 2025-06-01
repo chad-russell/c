@@ -483,12 +483,6 @@
                 };
               };
             };
-            http = {
-              routers = {};
-              middlewares = {};
-              services = {};
-              # No certificate resolvers needed here
-            };
           };
         };
 
