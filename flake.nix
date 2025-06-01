@@ -285,6 +285,12 @@
           dynamicConfigOptions = {
             http = {
               routers = {
+                # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
+                "traefik-dashboard-internal" = {
+                  rule = "Host(`traefik.internal.crussell.io`)";
+                  service = "api@internal"; # Special service for Traefik API/dashboard
+                  entryPoints = [ "web" ]; # Access via HTTP for now, or use websecure if you set up TLS for it
+                };
                 "test-internal" = {
                   rule = "Host(`test.internal.crussell.io`)";
                   service = "test-svc";
