@@ -428,6 +428,21 @@
           PasswordAuthentication = false;  # More secure for cloud deployment
         };
 
+        environment.systemPackages = with pkgs; [
+          git
+        ];
+
+        users.users.crussell = {
+          isNormalUser = true;
+          extraGroups = [ "wheel" ];
+          initialHashedPassword = "$y$j9T$bh0qHa7NdcwmdzYc8CjQj.$HUOFYiehqVxeTXtkFs2fAQZuohSp8uvonYB1Bbkf567";
+        };
+
+        programs.neovim = {
+          enable = true;
+          defaultEditor = true;
+        };
+
         services.resolved.enable = false;
 
         # Install Tailscale
