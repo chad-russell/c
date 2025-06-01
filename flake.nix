@@ -435,9 +435,6 @@
 
         # nixos-anywhere CLI tool
         nixos-anywhere = nixos-anywhere.packages.${system}.default;
-
-        # nixos-anywhere configuration for Hetzner VPS
-        hetzner-vps = nixos-anywhere.nixosConfigurations.hetzner-vps.config.system.build.toplevel;
       };
 
       nixosConfigurations = {
@@ -451,6 +448,7 @@
           modules = [ (makeNginxModule { includeBootConfig = true; }) ];
         };
 
+        # NixOS configuration for Hetzner VPS (used by nixos-anywhere)
         hetzner-bootstrap = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [

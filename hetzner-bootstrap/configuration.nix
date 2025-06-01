@@ -38,11 +38,6 @@
     ];
   };
 
-  # Allow nixos-anywhere to rebuild the system
-  system.extraSystemBuilderCmds = lib.mkBefore ''
-    cp ${config.system.build.toplevel}/sw/bin/nixos-rebuild /run/current-system/sw/bin/
-  '';
-
   # Basic packages
   environment.systemPackages = with pkgs; [
     git
