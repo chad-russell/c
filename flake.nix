@@ -428,10 +428,6 @@
           PasswordAuthentication = false;  # More secure for cloud deployment
         };
 
-        environment.systemPackages = with pkgs; [
-          git
-        ];
-
         users.users.crussell = {
           isNormalUser = true;
           extraGroups = [ "wheel" ];
@@ -449,12 +445,12 @@
         services.tailscale.enable = true;
 
         # Example script that uses the OAuth credentials
-        environment.systemPackages = [
-          pkgs.git 
-          pkgs.tailscale
-          pkgs.curl
-          pkgs.jq
-          (pkgs.writeShellScriptBin "tailscale-api-test" ''
+        environment.systemPackages = with pkgs; [
+          git 
+          tailscale
+          curl
+          jq
+          (writeShellScriptBin "tailscale-api-test" ''
             #!/bin/bash
             # Example script showing how to use the SOPS secrets
             CLIENT_ID=$(cat ${config.sops.secrets.tailscale-oauth-client-id.path})
