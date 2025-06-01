@@ -398,47 +398,14 @@
       };
 
       makeCloudProxyModule = { includeBootConfig ? false }: { pkgs, config, lib, ... }: {
-        imports = [ sops-nix.nixosModules.sops ];
+        imports = [ sops-nix.nixosModules.sops ./hetzner-bootstrap/configuration.nix ];
         
         networking.hostName = "cloud-proxy";
         networking.firewall.allowedTCPPorts = [ 80 443 22 8080 ];
+
         # Use DHCP for cloud deployment
         networking.useDHCP = true;
         networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
-
-        # Boot and filesystem configuration - only included for nixosSystem builds
-        fileSystems."/" = lib.mkIf includeBootConfig {
-          device = "/dev/sda1";
-          fsType = "ext4";
-        };
-        
-        boot = lib.mkIf includeBootConfig {
-          loader.grub.enable = true;
-          loader.grub.devices = [ "/dev/sda" ];
-          initrd.availableKernelModules = [ "ahci" "xhci_pci" "virtio_pci" "virtio_scsi" "sd_mod" "sr_mod" ];
-          initrd.kernelModules = [ ];
-          kernelModules = [ ];
-          extraModulePackages = [ ];
-        };
-
-        nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-        services.openssh.enable = true;
-        services.openssh.settings = {
-          PermitRootLogin = "yes";
-          PasswordAuthentication = false;  # More secure for cloud deployment
-        };
-
-        users.users.crussell = {
-          isNormalUser = true;
-          extraGroups = [ "wheel" ];
-          initialHashedPassword = "$y$j9T$bh0qHa7NdcwmdzYc8CjQj.$HUOFYiehqVxeTXtkFs2fAQZuohSp8uvonYB1Bbkf567";
-        };
-
-        programs.neovim = {
-          enable = true;
-          defaultEditor = true;
-        };
 
         services.resolved.enable = false;
 
@@ -607,7 +574,6 @@
 
         system.stateVersion = "25.05";
 
-        # SOPS configuration
         sops = {
           defaultSopsFile = ./secrets.yaml;
           defaultSopsFormat = "yaml";

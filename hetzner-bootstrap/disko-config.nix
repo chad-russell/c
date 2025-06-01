@@ -2,30 +2,23 @@
   disko.devices = {
     disk = {
       main = {
-        type = "disk";
+        type   = "disk";
         device = "/dev/sda";
         content = {
           type = "gpt";
           partitions = {
+            # 1MiB slice for legacy GRUB core.img on GPT
             boot = {
-              size = "1M";
-              type = "EF02";
+              size     = "1M";
+              type     = "EF02";
               priority = 1;
             };
-            ESP = {
-              size = "512M";
-              type = "EF00";
-              content = {
-                type = "filesystem";
-                format = "vfat";
-                mountpoint = "/boot";
-              };
-            };
+            # Root partition (rest-of-disk)
             root = {
               size = "100%";
               content = {
-                type = "filesystem";
-                format = "ext4";
+                type       = "filesystem";
+                format     = "ext4";
                 mountpoint = "/";
               };
             };

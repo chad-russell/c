@@ -8,14 +8,13 @@
     ];
 
   boot.loader.grub.enable = true;
+  boot.loader.grub.efiSupport = false;
 
   services.openssh.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  environment.systemPackages = with pkgs; [
-    git
-  ];
+  environment.systemPackages = with pkgs; [ git ];
 
   users.users.crussell = {
     isNormalUser = true;
