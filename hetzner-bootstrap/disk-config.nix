@@ -1,6 +1,4 @@
 { lib, disko, ... }: {
-  imports = [ disko.nixosModules.disko ];
-
   disko.devices = {
     disk = {
       main = {
@@ -29,7 +27,6 @@
                 type = "filesystem";
                 format = "ext4";
                 mountpoint = "/";
-                extraArgs = [ "-F" ]; # Force filesystem creation
               };
             };
           };

@@ -453,6 +453,7 @@
           inherit system;
           modules = [
             ./hetzner-bootstrap/configuration.nix
+            disko.nixosModules.disko
           ];
           specialArgs = {
             inherit disko;
