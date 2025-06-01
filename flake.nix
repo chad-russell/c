@@ -450,14 +450,12 @@
 
         # NixOS configuration for Hetzner VPS (used by nixos-anywhere)
         hetzner-bootstrap = nixpkgs.lib.nixosSystem {
-          inherit system;
+          system = "x86_64-linux";
+
           modules = [
             ./hetzner-bootstrap/configuration.nix
             disko.nixosModules.disko
           ];
-          specialArgs = {
-            inherit disko;
-          };
         };
       };
     };

@@ -1,4 +1,4 @@
-{ lib, disko, ... }: {
+{
   disko.devices = {
     disk = {
       main = {
@@ -9,7 +9,7 @@
           partitions = {
             boot = {
               size = "1M";
-              type = "EF02"; # BIOS boot partition
+              type = "EF02";
               priority = 1;
             };
             ESP = {
@@ -34,4 +34,4 @@
       };
     };
   };
-} 
+}
