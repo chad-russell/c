@@ -419,6 +419,13 @@
           jq
         ];
 
+        fileSystems."/" = {
+          device = "/dev/sda2";
+          fsType = "ext4";
+        };
+
+        boot.loader.grub.devices = [ "/dev/sda" ];
+
         # services.traefik = {
         #   enable = true;
         #   staticConfigOptions = {
