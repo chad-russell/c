@@ -15,7 +15,7 @@
 
       makeNginxModule = { includeBootConfig ? false }: { pkgs, lib, ... }: {
         networking.hostName = "vm-test";
-        networking.firewall.allowedTCPPorts = [ 22 80 ];
+        networking.firewall.allowedTCPPorts = [ 22 80 9925 ];
         networking.useDHCP = false;
         networking.defaultGateway = "192.168.1.1";
         networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
@@ -50,25 +50,88 @@
           PasswordAuthentication = true;
         };
 
-        services.nginx = {
-          enable = true;
-          virtualHosts."default" = {
-            root = "/var/www";
-            listen = [
-              { addr = "0.0.0.0"; port = 80; }
-            ];
-            default = true;
+        # Enable Podman
+        virtualisation = {
+          podman = {
+            enable = true;
+            dockerCompat = true;  # For docker-compose compatibility
           };
         };
 
-        environment.systemPackages = [
-          pkgs.git 
-          pkgs.curl
+        # Create Mealie data directory
+        systemd.tmpfiles.rules = [
+          "d /var/lib/mealie 0755 root root -"
         ];
 
-        systemd.tmpfiles.rules = [
-          "d /var/www 0755 root root -"
-          "f /var/www/index.html 0644 root root - <h1>Hello from NixOS + nginx!</h1>"
+        # Mealie container service
+        systemd.services.mealie = {
+          description = "Mealie Recipe Manager";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network.target" ];
+          
+          serviceConfig = {
+            Type = "simple";
+            ExecStartPre = [
+              "-${pkgs.podman}/bin/podman rm -f mealie"
+              "${pkgs.podman}/bin/podman pull ghcr.io/mealie-recipes/mealie:v2.8.0"
+            ];
+            ExecStart = ''
+              ${pkgs.podman}/bin/podman run --name mealie \
+                --rm \
+                -p 9925:9000 \
+                -e ALLOW_SIGNUP=false \
+                -e PUID=1000 \
+                -e PGID=1000 \
+                -e TZ=America/New_York \
+                -e BASE_URL=http://mealie.internal.crussell.io \
+                -v /var/lib/mealie:/app/data \
+                --memory=1000M \
+                ghcr.io/mealie-recipes/mealie:v2.8.0
+            '';
+            ExecStop = "${pkgs.podman}/bin/podman stop mealie";
+            Restart = "always";
+            RestartSec = "10s";
+          };
+        };
+
+        # Configure Nginx as reverse proxy for Mealie
+        services.nginx = {
+          enable = true;
+          
+          # Recommended Nginx settings
+          recommendedGzipSettings = true;
+          recommendedOptimisation = true;
+          recommendedProxySettings = true;
+          recommendedTlsSettings = true;
+
+          virtualHosts = {
+            "mealie.internal.crussell.io" = {
+              locations."/" = {
+                proxyPass = "http://127.0.0.1:9925";
+                proxyWebsockets = true;
+                extraConfig = ''
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                '';
+              };
+            };
+            "default" = {
+              root = "/var/www";
+              listen = [
+                { addr = "0.0.0.0"; port = 80; }
+              ];
+              default = true;
+            };
+          };
+        };
+
+        environment.systemPackages = with pkgs; [
+          git 
+          curl
+          podman
+          podman-compose
         ];
 
         users.users.root = {
@@ -167,6 +230,7 @@
                 { domain = "*.internal.crussell.io"; answer = "192.168.1.201"; }
                 { domain = "homeassistant.crussell.io"; answer = "192.168.1.201"; }
                 { domain = "ssltest.crussell.io"; answer = "192.168.1.201"; }
+                { domain = "mealie.internal.crussell.io"; answer = "192.168.1.201"; }
               ];
             };
           };
@@ -202,6 +266,18 @@
                   service = "test";
                   entryPoints = [ "web" ];
                 };
+                mealie = {
+                  rule = "Host(`mealie.internal.crussell.io`)";
+                  service = "mealie-svc";
+                  entryPoints = [ "websecure" ];
+                  tls.certResolver = "letsencrypt";
+                };
+                mealie-http-redirect = {
+                  rule = "Host(`mealie.internal.crussell.io`)";
+                  entryPoints = [ "web" ];
+                  middlewares = [ "https-redirect" ];
+                  service = "noop@internal";
+                };
                 homeassistant = {
                   rule = "Host(`homeassistant.crussell.io`)";
                   service = "homeassistant-svc";
@@ -231,6 +307,7 @@
               };
               services = {
                 test.loadBalancer.servers = [{ url = "http://192.168.1.202:80"; }];
+                mealie-svc.loadBalancer.servers = [{ url = "http://192.168.1.202:9925"; }];
                 homeassistant-svc.loadBalancer.servers = [{ url = "http://192.168.1.51:8123"; }];
               };
             };
