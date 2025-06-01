@@ -228,9 +228,7 @@
               enabled = true;
               rewrites = [
                 { domain = "*.internal.crussell.io"; answer = "192.168.1.201"; }
-                { domain = "homeassistant.crussell.io"; answer = "192.168.1.201"; }
-                { domain = "ssltest.crussell.io"; answer = "192.168.1.201"; }
-                { domain = "mealie.internal.crussell.io"; answer = "192.168.1.201"; }
+                { domain = "*.crussell.io"; answer = "192.168.1.201"; }
               ];
             };
           };
