@@ -11,10 +11,16 @@
 
   services.openssh.enable = true;
 
-  users.users.eugene = {
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  environment.systemPackages = with pkgs; [
+    git
+  ];
+
+  users.users.crussell = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
-    initialHashedPassword = "$y$j9T$2DyEjQxPoIjTkt8zCoWl.0$3mHxH.fqkCgu53xa0vannyu4Cue3Q7xL4CrUhMxREKC"; # Password.123
+    initialHashedPassword = "$y$j9T$bh0qHa7NdcwmdzYc8CjQj.$HUOFYiehqVxeTXtkFs2fAQZuohSp8uvonYB1Bbkf567";
   };
 
   programs.neovim = {
