@@ -7,9 +7,11 @@
     sops-nix.url = "github:Mic92/sops-nix";
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
+    nixos-anywhere.url = "github:nix-community/nixos-anywhere";
+    nixos-anywhere.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixos-generators, sops-nix, disko, ... }:
+  outputs = { self, nixpkgs, nixos-generators, sops-nix, disko, nixos-anywhere, ... }:
     let
       system = "x86_64-linux";
 
@@ -414,7 +416,7 @@
           #!/bin/bash
           set -e
           
-          VM_IP="192.168.1.2XX"
+          VM_IP="REPLACE_ME"
           KEY_FILE="age-key.txt"
           
           if [ ! -f "$KEY_FILE" ]; then
@@ -431,45 +433,14 @@
           ssh "root@$VM_IP" "tailscale-api-test"
         '';
 
-        # nixos-anywhere deployment script for Hetzner
-        deploy-hetzner = nixpkgs.legacyPackages.${system}.writeShellScriptBin "deploy-hetzner" ''
-          #!/bin/bash
-          set -e
-          
-          if [ $# -ne 1 ]; then
-            echo "Usage: $0 <server-ip>"
-            echo "Example: $0 1.2.3.4"
-            exit 1
-          fi
-          
-          SERVER_IP="$1"
-          
-          echo "Deploying NixOS to Hetzner server at $SERVER_IP..."
-          echo "Make sure you have added your SSH key to configuration.nix!"
-          
-          # Install nixos-anywhere if not available
-          if ! command -v nixos-anywhere &> /dev/null; then
-            echo "Installing nixos-anywhere..."
-            nix profile install github:nix-community/nixos-anywhere
-          fi
-          
-          # Deploy using nixos-anywhere
-          nixos-anywhere --flake .#hetzner-cloud root@$SERVER_IP
-          
-          echo "Deployment complete! You can now SSH to your server:"
-          echo "ssh admin@$SERVER_IP"
-        '';
+        # nixos-anywhere CLI tool
+        nixos-anywhere = nixos-anywhere.packages.${system}.default;
+
+        # nixos-anywhere configuration for Hetzner VPS
+        hetzner-vps = nixos-anywhere.nixosConfigurations.hetzner-vps.config.system.build.toplevel;
       };
 
       nixosConfigurations = {
-        hetzner-cloud = nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [
-            disko.nixosModules.disko
-            ./hetzner
-          ];
-        };
-
         gateway = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [ (makeGatewayModule { includeBootConfig = true; }) ];
@@ -478,6 +449,19 @@
         nginx = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [ (makeNginxModule { includeBootConfig = true; }) ];
+        };
+
+        # NixOS configuration for Hetzner VPS (used by nixos-anywhere)
+        hetzner-vps = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./hetzner-bootstrap/configuration.nix
+            # You might want to add other common modules here, e.g. for users, ssh, etc.
+            # disko is already imported in hetzner-bootstrap/configuration.nix via hetzner-bootstrap/disk-config.nix
+          ];
+          specialArgs = {
+            # You can pass special arguments to your modules here if needed
+          };
         };
       };
     };
