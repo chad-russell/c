@@ -2,23 +2,34 @@
 
 {
   imports = [
+    ./hardware-configuration.nix
     ./disk-config.nix
   ];
 
   # NixOS Anywhere settings for Hetzner Cloud
-  # Refer to: https://github.com/nix-community/nixos-anywhere-examples/blob/main/hetzner-cloud/configuration.nix
+  # Based on: https://wiki.nixos.org/wiki/Install_NixOS_on_Hetzner_Cloud#nixos-anywhere
 
-  boot.loader.systemd-boot.enable = lib.mkForce false; # systemd-boot is not strictly necessary for nixos-anywhere 
-  boot.loader.grub = {
-    enable = true;
-    device = "nodev"; # We let disko handle the boot loader installation to the correct device
-    efiSupport = true;
-    useOSProber = false;
-  };
+  boot.loader.grub.enable = true;
+
+  # Cloud-specific boot configuration
+  boot.initrd.availableKernelModules = [ "ahci" "xhci_pci" "virtio_pci" "virtio_scsi" "sd_mod" "sr_mod" ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ ];
+  boot.extraModulePackages = [ ];
+
+  # Console configuration for cloud environments
+  boot.kernelParams = [ "console=ttyS0,115200" "console=tty1" ];
+  boot.loader.grub.extraConfig = ''
+    serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1
+    terminal_input console serial
+    terminal_output console serial
+  '';
+
+  swapDevices = [ ];
 
   # Basic networking for Hetzner Cloud (assumes DHCP)
   networking.useDHCP = true;
-  networking.hostName = "hetzner-vps"; # Set your desired hostname
+  networking.hostName = "reverse-proxy";
 
   # SSH access
   services.openssh = {
@@ -41,9 +52,9 @@
   # Basic packages
   environment.systemPackages = with pkgs; [
     git
-    vim # or your preferred editor
+    neovim
   ];
 
   # Set the state version
-  system.stateVersion = "25.05"; # Or your desired NixOS version
+  system.stateVersion = "25.05";
 } 

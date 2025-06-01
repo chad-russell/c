@@ -3,15 +3,20 @@
 
   disko.devices = {
     disk = {
-      sda = { # Assuming /dev/sda, common for Hetzner Cloud VMs. Please verify.
+      main = {
         type = "disk";
-        device = "/dev/sda"; 
+        device = "/dev/sda";
         content = {
           type = "gpt";
           partitions = {
+            boot = {
+              size = "1M";
+              type = "EF02"; # BIOS boot partition
+              priority = 1;
+            };
             ESP = {
-              type = "EF00";
               size = "512M";
+              type = "EF00";
               content = {
                 type = "filesystem";
                 format = "vfat";
