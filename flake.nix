@@ -397,7 +397,7 @@
         };
       };
 
-      makeCloudProxyModule = { includeBootConfig ? false }: { pkgs, config, lib, ... }: {
+      cloudProxyModule = { pkgs, config, lib, ... }: {
         imports = [ sops-nix.nixosModules.sops ./hetzner-bootstrap/configuration.nix ];
         
         networking.hostName = "cloud-proxy";
@@ -669,7 +669,7 @@
         # Minimal cloud reverse proxy for Hetzner
         cloud-proxy = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ (makeCloudProxyModule { includeBootConfig = true; }) ];
+          modules = [ cloudProxyModule ];
         };
       };
     };
