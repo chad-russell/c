@@ -708,12 +708,6 @@
           modules = [ (makeNginxModule { includeBootConfig = true; }) ];
         };
 
-        # Minimal cloud reverse proxy for Hetzner
-        hetzner = nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [ (makeCloudProxyModule { includeBootConfig = true; }) ];
-        };
-
         # NixOS configuration for Hetzner VPS (used by nixos-anywhere)
         hetzner-bootstrap = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -722,6 +716,12 @@
             ./hetzner-bootstrap/configuration.nix
             disko.nixosModules.disko
           ];
+        };
+
+        # Minimal cloud reverse proxy for Hetzner
+        cloud-proxy = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ (makeCloudProxyModule { includeBootConfig = true; }) ];
         };
       };
     };
