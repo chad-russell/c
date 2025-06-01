@@ -414,6 +414,7 @@
         
         boot = lib.mkIf includeBootConfig {
           loader.grub.enable = true;
+          loader.grub.devices = [ "/dev/sda" ];
           initrd.availableKernelModules = [ "ahci" "xhci_pci" "virtio_pci" "virtio_scsi" "sd_mod" "sr_mod" ];
           initrd.kernelModules = [ ];
           kernelModules = [ ];
