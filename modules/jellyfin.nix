@@ -27,6 +27,24 @@
             "net.ipv6.conf.all.disable_ipv6" = "1";
             "net.ipv6.conf.default.disable_ipv6" = "1";
         };
+        
+        # Intel GPU kernel modules for hardware acceleration
+        kernelModules = [ "i915" ];
+        extraModulePackages = with config.boot.kernelPackages; [ ];
+    };
+
+    # Hardware acceleration support
+    hardware.opengl = {
+        enable = true;
+        driSupport = true;
+        driSupport32Bit = true;
+        extraPackages = with pkgs; [
+            intel-media-driver  # VAAPI driver for modern Intel GPUs (Broadwell+)
+            vaapiIntel          # VAAPI driver for older Intel GPUs  
+            vaapiVdpau
+            libvdpau-va-gl
+            intel-compute-runtime # OpenCL
+        ];
     };
 
     services.openssh.enable = true;
@@ -43,7 +61,7 @@
         };
     };
 
-    # Create data directories
+    # Create data directories and set proper permissions for GPU access
     systemd.tmpfiles.rules = [
         "d /var/lib/jellyfin 0755 root root -"
         "d /var/lib/jellyseer 0755 root root -"
@@ -51,7 +69,13 @@
         "d /media/movies 0755 root root -"
         "d /media/tv 0755 root root -"
         "d /media/music 0755 root root -"
+        # Ensure proper permissions for GPU devices
+        "a+ /dev/dri/renderD* - - - - u:1000:rw"
+        "a+ /dev/dri/card* - - - - u:1000:rw"
     ];
+
+    # Add users to video group for GPU access
+    users.groups.video = {};
 
     # Jellyfin container service
     systemd.services.jellyfin = {
@@ -75,6 +99,8 @@
             -v /var/lib/jellyfin:/config \
             -v /media:/media \
             --device /dev/dri:/dev/dri \
+            --group-add video \
+            --user 1000:1000 \
             --memory=2000M \
             docker.io/jellyfin/jellyfin:latest
         '';
@@ -118,14 +144,18 @@
         podman
         podman-compose
         ffmpeg
+        # GPU debugging tools
+        intel-gpu-tools
+        vainfo  # Check VAAPI support
+        clinfo  # Check OpenCL support
     ];
 
     users.users.crussell = {
         isNormalUser = true;
-        extraGroups = [ "wheel" ];
+        extraGroups = [ "wheel" "video" ];  # Added video group
         initialHashedPassword = "$y$j9T$bh0qHa7NdcwmdzYc8CjQj.$HUOFYiehqVxeTXtkFs2fAQZuohSp8uvonYB1Bbkf567";
         openssh.authorizedKeys.keys = [
-            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsHOYNAog8L5SAhKp551g4oJFSi/GB+Fg38mmBLhwbrCUSfVSFqKeaOuRlLCQVnTWPZYfyp6cTibHBeigky6fjKhQgKnUJgwPdHjxhSvk7m6zgGj71s45bFT918E1J8hysN2wrijoo6oJ1zSeX3FIWOcFZVR4MHxCdYCMr+4mJp8tb1oQRea6GxCFGCms7DoNii+gWL/K2KZTMHKZ6l9Nf5CXq/6+a9Pfog3XuRlpTxLlIVj8YMC8TeRki0m9mG4+gk4OtCzACL/ngY0OxRWN4IN0NhFZOO5FHwytMR9/yNiAzafzaIt2szd69nmPG3DrXSUN1nXZKR78kM5O1kIaEKNeWJjhTXuDF7DtMF61TlXDWmsFxQbF9TAWK7nXJMUzAgXY1vIkTiYV3uwBB9upyKmXD/M5U1cFDvY6sSnINHxaqXp7/IoEHsXzHKmR5yhGLVszMzMlINBTxrWEYbjzNJPEvWeLCt3EbU4LPVffc8MA+l9zujSDjMO78uC7k/Ek= chadrussell@Chads-MacBook-Pro.local"
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsHOYNAog8L5SAhKp551g4oJFSi/GB+Fg38mmBLhwbrCUSfVSFqKeaOuRlLCQVnTWPZYfyp6cTibHBeigky6fjKhQgKnUJgwPdHjxhSvk7m6zgGj71s45bFT918E1J8hysN2wrijoo6oJ1zSeX3FIWOcFZVR4MHxCdYCMr+4mJp8tb1oQRea6GxCFGCms7DoNii+gWL/K2KZTMHKZ6l9Nf5CXq/6+a9Pfog3XuRlpTxLlIVj8YMC8TeRki0m9mG4+gk4OtCzACL/ngY0OxRWN4IN0NhFZOO5FHwytMR9/yNiAzafzaIt2szd69nmPG3DrXSUN1nXZKR78kM5O1kIaEKNeWJjhTXuDF7DtMF61TlXDWmsFxQbF9TAWK7nXJMUzAgXY1vIkTiYV8MA+l9zujSDjMO78uC7k/Ek= chadrussell@Chads-MacBook-Pro.local"
         ];
     };
 
