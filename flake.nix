@@ -18,6 +18,7 @@
       makeNginxModule = import ./modules/nginx.nix;
       makeGatewayModule = import ./modules/gateway.nix;
       makeCloudProxyModule = import ./modules/cloud-proxy.nix;
+      makeJellyfinModule = import ./modules/jellyfin.nix;
     in {
       packages.${system} = {
         nginx = nixos-generators.nixosGenerate {
@@ -30,6 +31,12 @@
           inherit system;
           format = "proxmox";
           modules = [ (makeGatewayModule { inherit sops-nix; }) ];
+        };
+
+        jellyfin = nixos-generators.nixosGenerate {
+          inherit system;
+          format = "proxmox";
+          modules = [ (makeJellyfinModule { }) ];
         };
 
         # Helper script for deploying the age key
@@ -74,6 +81,11 @@
         nginx = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [ (makeNginxModule { includeBootConfig = true; }) ];
+        };
+
+        jellyfin = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ (makeJellyfinModule { includeBootConfig = true; }) ];
         };
 
         # NixOS configuration for Hetzner VPS (used by nixos-anywhere)

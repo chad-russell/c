@@ -92,30 +92,30 @@
         staticConfigOptions = {
         entryPoints = {
             web = {
-            address = ":80";
-            proxyProtocol = {
-                trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
-            };
-            http.redirections = {
-                entryPoint = {
-                to = "websecure";
-                scheme = "https";
-                permanent = true;
+                address = ":80";
+                proxyProtocol = {
+                    trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
+                };
+                http.redirections = {
+                    entryPoint = {
+                        to = "websecure";
+                        scheme = "https";
+                        permanent = true;
+                    };
                 };
             };
-            };
             websecure = {
-            address = ":443";
-            proxyProtocol = {
-                trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
-            };
-            http.tls = {
-                certResolver = "letsencrypt";
-                domains = [
-                { main = "crussell.io"; sans = ["*.crussell.io"]; }
-                { main = "internal.crussell.io"; sans = ["*.internal.crussell.io"]; }
-                ];
-            };
+                address = ":443";
+                proxyProtocol = {
+                    trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
+                };
+                http.tls = {
+                    certResolver = "letsencrypt";
+                    domains = [
+                        { main = "crussell.io"; sans = ["*.crussell.io"]; }
+                        { main = "internal.crussell.io"; sans = ["*.internal.crussell.io"]; }
+                    ];
+                };
             };
         };
         api = {
@@ -125,9 +125,9 @@
             storage = "/var/lib/traefik/acme.json";
             caServer = "https://acme-v02.api.letsencrypt.org/directory";
             dnsChallenge = {
-            provider = "route53";
-            delayBeforeCheck = 240;
-            resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
+                provider = "route53";
+                delayBeforeCheck = 240;
+                resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
             };
         };
         log.level = "DEBUG";
@@ -142,49 +142,64 @@
             };
             };
             routers = {
-            # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
-            "traefik-dashboard-internal" = {
-                rule = "Host(`traefik.internal.crussell.io`)";
-                service = "api@internal"; # Special service for Traefik API/dashboard
-                entryPoints = [ "web" "websecure" ]; 
-                middlewares = [ "traefik-dashboard-auth" ];
-                # TLS will be handled by the websecure entrypoint's global TLS config
-            };
-            "test-internal" = {
-                rule = "Host(`test.internal.crussell.io`)";
-                service = "test-svc";
-                entryPoints = [ "websecure" ];
-            };
+                # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
+                "traefik-dashboard-internal" = {
+                    rule = "Host(`traefik.internal.crussell.io`)";
+                    service = "api@internal"; # Special service for Traefik API/dashboard
+                    entryPoints = [ "web" "websecure" ]; 
+                    middlewares = [ "traefik-dashboard-auth" ];
+                    # TLS will be handled by the websecure entrypoint's global TLS config
+                };
 
-            "homeassistant-public" = {
-                rule = "Host(`homeassistant.crussell.io`) || Host(`hetzner-homeassistant.crussell.io`)";
-                service = "homeassistant-svc";
-                entryPoints = [ "websecure" ];
-            };
+                "test-internal" = {
+                    rule = "Host(`test.internal.crussell.io`)";
+                    service = "test-svc";
+                    entryPoints = [ "websecure" ];
+                };
 
-            "mealie-public" = {
-                rule = "Host(`mealie.crussell.io`) || Host(`hetzner-mealie.crussell.io`)";
-                service = "mealie-svc";
-                entryPoints = [ "websecure" ];
-            };
+                "jellyfin-internal" = {
+                    rule = "Host(`jellyfin.internal.crussell.io`)";
+                    service = "jellyfin-svc";
+                    entryPoints = [ "websecure" ];
+                };
 
-            "ssltesthost-public" = {
-                rule = "Host(`ssltest.crussell.io`)";
-                service = "test-svc";
-                entryPoints = [ "websecure" ];
-            };
+                "jellyseer-internal" = {
+                    rule = "Host(`jellyseer.internal.crussell.io`)";
+                    service = "jellyseer-svc";
+                    entryPoints = [ "websecure" ];
+                };
 
-            "root-domain-public" = {
-                rule = "Host(`crussell.io`)";
-                service = "homeassistant-svc";
-                entryPoints = [ "websecure" ];
-            };
+                "homeassistant-public" = {
+                    rule = "Host(`homeassistant.crussell.io`)";
+                    service = "homeassistant-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
+                "mealie-public" = {
+                    rule = "Host(`mealie.crussell.io`)";
+                    service = "mealie-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
+                "jellyfin-public" = {
+                    rule = "Host(`jellyfin.crussell.io`)";
+                    service = "jellyfin-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
+                "root-domain-public" = {
+                    rule = "Host(`crussell.io`)";
+                    service = "homeassistant-svc";
+                    entryPoints = [ "websecure" ];
+                };
             };
 
             services = {
-            "test-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:80"; }]; }; # Renamed from 'test'
-            "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:9925"; }]; };
-            "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.51:8123"; }]; };
+                "test-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:80"; }]; };
+                "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:9925"; }]; };
+                "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.51:8123"; }]; };
+                "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:8096"; }]; };
+                "jellyseer-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:5055"; }]; };
             };
         };
         };
@@ -193,10 +208,10 @@
     # Configure Traefik with AWS credentials for Route53
     systemd.services.traefik = {
         environment = {
-        AWS_REGION = "us-east-1";
+            AWS_REGION = "us-east-1";
         };
         serviceConfig = {
-        EnvironmentFile = config.sops.templates."traefik-env".path;
+            EnvironmentFile = config.sops.templates."traefik-env".path;
         };
     };
 
