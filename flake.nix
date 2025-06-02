@@ -15,9 +15,9 @@
     let
       system = "x86_64-linux";
 
-      makeNginxModule = args: import ./modules/nginx.nix ({ inherit sops-nix; } // args);
-      makeGatewayModule = args: import ./modules/gateway.nix ({ inherit sops-nix; } // args);
-      cloudProxyModule = args: import ./modules/cloud-proxy.nix ({ inherit sops-nix; } // args);
+      makeNginxModule = import ./modules/nginx.nix;
+      makeGatewayModule = import ./modules/gateway.nix;
+      cloudProxyModule = import ./modules/cloud-proxy.nix;
     in {
       packages.${system} = {
         nginx = nixos-generators.nixosGenerate {
@@ -68,11 +68,13 @@
       nixosConfigurations = {
         gateway = nixpkgs.lib.nixosSystem {
           inherit system;
+          specialArgs = { inherit sops-nix self; };
           modules = [ (makeGatewayModule { includeBootConfig = true; }) ];
         };
 
         nginx = nixpkgs.lib.nixosSystem {
           inherit system;
+          specialArgs = { inherit sops-nix self; };
           modules = [ (makeNginxModule { includeBootConfig = true; }) ];
         };
 
@@ -90,6 +92,7 @@
         # Minimal cloud reverse proxy for Hetzner
         cloud-proxy = nixpkgs.lib.nixosSystem {
           inherit system;
+          specialArgs = { inherit sops-nix self; };
           modules = [ cloudProxyModule ];
         };
       };

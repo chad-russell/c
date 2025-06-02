@@ -1,4 +1,4 @@
-{ includeBootConfig ? false, sops-nix }: { pkgs, lib, ... }: {
+{ includeBootConfig ? false }: { pkgs, lib, sops-nix, self, ... }: {
     networking.hostName = "vm-test";
     networking.firewall.allowedTCPPorts = [ 22 80 9925 ];
     networking.useDHCP = false;

@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, config, lib, sops-nix, self, ... }: {
     imports = [ sops-nix.nixosModules.sops ./hetzner-bootstrap/configuration.nix ];
     
     networking.hostName = "cloud-proxy";
@@ -84,7 +84,7 @@
     ];
 
     sops = {
-        defaultSopsFile = ./secrets.yaml;
+        defaultSopsFile = self + "/secrets.yaml";
         defaultSopsFormat = "yaml";
         age.keyFile = "/etc/sops/age/keys.txt";
         secrets = {
