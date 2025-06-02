@@ -59,6 +59,48 @@
             enable = true;
             dockerCompat = true;  # For docker-compose compatibility
         };
+        oci-containers = {
+            backend = "podman";
+            containers = {
+                jellyfin = {
+                    image = "docker.io/jellyfin/jellyfin:latest";
+                    autoStart = true;
+                    ports = [ "8096:8096" ];
+                    environment = {
+                        PUID = "1000";
+                        PGID = "1000";
+                        TZ = "America/New_York";
+                    };
+                    volumes = [
+                        "/var/lib/jellyfin:/config"
+                        "/media:/media"
+                    ];
+                    extraOptions = [
+                        "--device=/dev/dri:/dev/dri"
+                        "--group-add=video"
+                        "--user=1000:1000"
+                        "--memory=2000M"
+                    ];
+                };
+                
+                jellyseer = {
+                    image = "docker.io/fallenbagel/jellyseerr:latest";
+                    autoStart = true;
+                    ports = [ "5055:5055" ];
+                    environment = {
+                        LOG_LEVEL = "debug";
+                        TZ = "America/New_York";
+                    };
+                    volumes = [
+                        "/var/lib/jellyseer:/app/config"
+                    ];
+                    extraOptions = [
+                        "--memory=500M"
+                    ];
+                    dependsOn = [ "jellyfin" ];
+                };
+            };
+        };
     };
 
     # Create data directories and set proper permissions for GPU access
@@ -76,67 +118,6 @@
 
     # Add users to video group for GPU access
     users.groups.video = {};
-
-    # Jellyfin container service
-    systemd.services.jellyfin = {
-        description = "Jellyfin Media Server";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network.target" ];
-        
-        serviceConfig = {
-        Type = "simple";
-        ExecStartPre = [
-            "-${pkgs.podman}/bin/podman rm -f jellyfin"
-            "${pkgs.podman}/bin/podman pull docker.io/jellyfin/jellyfin:latest"
-        ];
-        ExecStart = ''
-            ${pkgs.podman}/bin/podman run --name jellyfin \
-            --rm \
-            -p 8096:8096 \
-            -e PUID=1000 \
-            -e PGID=1000 \
-            -e TZ=America/New_York \
-            -v /var/lib/jellyfin:/config \
-            -v /media:/media \
-            --device /dev/dri:/dev/dri \
-            --group-add video \
-            --user 1000:1000 \
-            --memory=2000M \
-            docker.io/jellyfin/jellyfin:latest
-        '';
-        ExecStop = "${pkgs.podman}/bin/podman stop jellyfin";
-        Restart = "always";
-        RestartSec = "10s";
-        };
-    };
-
-    # Jellyseer container service
-    systemd.services.jellyseer = {
-        description = "Jellyseer Request Management";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network.target" "jellyfin.service" ];
-        
-        serviceConfig = {
-            Type = "simple";
-            ExecStartPre = [
-                "-${pkgs.podman}/bin/podman rm -f jellyseer"
-                "${pkgs.podman}/bin/podman pull docker.io/fallenbagel/jellyseerr:latest"
-            ];
-            ExecStart = ''
-                ${pkgs.podman}/bin/podman run --name jellyseer \
-                --rm \
-                -p 5055:5055 \
-                -e LOG_LEVEL=debug \
-                -e TZ=America/New_York \
-                -v /var/lib/jellyseer:/app/config \
-                --memory=500M \
-                docker.io/fallenbagel/jellyseerr:latest
-            '';
-            ExecStop = "${pkgs.podman}/bin/podman stop jellyseer";
-            Restart = "always";
-            RestartSec = "10s";
-        };
-    };
 
     environment.systemPackages = with pkgs; [
         git 

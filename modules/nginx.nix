@@ -38,8 +38,31 @@
     # Enable Podman
     virtualisation = {
         podman = {
-        enable = true;
-        dockerCompat = true;  # For docker-compose compatibility
+            enable = true;
+            dockerCompat = true;  # For docker-compose compatibility
+        };
+        oci-containers = {
+            backend = "podman";
+            containers = {
+                mealie = {
+                    image = "ghcr.io/mealie-recipes/mealie:v2.8.0";
+                    autoStart = true;
+                    ports = [ "9925:9000" ];
+                    environment = {
+                        ALLOW_SIGNUP = "false";
+                        PUID = "1000";
+                        PGID = "1000";
+                        TZ = "America/New_York";
+                        BASE_URL = "http://mealie.internal.crussell.io";
+                    };
+                    volumes = [
+                        "/var/lib/mealie:/app/data"
+                    ];
+                    extraOptions = [
+                        "--memory=1000M"
+                    ];
+                };
+            };
         };
     };
 
@@ -47,37 +70,6 @@
     systemd.tmpfiles.rules = [
         "d /var/lib/mealie 0755 root root -"
     ];
-
-    # Mealie container service
-    systemd.services.mealie = {
-        description = "Mealie Recipe Manager";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network.target" ];
-        
-        serviceConfig = {
-        Type = "simple";
-        ExecStartPre = [
-            "-${pkgs.podman}/bin/podman rm -f mealie"
-            "${pkgs.podman}/bin/podman pull ghcr.io/mealie-recipes/mealie:v2.8.0"
-        ];
-        ExecStart = ''
-            ${pkgs.podman}/bin/podman run --name mealie \
-            --rm \
-            -p 9925:9000 \
-            -e ALLOW_SIGNUP=false \
-            -e PUID=1000 \
-            -e PGID=1000 \
-            -e TZ=America/New_York \
-            -e BASE_URL=http://mealie.internal.crussell.io \
-            -v /var/lib/mealie:/app/data \
-            --memory=1000M \
-            ghcr.io/mealie-recipes/mealie:v2.8.0
-        '';
-        ExecStop = "${pkgs.podman}/bin/podman stop mealie";
-        Restart = "always";
-        RestartSec = "10s";
-        };
-    };
 
     # Configure Nginx as reverse proxy for Mealie
     services.nginx = {
