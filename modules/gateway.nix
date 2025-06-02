@@ -1,4 +1,4 @@
-{ includeBootConfig ? false }: { pkgs, config, lib, sops-nix, self, ... }: {
+{ includeBootConfig ? false, sops-nix }: { pkgs, config, lib, ... }: {
     imports = [ sops-nix.nixosModules.sops ];
     
     networking.hostName = "vm-gateway";
@@ -245,7 +245,7 @@
 
     # SOPS configuration
     sops = {
-        defaultSopsFile = self + "/secrets.yaml";
+        defaultSopsFile = ../secrets.yaml;
         defaultSopsFormat = "yaml";
         age.keyFile = "/etc/sops/age/keys.txt";
         

@@ -17,21 +17,19 @@
 
       makeNginxModule = import ./modules/nginx.nix;
       makeGatewayModule = import ./modules/gateway.nix;
-      cloudProxyModule = import ./modules/cloud-proxy.nix;
+      makeCloudProxyModule = import ./modules/cloud-proxy.nix;
     in {
       packages.${system} = {
         nginx = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          extraSpecialArgs = { inherit sops-nix self; };
           modules = [ (makeNginxModule { }) ];
         };
 
         gateway = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          extraSpecialArgs = { inherit sops-nix self; };
-          modules = [ (makeGatewayModule { }) ];
+          modules = [ (makeGatewayModule { inherit sops-nix; }) ];
         };
 
         # Helper script for deploying the age key
@@ -70,13 +68,11 @@
       nixosConfigurations = {
         gateway = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit sops-nix self; };
-          modules = [ (makeGatewayModule { includeBootConfig = true; }) ];
+          modules = [ (makeGatewayModule { includeBootConfig = true; inherit sops-nix; }) ];
         };
 
         nginx = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit sops-nix self; };
           modules = [ (makeNginxModule { includeBootConfig = true; }) ];
         };
 
@@ -94,8 +90,7 @@
         # Minimal cloud reverse proxy for Hetzner
         cloud-proxy = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit sops-nix self; };
-          modules = [ cloudProxyModule ];
+          modules = [ (makeCloudProxyModule { inherit sops-nix; }) ];
         };
       };
     };
