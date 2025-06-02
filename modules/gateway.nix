@@ -1,4 +1,4 @@
-{ includeBootConfig ? false }: { pkgs, config, lib, ... }: {
+{ includeBootConfig ? false, sops-nix }: { pkgs, config, lib, ... }: {
     imports = [ sops-nix.nixosModules.sops ];
     
     networking.hostName = "vm-gateway";

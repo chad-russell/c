@@ -15,9 +15,9 @@
     let
       system = "x86_64-linux";
 
-      makeNginxModule = import ./modules/nginx.nix;
-      makeGatewayModule = import ./modules/gateway.nix;
-      cloudProxyModule = import ./modules/cloud-proxy.nix;
+      makeNginxModule = args: import ./modules/nginx.nix ({ inherit sops-nix; } // args);
+      makeGatewayModule = args: import ./modules/gateway.nix ({ inherit sops-nix; } // args);
+      cloudProxyModule = args: import ./modules/cloud-proxy.nix ({ inherit sops-nix; } // args);
     in {
       packages.${system} = {
         nginx = nixos-generators.nixosGenerate {
