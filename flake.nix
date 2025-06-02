@@ -23,12 +23,14 @@
         nginx = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
+          extraSpecialArgs = { inherit sops-nix self; };
           modules = [ (makeNginxModule { }) ];
         };
 
         gateway = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
+          extraSpecialArgs = { inherit sops-nix self; };
           modules = [ (makeGatewayModule { }) ];
         };
 
