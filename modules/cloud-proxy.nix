@@ -1,5 +1,5 @@
-{ sops-nix }: { pkgs, config, lib, ... }: {
-    imports = [ sops-nix.nixosModules.sops ../hetzner-bootstrap/configuration.nix ];
+{ pkgs, config, lib, ... }: {
+    imports = [ ../hetzner-bootstrap/configuration.nix ];
     
     networking.hostName = "cloud-proxy";
     networking.firewall.allowedTCPPorts = [ 80 443 22 ];
@@ -70,32 +70,7 @@
         };
     };
 
-    # SOPS/AWS related configurations are generally not needed for this simplified proxy.
-    systemd.services.traefik = {
-        # environment = { AWS_REGION = "us-east-1"; }; # Likely not needed
-        # serviceConfig = {}; 
-    };
-
     systemd.tmpfiles.rules = [
         "d /var/lib/traefik 0755 traefik traefik -"
-        # No acme.json managed by this Traefik instance
-        "d /etc/sops 0755 root root -"
-        "d /etc/sops/age 0755 root root -"
     ];
-
-    sops = {
-        defaultSopsFile = ../secrets.yaml;
-        defaultSopsFormat = "yaml";
-        age.keyFile = "/etc/sops/age/keys.txt";
-        secrets = {
-        # No Traefik-specific secrets needed for cloud-proxy in this setup.
-        # Keep tailscale secrets if other scripts on cloud-proxy use them, otherwise can be removed.
-            tailscale-oauth-client-id = { 
-            # owner = "root"; group = "root"; mode = "0400"; # Example, if used by other tools
-            };
-            tailscale-oauth-client-secret = {
-            # owner = "root"; group = "root"; mode = "0400"; # Example, if used by other tools
-            };
-        };
-    };
 }

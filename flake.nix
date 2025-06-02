@@ -17,8 +17,8 @@
 
       makeNginxModule = import ./modules/nginx.nix;
       makeGatewayModule = import ./modules/gateway.nix;
-      makeCloudProxyModule = import ./modules/cloud-proxy.nix;
       makeJellyfinModule = import ./modules/jellyfin.nix;
+      cloudProxyModule = import ./modules/cloud-proxy.nix;
     in {
       packages.${system} = {
         nginx = nixos-generators.nixosGenerate {
@@ -102,7 +102,7 @@
         # Minimal cloud reverse proxy for Hetzner
         cloud-proxy = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ (makeCloudProxyModule { inherit sops-nix; }) ];
+          modules = [ cloudProxyModule ];
         };
       };
     };
