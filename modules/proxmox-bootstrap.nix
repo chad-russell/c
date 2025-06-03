@@ -2,11 +2,12 @@
   # Generic hostname - will be changed during service deployment
   networking.hostName = "vm-bootstrap";
   
+  # Use global DHCP for maximum compatibility
+  # This will enable DHCP on all available ethernet interfaces
+  networking.useDHCP = true;
+  
   # Allow SSH and basic networking
   networking.firewall.allowedTCPPorts = [ 22 ];
-  
-  # Let the proxmox format handle networking by default
-  # Individual services will override with static IPs
   
   # SSH configuration
   services.openssh.enable = true;
@@ -15,10 +16,9 @@
     PasswordAuthentication = true;
   };
 
-  # Essential packages for management
+  # Essential packages for management (including dhcp client tools)
   environment.systemPackages = with pkgs; [
     git
-    neovim
   ];
 
   # User configuration
