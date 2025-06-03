@@ -90,6 +90,16 @@
         openFirewall = true;
     };
 
+    services.radarr = {
+        enable = true;
+        openFirewall = true;
+    };
+
+    services.sonarr = {
+        enable = true;
+        openFirewall = true;
+    };
+
     # Create media directories
     systemd.tmpfiles.rules = [
         "d /var/lib/jellyfin 0755 crussell users -"
