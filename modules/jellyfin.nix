@@ -33,10 +33,9 @@
     };
 
     # Hardware acceleration support
-    hardware.opengl = {
+    hardware.graphics = {
         enable = true;
-        driSupport = true;
-        driSupport32Bit = true;
+        enable32Bit = true;  # Renamed from driSupport32Bit
         extraPackages = with pkgs; [
             intel-media-driver  # VAAPI driver for modern Intel GPUs (Broadwell+)
             vaapiIntel          # VAAPI driver for older Intel GPUs  
