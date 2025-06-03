@@ -90,13 +90,11 @@
     services.radarr = {
         enable = true;
         openFirewall = true;
-        user = "crussell";  # Run as our user to access media files easily
     };
 
     services.sonarr = {
         enable = true;
         openFirewall = true;
-        user = "crussell";  # Run as our user to access media files easily
     };
 
     services.prowlarr = {
@@ -114,7 +112,7 @@
         "d /media/movies 0755 crussell users -"
         "d /media/tv 0755 crussell users -"
         "d /media/music 0755 crussell users -"
-        "d /mnt/media 0755 crussell users -"
+        "d /mnt/media 0775 crussell media -"
     ];
 
     # Add users to video group for GPU access
@@ -149,6 +147,8 @@
             "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsHOYNAog8L5SAhKp551g4oJFSi/GB+Fg38mmBLhwbrCUSfVSFqKeaOuRlLCQVnTWPZYfyp6cTibHBeigky6fjKhQgKnUJgwPdHjxhSvk7m6zgGj71s45bFT918E1J8hysN2wrijoo6oJ1zSeX3FIWOcFZVR4MHxCdYCMr+4mJp8tb1oQRea6GxCFGCms7DoNii+gWL/K2KZTMHKZ6l9Nf5CXq/6+a9Pfog3XuRlpTxLlIVj8YMC8TeRki0m9mG4+gk4OtCzACL/ngY0OxRWN4IN0NhFZOO5FHwytMR9/yNiAzafzaIt2szd69nmPG3DrXSUN1nXZKR78kM5O1kIaEKNeWJjhTXuDF7DtMF61TlXDWmsFxQbF9TAWK7nXJMUzAgXY1vIkTiYV3uwBB9upyKmXD/M5U1cFDvY6sSnINHxaqXp7/IoEHsXzHKmR5yhGLVszMzMlINBTxrWEYbjzNJPEvWeLCt3EbU4LPVffc8MA+l9zujSDjMO78uC7k/Ek= chadrussell@Chads-MacBook-Pro.local"
         ];
     };
+
+    users.groups.media.members = [ "radarr" "sonarr" "crussell" ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
