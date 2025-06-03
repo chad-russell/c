@@ -22,14 +22,14 @@
       cloudProxyModule = import ./modules/cloud-proxy.nix;
       
       # Bootstrap module - minimal base system for Proxmox
-      bootstrapModule = import ./modules/bootstrap.nix;
+      proxmoxBootstrapModule = import ./modules/proxmox-bootstrap.nix;
     in {
       packages.${system} = {
         # Single bootstrap image for Proxmox deployment
-        bootstrap = nixos-generators.nixosGenerate {
+        proxmox-bootstrap = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          modules = [ bootstrapModule ];
+          modules = [ proxmoxBootstrapModule ];
         };
 
         # Helper script for deploying the age key

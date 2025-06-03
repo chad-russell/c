@@ -4,7 +4,12 @@
   
   # Allow SSH and basic networking
   networking.firewall.allowedTCPPorts = [ 22 ];
-  networking.useDHCP = true;  # Let DHCP handle initial networking
+  
+  # Override the Proxmox module's DHCP setting - we want DHCP for bootstrap
+  networking.useDHCP = lib.mkForce true;
+  
+  # Also ensure specific interface doesn't conflict
+  networking.interfaces = lib.mkForce {};
   
   # Basic boot configuration for Proxmox
   boot.loader.grub.enable = true;

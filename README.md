@@ -104,24 +104,24 @@ Services use static IP assignments in the 192.168.1.x range. Adjust IP addresses
 
 ## To Build on NixOS
 ```bash
-nix build .#proxmoxImage
+nix build .#bootstrap
 ```
 
 ## To restore onto a proxmox node
 ```bash
-qmrestore /var/lib/vz/dump/vzdump-qemu-nixos-*.vma.zst 103 --storage vmstore --force
+qmrestore /var/lib/vz/dump/vzdump-qemu-nixos-*.vma.zst ID --storage vmstore --force
 ```
 
 ## More useful commands:
 ```bash
 # Increase RAM to 4096 MB
-qm set 101 --memory 4096
+qm set ID --memory 4096
 
 # Set CPU cores
-qm set 101 --cores 2
+qm set ID --cores 2
 
 # Expand the main disk (if needed)
-qm resize 101 virtio0 +50G
+qm resize ID virtio0 +50G
 ```
 
 ## Key Configuration Details & Troubleshooting Notes
