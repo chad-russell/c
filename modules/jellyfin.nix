@@ -106,7 +106,6 @@
     services.prowlarr = {
         enable = true;
         openFirewall = true;
-        user = "crussell";  # Run as our user to access media files easily
     };
 
     # Create media directories
