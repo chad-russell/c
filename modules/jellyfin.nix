@@ -7,12 +7,7 @@
 
     # More flexible network interface configuration that works with both i440fx and q35
     networking.interfaces = {
-        ens18.ipv4.addresses = [{
-            address = "192.168.1.203";
-            prefixLength = 24;
-        }];
-        # Fallback for q35 machine type which might use different interface names
-        enp0s18.ipv4.addresses = [{
+        enp6s18.ipv4.addresses = [{
             address = "192.168.1.203";
             prefixLength = 24;
         }];
