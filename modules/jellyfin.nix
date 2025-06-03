@@ -104,7 +104,6 @@
 
     # Create media directories
     systemd.tmpfiles.rules = [
-        "d /var/lib/jellyfin 0755 crussell users -"
         "d /mnt/media 0775 crussell media -"
     ];
 
@@ -141,7 +140,7 @@
         ];
     };
 
-    users.groups.media.members = [ "radarr" "sonarr" "crussell" ];
+    users.groups.media.members = [ "jellyfin" "radarr" "sonarr" "crussell" ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
