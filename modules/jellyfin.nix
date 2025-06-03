@@ -3,7 +3,7 @@
     networking.firewall.allowedTCPPorts = [ 22 8096 5055 ];
     networking.useDHCP = false;
     networking.defaultGateway = "192.168.1.1";
-    networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    networking.nameservers = [ "192.168.1.201" ];
 
     # More flexible network interface configuration that works with both i440fx and q35
     networking.interfaces = {
@@ -103,11 +103,6 @@
     };
 
     services.jackett = {
-        enable = true;
-        openFirewall = true;
-    };
-
-    services.flaresolverr = {
         enable = true;
         openFirewall = true;
     };
