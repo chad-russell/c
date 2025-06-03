@@ -90,11 +90,15 @@
     services.radarr = {
         enable = true;
         openFirewall = true;
+        user = "crussell";  # Run as our user to access media files easily
+        group = "users";
     };
 
     services.sonarr = {
         enable = true;
         openFirewall = true;
+        user = "crussell";  # Run as our user to access media files easily
+        group = "users";
     };
 
     services.prowlarr = {
@@ -108,11 +112,7 @@
         "d /var/lib/radarr 0755 crussell users -"
         "d /var/lib/sonarr 0755 crussell users -"
         "d /var/lib/prowlarr 0755 crussell users -"
-        "d /media 0755 crussell users -"
-        "d /media/movies 0755 crussell users -"
-        "d /media/tv 0755 crussell users -"
-        "d /media/music 0755 crussell users -"
-        "d /mnt/media 0775 crussell media -"
+        "d /mnt/media 0775 crussell users -"
     ];
 
     # Add users to video group for GPU access
