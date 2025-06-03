@@ -1,14 +1,16 @@
 { pkgs, lib, ... }: {
-  # Generic hostname - will be changed during service deployment
-  networking.hostName = "vm-bootstrap";
-  
-  # Use global DHCP for maximum compatibility
-  # This will enable DHCP on all available ethernet interfaces
-  # Use mkForce to override the proxmox-image.nix default (which sets useDHCP = false)
-  networking.useDHCP = lib.mkForce true;
-  
-  # Allow SSH and basic networking
-  networking.firewall.allowedTCPPorts = [ 22 ];
+    networking.hostName = "vm-bootstrap";
+    networking.firewall.allowedTCPPorts = [ 22 ];
+    networking.useDHCP = false;
+    networking.defaultGateway = "192.168.1.1";
+    networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+
+    networking.interfaces.ens18 = {
+        ipv4.addresses = [{
+          address = "192.168.1.254";
+          prefixLength = 24;
+        }];
+    };
   
   # SSH configuration
   services.openssh.enable = true;
@@ -40,9 +42,6 @@
 
   # Enable flakes and new nix commands
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  # Fix the deprecated diskSize option - use the new location
-  virtualisation.diskSize = 51200; # 50GB disk size
 
   system.stateVersion = "25.05";
 } 
