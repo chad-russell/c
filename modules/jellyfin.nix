@@ -5,8 +5,14 @@
     networking.defaultGateway = "192.168.1.1";
     networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
-    networking.interfaces.ens18 = {
-        ipv4.addresses = [{
+    # More flexible network interface configuration that works with both i440fx and q35
+    networking.interfaces = {
+        ens18.ipv4.addresses = [{
+            address = "192.168.1.203";
+            prefixLength = 24;
+        }];
+        # Fallback for q35 machine type which might use different interface names
+        enp0s18.ipv4.addresses = [{
             address = "192.168.1.203";
             prefixLength = 24;
         }];
@@ -21,7 +27,8 @@
     boot = {
         loader.grub.enable = true;
         loader.grub.devices = [ "/dev/vda" ];
-        initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
+        # More flexible kernel module loading
+        initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" "virtio_pci" "virtio_blk" ];
         initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
         kernel.sysctl = {
             "net.ipv6.conf.all.disable_ipv6" = "1";
@@ -55,6 +62,7 @@
             intel-vaapi-driver      # For older processors. LIBVA_DRIVER_NAME=i965
             libva-vdpau-driver      # Previously vaapiVdpau
             intel-compute-runtime-legacy1 # OpenCL support for intel CPUs before 12th gen (i5-9500T is 9th gen)
+            # intel-compute-runtime
             vpl-gpu-rt             # QSV on 11th gen or newer
             intel-media-sdk        # QSV up to 11th gen
             intel-ocl              # OpenCL support

@@ -167,3 +167,16 @@ These settings are managed directly in the Proxmox VE web GUI for each VM:
 - [ ] LAN without internet → works ✅
 - [ ] Remote (Tailscale) → works ✅
 - [ ] Public users → works ✅
+
+
+## Configuring iGPU passthrough for Intel
+```bash
+# Get correct ids:
+lspci -n | grep 00:02.0
+
+# On each node:
+echo "blacklist i915" >> /etc/modprobe.d/blacklist.conf
+echo "options vfio-pci ids=8086:3e92" >> /etc/modprobe.d/vfio.conf
+update-initramfs -u -k all
+reboot
+```

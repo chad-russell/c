@@ -157,12 +157,6 @@
                     entryPoints = [ "websecure" ];
                 };
 
-                "jellyfin-internal" = {
-                    rule = "Host(`jellyfin.internal.crussell.io`)";
-                    service = "jellyfin-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
                 "jellyseer-internal" = {
                     rule = "Host(`jellyseer.internal.crussell.io`)";
                     service = "jellyseer-svc";
