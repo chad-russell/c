@@ -4,7 +4,8 @@
   
   # Use global DHCP for maximum compatibility
   # This will enable DHCP on all available ethernet interfaces
-  networking.useDHCP = true;
+  # Use mkForce to override the proxmox-image.nix default (which sets useDHCP = false)
+  networking.useDHCP = lib.mkForce true;
   
   # Allow SSH and basic networking
   networking.firewall.allowedTCPPorts = [ 22 ];
@@ -39,6 +40,9 @@
 
   # Enable flakes and new nix commands
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Fix the deprecated diskSize option - use the new location
+  virtualisation.diskSize = 51200; # 50GB disk size
 
   system.stateVersion = "25.05";
 } 
