@@ -35,6 +35,9 @@
     # Enable all firmware for proper Intel GPU support (especially important for newer CPUs)
     hardware.enableAllFirmware = true;
 
+    # Allow unfree packages for Intel GPU firmware
+    nixpkgs.config.allowUnfree = true;
+
     # Hardware acceleration support - following NixOS wiki recommendations
     nixpkgs.config.packageOverrides = pkgs: {
         intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
