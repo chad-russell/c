@@ -19,6 +19,12 @@
         fsType = "ext4";
     };
 
+    fileSystems."/mnt/media" = {
+        device = "192.168.1.55:/mnt/tank/media";
+        fsType = "nfs";
+        options = [ "x-systemd.automount" "noatime" "nfsvers=4" ];
+    };
+
     boot = {
         loader.grub.enable = true;
         loader.grub.devices = [ "/dev/vda" ];
@@ -91,6 +97,7 @@
         "d /media/movies 0755 crussell users -"
         "d /media/tv 0755 crussell users -"
         "d /media/music 0755 crussell users -"
+        "d /mnt/media 0755 crussell users -"
     ];
 
     # Add users to video group for GPU access
@@ -108,6 +115,7 @@
         intel-gpu-tools
         clinfo          # Check OpenCL support: clinfo  
         libva-utils     # VAAPI utilities (includes vainfo command)
+        nfs-utils
     ];
 
     users.users.crussell = {
