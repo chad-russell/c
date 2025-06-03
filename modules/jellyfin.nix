@@ -105,9 +105,6 @@
     # Create media directories
     systemd.tmpfiles.rules = [
         "d /var/lib/jellyfin 0755 crussell users -"
-        "d /var/lib/radarr 0755 radarr radarr -"
-        "d /var/lib/sonarr 0755 sonarr sonarr -"
-        "d /var/lib/prowlarr 0755 crussell users -"
         "d /mnt/media 0775 crussell media -"
     ];
 
