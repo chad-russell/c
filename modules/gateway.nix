@@ -1,4 +1,4 @@
-{ includeBootConfig ? false, sops-nix }: { pkgs, config, lib, ... }: {
+{ sops-nix }: { pkgs, config, lib, ... }: {
     imports = [ sops-nix.nixosModules.sops ];
     
     networking.hostName = "vm-gateway";
@@ -16,12 +16,12 @@
     };
 
     # Boot and filesystem configuration - only included for nixosSystem builds
-    fileSystems."/" = lib.mkIf includeBootConfig {
+    fileSystems."/" = {
         device = "/dev/vda1";
         fsType = "ext4";
     };
     
-    boot = lib.mkIf includeBootConfig {
+    boot = {
         loader.grub.enable = true;
         loader.grub.devices = [ "/dev/vda" ];
         initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
