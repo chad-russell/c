@@ -157,12 +157,6 @@
                     entryPoints = [ "websecure" ];
                 };
 
-                "jellyseer-internal" = {
-                    rule = "Host(`jellyseer.internal.crussell.io`)";
-                    service = "jellyseer-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
                 "homeassistant-public" = {
                     rule = "Host(`homeassistant.crussell.io`)";
                     service = "homeassistant-svc";
@@ -181,6 +175,36 @@
                     entryPoints = [ "websecure" ];
                 };
 
+                "sonarr-internal" = {
+                    rule = "Host(`sonarr.internal.crussell.io`)";
+                    service = "sonarr-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
+                "radarr-internal" = {
+                    rule = "Host(`radarr.internal.crussell.io`)";
+                    service = "radarr-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
+                "jackett-internal" = {
+                    rule = "Host(`jackett.internal.crussell.io`)";
+                    service = "jackett-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
+                "jellyseerr-internal" = {
+                    rule = "Host(`jellyseerr.internal.crussell.io`)";
+                    service = "jellyseerr-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
+                "prowlarr-internal" = {
+                    rule = "Host(`prowlarr.internal.crussell.io`)";
+                    service = "prowlarr-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
                 "root-domain-public" = {
                     rule = "Host(`crussell.io`)";
                     service = "homeassistant-svc";
@@ -193,7 +217,11 @@
                 "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:9925"; }]; };
                 "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.51:8123"; }]; };
                 "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:8096"; }]; };
-                "jellyseer-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:5055"; }]; };
+                "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:8989"; }]; };
+                "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:7878"; }]; };
+                "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:9117"; }]; };
+                "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:5055"; }]; };
+                "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:5056"; }]; };
             };
         };
         };

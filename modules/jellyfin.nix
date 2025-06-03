@@ -107,6 +107,11 @@
         openFirewall = true;
     };
 
+    services.flaresolverr = {
+        enable = true;
+        openFirewall = true;
+    };
+
     # Create media directories
     systemd.tmpfiles.rules = [
         "d /mnt/media 0775 crussell media -"
