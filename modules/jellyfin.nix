@@ -32,106 +32,83 @@
         kernelModules = [ "i915" ];
     };
 
-    # Hardware acceleration support
+    # Enable all firmware for proper Intel GPU support (especially important for newer CPUs)
+    hardware.enableAllFirmware = true;
+
+    # Hardware acceleration support - following NixOS wiki recommendations
+    nixpkgs.config.packageOverrides = pkgs: {
+        intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+    };
+
+    # Set VAAPI driver environment variables
+    systemd.services.jellyfin.environment.LIBVA_DRIVER_NAME = "iHD"; # For intel-media-driver
+    environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
+
     hardware.graphics = {
         enable = true;
-        enable32Bit = true;  # Renamed from driSupport32Bit
+        enable32Bit = true;
         extraPackages = with pkgs; [
-            intel-media-driver  # VAAPI driver for modern Intel GPUs (Broadwell+)
-            vaapiIntel          # VAAPI driver for older Intel GPUs  
-            vaapiVdpau
-            libvdpau-va-gl
-            intel-compute-runtime # OpenCL
+            intel-media-driver      # For Broadwell (2014) or newer processors. LIBVA_DRIVER_NAME=iHD
+            intel-vaapi-driver      # For older processors. LIBVA_DRIVER_NAME=i965
+            libva-vdpau-driver      # Previously vaapiVdpau
+            intel-compute-runtime   # OpenCL filter support (hardware tonemapping and subtitle burn-in)
+            intel-compute-runtime-legacy1 # OpenCL support for intel CPUs before 12th gen
+            vpl-gpu-rt             # QSV on 11th gen or newer
+            intel-media-sdk        # QSV up to 11th gen
+            intel-ocl              # OpenCL support
         ];
     };
 
+    # SSH configuration
     services.openssh.enable = true;
     services.openssh.settings = {
         PermitRootLogin = "yes";
         PasswordAuthentication = true;
     };
 
-    # Enable Podman
-    virtualisation = {
-        podman = {
-            enable = true;
-            dockerCompat = true;  # For docker-compose compatibility
-        };
-        oci-containers = {
-            backend = "podman";
-            containers = {
-                jellyfin = {
-                    image = "docker.io/jellyfin/jellyfin:latest";
-                    autoStart = true;
-                    ports = [ "8096:8096" ];
-                    environment = {
-                        PUID = "1000";
-                        PGID = "1000";
-                        TZ = "America/New_York";
-                    };
-                    volumes = [
-                        "/var/lib/jellyfin:/config"
-                        "/media:/media"
-                    ];
-                    extraOptions = [
-                        "--device=/dev/dri:/dev/dri"
-                        "--group-add=video"
-                        "--user=1000:1000"
-                        "--memory=2000M"
-                    ];
-                };
-                
-                jellyseer = {
-                    image = "docker.io/fallenbagel/jellyseerr:latest";
-                    autoStart = true;
-                    ports = [ "5055:5055" ];
-                    environment = {
-                        LOG_LEVEL = "debug";
-                        TZ = "America/New_York";
-                    };
-                    volumes = [
-                        "/var/lib/jellyseer:/app/config"
-                    ];
-                    extraOptions = [
-                        "--memory=500M"
-                    ];
-                    dependsOn = [ "jellyfin" ];
-                };
-            };
-        };
+    # Native Jellyfin service
+    services.jellyfin = {
+        enable = true;
+        openFirewall = true;
+        user = "crussell";  # Run as our user to access media files easily
     };
 
-    # Create data directories and set proper permissions for GPU access
+    # Native Jellyseerr service
+    services.jellyseerr = {
+        enable = true;
+        openFirewall = true;
+    };
+
+    # Create media directories
     systemd.tmpfiles.rules = [
-        "d /var/lib/jellyfin 0755 root root -"
-        "d /var/lib/jellyseer 0755 root root -"
-        "d /media 0755 root root -"
-        "d /media/movies 0755 root root -"
-        "d /media/tv 0755 root root -"
-        "d /media/music 0755 root root -"
-        # Ensure proper permissions for GPU devices
-        "a+ /dev/dri/renderD* - - - - u:1000:rw"
-        "a+ /dev/dri/card* - - - - u:1000:rw"
+        "d /var/lib/jellyfin 0755 crussell users -"
+        "d /media 0755 crussell users -"
+        "d /media/movies 0755 crussell users -"
+        "d /media/tv 0755 crussell users -"
+        "d /media/music 0755 crussell users -"
     ];
 
     # Add users to video group for GPU access
     users.groups.video = {};
 
+    # Essential packages including jellyfin packages and debugging tools
     environment.systemPackages = with pkgs; [
         git 
         curl
-        podman
-        podman-compose
-        ffmpeg
+        # Jellyfin packages
+        jellyfin
+        jellyfin-web
+        jellyfin-ffmpeg
         # GPU debugging tools
         intel-gpu-tools
-        vainfo  # Check VAAPI support
-        clinfo  # Check OpenCL support
+        vainfo          # Check VAAPI support: vainfo
+        clinfo          # Check OpenCL support: clinfo  
+        libva-utils     # VAAPI utilities
     ];
 
     users.users.crussell = {
         isNormalUser = true;
-        extraGroups = [ "wheel" "video" ];  # Added video group
+        extraGroups = [ "wheel" "video" "jellyfin" ];  # Added jellyfin group
         initialHashedPassword = "$y$j9T$bh0qHa7NdcwmdzYc8CjQj.$HUOFYiehqVxeTXtkFs2fAQZuohSp8uvonYB1Bbkf567";
         openssh.authorizedKeys.keys = [
             "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsHOYNAog8L5SAhKp551g4oJFSi/GB+Fg38mmBLhwbrCUSfVSFqKeaOuRlLCQVnTWPZYfyp6cTibHBeigky6fjKhQgKnUJgwPdHjxhSvk7m6zgGj71s45bFT918E1J8hysN2wrijoo6oJ1zSeX3FIWOcFZVR4MHxCdYCMr+4mJp8tb1oQRea6GxCFGCms7DoNii+gWL/K2KZTMHKZ6l9Nf5CXq/6+a9Pfog3XuRlpTxLlIVj8YMC8TeRki0m9mG4+gk4OtCzACL/ngY0OxRWN4IN0NhFZOO5FHwytMR9/yNiAzafzaIt2szd69nmPG3DrXSUN1nXZKR78kM5O1kIaEKNeWJjhTXuDF7DtMF61TlXDWmsFxQbF9TAWK7nXJMUzAgXY1vIkTiYV8MA+l9zujSDjMO78uC7k/Ek= chadrussell@Chads-MacBook-Pro.local"
