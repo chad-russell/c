@@ -104,9 +104,8 @@
         jellyfin-ffmpeg
         # GPU debugging tools
         intel-gpu-tools
-        vainfo          # Check VAAPI support: vainfo
         clinfo          # Check OpenCL support: clinfo  
-        libva-utils     # VAAPI utilities
+        libva-utils     # VAAPI utilities (includes vainfo command)
     ];
 
     users.users.crussell = {
