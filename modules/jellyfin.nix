@@ -90,15 +90,11 @@
     services.radarr = {
         enable = true;
         openFirewall = true;
-        user = "crussell";  # Run as our user to access media files easily
-        group = "users";
     };
 
     services.sonarr = {
         enable = true;
         openFirewall = true;
-        user = "crussell";  # Run as our user to access media files easily
-        group = "users";
     };
 
     services.prowlarr = {
@@ -109,10 +105,10 @@
     # Create media directories
     systemd.tmpfiles.rules = [
         "d /var/lib/jellyfin 0755 crussell users -"
-        "d /var/lib/radarr 0755 crussell users -"
-        "d /var/lib/sonarr 0755 crussell users -"
+        "d /var/lib/radarr 0755 radarr radarr -"
+        "d /var/lib/sonarr 0755 sonarr sonarr -"
         "d /var/lib/prowlarr 0755 crussell users -"
-        "d /mnt/media 0775 crussell users -"
+        "d /mnt/media 0775 crussell media -"
     ];
 
     # Add users to video group for GPU access
