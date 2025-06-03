@@ -54,8 +54,7 @@
             intel-media-driver      # For Broadwell (2014) or newer processors. LIBVA_DRIVER_NAME=iHD
             intel-vaapi-driver      # For older processors. LIBVA_DRIVER_NAME=i965
             libva-vdpau-driver      # Previously vaapiVdpau
-            intel-compute-runtime   # OpenCL filter support (hardware tonemapping and subtitle burn-in)
-            intel-compute-runtime-legacy1 # OpenCL support for intel CPUs before 12th gen
+            intel-compute-runtime-legacy1 # OpenCL support for intel CPUs before 12th gen (i5-9500T is 9th gen)
             vpl-gpu-rt             # QSV on 11th gen or newer
             intel-media-sdk        # QSV up to 11th gen
             intel-ocl              # OpenCL support
