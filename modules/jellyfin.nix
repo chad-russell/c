@@ -88,16 +88,25 @@
     services.jellyseerr = {
         enable = true;
         openFirewall = true;
+        user = "crussell";  # Run as our user to access media files easily
     };
 
     services.radarr = {
         enable = true;
         openFirewall = true;
+        user = "crussell";  # Run as our user to access media files easily
     };
 
     services.sonarr = {
         enable = true;
         openFirewall = true;
+        user = "crussell";  # Run as our user to access media files easily
+    };
+
+    services.prowlarr = {
+        enable = true;
+        openFirewall = true;
+        user = "crussell";  # Run as our user to access media files easily
     };
 
     # Create media directories
