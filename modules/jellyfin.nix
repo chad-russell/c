@@ -102,6 +102,11 @@
         openFirewall = true;
     };
 
+    services.jackett = {
+        enable = true;
+        openFirewall = true;
+    };
+
     # Create media directories
     systemd.tmpfiles.rules = [
         "d /mnt/media 0775 crussell media -"
@@ -143,7 +148,7 @@
         ];
     };
 
-    users.groups.media.members = [ "jellyfin" "radarr" "sonarr" "crussell" ];
+    users.groups.media.members = [ "jellyfin" "radarr" "sonarr" "jackett" "crussell" ];
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
