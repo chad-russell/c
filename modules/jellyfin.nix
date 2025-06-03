@@ -106,6 +106,8 @@
     systemd.tmpfiles.rules = [
         "d /mnt/media 0775 crussell media -"
         "Z /mnt/media/Movies 0775 crussell media -"
+        "Z /mnt/media/TV 0775 crussell media -"
+        "Z /mnt/media/Downloads 0775 crussell media -"
     ];
 
     # Add users to video group for GPU access
