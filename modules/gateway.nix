@@ -221,7 +221,7 @@
                 "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:7878"; }]; };
                 "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:9117"; }]; };
                 "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:5055"; }]; };
-                "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:5056"; }]; };
+                "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:9696"; }]; };
             };
         };
         };
