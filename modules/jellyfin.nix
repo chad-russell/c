@@ -70,21 +70,18 @@
         ];
     };
 
-    # SSH configuration
     services.openssh.enable = true;
     services.openssh.settings = {
         PermitRootLogin = "yes";
         PasswordAuthentication = true;
     };
 
-    # Native Jellyfin service
     services.jellyfin = {
         enable = true;
         openFirewall = true;
         user = "crussell";  # Run as our user to access media files easily
     };
 
-    # Native Jellyseerr service
     services.jellyseerr = {
         enable = true;
         openFirewall = true;
@@ -110,6 +107,9 @@
     # Create media directories
     systemd.tmpfiles.rules = [
         "d /var/lib/jellyfin 0755 crussell users -"
+        "d /var/lib/radarr 0755 crussell users -"
+        "d /var/lib/sonarr 0755 crussell users -"
+        "d /var/lib/prowlarr 0755 crussell users -"
         "d /media 0755 crussell users -"
         "d /media/movies 0755 crussell users -"
         "d /media/tv 0755 crussell users -"
