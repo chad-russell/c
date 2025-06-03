@@ -15,28 +15,21 @@
     let
       system = "x86_64-linux";
 
+      # Import service modules
       makeNginxModule = import ./modules/nginx.nix;
       makeGatewayModule = import ./modules/gateway.nix;
       makeJellyfinModule = import ./modules/jellyfin.nix;
       cloudProxyModule = import ./modules/cloud-proxy.nix;
+      
+      # Bootstrap module - minimal base system for Proxmox
+      bootstrapModule = import ./modules/bootstrap.nix;
     in {
       packages.${system} = {
-        nginx = nixos-generators.nixosGenerate {
+        # Single bootstrap image for Proxmox deployment
+        bootstrap = nixos-generators.nixosGenerate {
           inherit system;
           format = "proxmox";
-          modules = [ (makeNginxModule { }) ];
-        };
-
-        gateway = nixos-generators.nixosGenerate {
-          inherit system;
-          format = "proxmox";
-          modules = [ (makeGatewayModule { inherit sops-nix; }) ];
-        };
-
-        jellyfin = nixos-generators.nixosGenerate {
-          inherit system;
-          format = "proxmox";
-          modules = [ (makeJellyfinModule { }) ];
+          modules = [ bootstrapModule ];
         };
 
         # Helper script for deploying the age key
@@ -73,25 +66,25 @@
       };
 
       nixosConfigurations = {
+        # Service configurations - these are what you rebuild to after bootstrap
         gateway = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ (makeGatewayModule { includeBootConfig = true; inherit sops-nix; }) ];
+          modules = [ (makeGatewayModule { inherit sops-nix; }) ];
         };
 
         nginx = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ (makeNginxModule { includeBootConfig = true; }) ];
+          modules = [ (makeNginxModule { }) ];
         };
 
         jellyfin = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ (makeJellyfinModule { includeBootConfig = true; }) ];
+          modules = [ (makeJellyfinModule { }) ];
         };
 
         # NixOS configuration for Hetzner VPS (used by nixos-anywhere)
         hetzner-bootstrap = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-
           modules = [
             ./hetzner-bootstrap/configuration.nix
             ./hetzner-bootstrap/disko-config.nix

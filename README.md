@@ -1,3 +1,107 @@
+# Home Compute Cluster
+
+A NixOS-based home compute cluster with services running on Proxmox VMs.
+
+## Architecture
+
+This setup uses a **two-phase deployment approach**:
+
+1. **Bootstrap Phase**: Deploy a minimal base VM image to Proxmox
+2. **Operational Phase**: SSH into the VM and rebuild with the specific service configuration
+
+This separation provides:
+- Single source of truth for service configurations
+- Clean separation between VM creation and service management  
+- Standard `nixos-rebuild` workflow for updates
+- Reduced complexity and duplication
+
+## Quick Start
+
+### 1. Bootstrap Phase
+
+Build and deploy the bootstrap VM:
+
+```bash
+# Build the bootstrap image
+nix build .#bootstrap
+
+# Deploy to Proxmox (adapt for your setup)
+# The result will be in ./result/
+```
+
+The bootstrap VM includes:
+- Basic NixOS system with flakes enabled
+- SSH access configured
+- Git, curl, vim, htop
+- Your user account with sudo access
+
+### 2. Operational Phase
+
+After the bootstrap VM is running:
+
+```bash
+# SSH into the new VM
+ssh crussell@<VM_IP>
+
+# Clone this repository
+git clone <repository-url>
+cd <repository-directory>
+
+# Switch to the desired service configuration
+sudo nixos-rebuild switch --flake .#jellyfin
+# or
+sudo nixos-rebuild switch --flake .#nginx  
+# or
+sudo nixos-rebuild switch --flake .#gateway
+```
+
+## Available Services
+
+- **jellyfin**: Media server with GPU hardware acceleration + Jellyseerr
+- **nginx**: Reverse proxy and web server
+- **gateway**: Network gateway with Tailscale integration
+- **cloud-proxy**: Minimal reverse proxy for cloud deployment
+
+## Updating Services
+
+To update a service after deployment:
+
+```bash
+# SSH into the service VM
+ssh crussell@<VM_IP>
+
+# Pull latest changes
+git pull
+
+# Rebuild with updated configuration
+sudo nixos-rebuild switch --flake .#<service-name>
+```
+
+## Service Details
+
+### Jellyfin VM
+- **IP**: 192.168.1.203
+- **Ports**: 8096 (Jellyfin), 5055 (Jellyseerr)
+- **Features**: Intel GPU hardware acceleration, Podman containers
+- **Storage**: `/media` for content, `/var/lib/jellyfin` for config
+
+### Development Workflow
+
+1. Modify service configurations in `modules/`
+2. Test changes by rebuilding on the target VM
+3. Commit and push changes
+4. Pull and rebuild on other VMs as needed
+
+## Tools
+
+- `nix build .#bootstrap` - Build bootstrap VM image
+- `nix build .#deploy-key` - Build age key deployment script  
+- `nix build .#nixos-anywhere` - Build nixos-anywhere tool
+
+## Network Configuration
+
+Services use static IP assignments in the 192.168.1.x range. Adjust IP addresses in the respective module files as needed for your network.
+
 ## To Build on NixOS
 ```bash
 nix build .#proxmoxImage

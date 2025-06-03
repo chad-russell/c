@@ -1,4 +1,4 @@
-{ includeBootConfig ? false }: { pkgs, lib, ... }: {
+{ config, pkgs, lib, ... }: {
     networking.hostName = "vm-jellyfin";
     networking.firewall.allowedTCPPorts = [ 22 8096 5055 ];
     networking.useDHCP = false;
@@ -12,13 +12,13 @@
         }];
     };
 
-    # Boot and filesystem configuration - only included for nixosSystem builds
-    fileSystems."/" = lib.mkIf includeBootConfig {
+    # Boot and filesystem configuration
+    fileSystems."/" = {
         device = "/dev/vda1";
         fsType = "ext4";
     };
 
-    boot = lib.mkIf includeBootConfig {
+    boot = {
         loader.grub.enable = true;
         loader.grub.devices = [ "/dev/vda" ];
         initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
@@ -30,7 +30,6 @@
         
         # Intel GPU kernel modules for hardware acceleration
         kernelModules = [ "i915" ];
-        extraModulePackages = with config.boot.kernelPackages; [ ];
     };
 
     # Hardware acceleration support
@@ -146,9 +145,7 @@
         ];
     };
 
-    nix.extraOptions = ''
-        experimental-features = nix-command flakes
-    '';
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     system.stateVersion = "25.05";
 } 
