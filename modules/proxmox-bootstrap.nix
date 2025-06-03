@@ -5,30 +5,9 @@
   # Allow SSH and basic networking
   networking.firewall.allowedTCPPorts = [ 22 ];
   
-  # Override the Proxmox module's DHCP setting - we want DHCP for bootstrap
-  networking.useDHCP = lib.mkForce true;
+  # Let the proxmox format handle networking by default
+  # Individual services will override with static IPs
   
-  # Also ensure specific interface doesn't conflict
-  networking.interfaces = lib.mkForce {};
-  
-  # Basic boot configuration for Proxmox
-  boot.loader.grub.enable = true;
-  boot.loader.grub.devices = [ "/dev/vda" ];
-  boot.initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
-  boot.initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
-  
-  # Disable IPv6 by default (can be re-enabled by service configs)
-  boot.kernel.sysctl = {
-    "net.ipv6.conf.all.disable_ipv6" = "1";
-    "net.ipv6.conf.default.disable_ipv6" = "1";
-  };
-
-  # Basic filesystem
-  fileSystems."/" = {
-    device = "/dev/vda1";
-    fsType = "ext4";
-  };
-
   # SSH configuration
   services.openssh.enable = true;
   services.openssh.settings = {
