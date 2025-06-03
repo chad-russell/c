@@ -88,7 +88,6 @@
     services.jellyseerr = {
         enable = true;
         openFirewall = true;
-        user = "crussell";  # Run as our user to access media files easily
     };
 
     services.radarr = {
