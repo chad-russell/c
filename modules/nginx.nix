@@ -3,7 +3,7 @@
     networking.firewall.allowedTCPPorts = [ 22 80 9925 ];
     networking.useDHCP = false;
     networking.defaultGateway = "192.168.1.1";
-    networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    networking.nameservers = [ "192.168.1.201" ];
 
     networking.interfaces.ens18 = {
         ipv4.addresses = [{
