@@ -96,6 +96,9 @@
         "d /var/lib/mealie 0755 root root -"
         "d /var/lib/beszel_data 0755 crussell users -"
         "d /var/lib/beszel_socket 0755 crussell users -"
+        # Fix ownership of existing directories
+        "Z /var/lib/beszel_data 0755 crussell users -"
+        "Z /var/lib/beszel_socket 0755 crussell users -"
     ];
 
     # Configure Nginx as reverse proxy for Mealie
@@ -178,5 +181,15 @@
         owner = "root";
         group = "root";
         mode = "0444";
+    };
+
+    # Enable Podman user socket for crussell user
+    systemd.user.sockets.podman = {
+        enable = true;
+        wantedBy = [ "sockets.target" ];
+    };
+
+    systemd.user.services.podman = {
+        enable = true;
     };
 }
