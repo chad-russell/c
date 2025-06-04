@@ -10,6 +10,9 @@
         }];
     };
 
+    networking.defaultGateway = "192.168.1.1";
+    networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+
     # Boot and filesystem configuration
     fileSystems."/" = {
         device = "/dev/vda1";
