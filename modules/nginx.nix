@@ -145,11 +145,6 @@
 
     system.stateVersion = "25.05";
 
-    # SOPS configuration
-    sops.defaultSopsFile = ../secrets.yaml;
-    sops.defaultSopsFormat = "yaml";
-    sops.age.keyFile = "/etc/sops/age/keys.txt";
-
     # Enable Podman user socket for crussell user
     systemd.user.sockets.podman = {
         enable = true;

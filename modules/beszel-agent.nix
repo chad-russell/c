@@ -36,6 +36,11 @@
   # Open firewall port for the agent
   networking.firewall.allowedTCPPorts = [ 45876 ];
 
+  # SOPS configuration
+  sops.defaultSopsFile = ../secrets.yaml;
+  sops.defaultSopsFormat = "yaml";
+  sops.age.keyFile = "/etc/sops/age/keys.txt";
+
   # SOPS secret for beszel-agent key
   sops.secrets.beszel-agent-key = {
     owner = "root"; # Or specific user if needed, but agent runs as UID 1000
