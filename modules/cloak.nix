@@ -44,6 +44,10 @@
     # Enable Tailscale
     services.tailscale = {
         enable = true;
+        extraUpFlags = [
+            "--accept-routes"
+            "--accept-dns=false"
+        ];
         extraSetFlags = [
             "--exit-node=us-mia-wg-002.mullvad.ts.net"
             "--exit-node-allow-lan-access"
