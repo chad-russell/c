@@ -211,9 +211,9 @@
                     entryPoints = [ "websecure" ];
                 };
 
-                "truenas-internal" = {
-                    rule = "Host(`truenas.internal.crussell.io`)";
-                    service = "truenas-svc";
+                "nas-internal" = {
+                    rule = "Host(`nas.internal.crussell.io`)";
+                    service = "nas-svc";
                     entryPoints = [ "websecure" ];
                 };
 
@@ -235,7 +235,7 @@
                 "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:5055"; }]; };
                 "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:9696"; }]; };
                 "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.204:8080"; }]; };
-                "truenas-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.55:80"; }]; };
+                "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.55:80"; }]; };
             };
         };
         };
