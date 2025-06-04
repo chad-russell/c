@@ -140,6 +140,7 @@
 
     users.users.crussell = {
         isNormalUser = true;
+        uid = 1000;
         extraGroups = [ "wheel" ];
         initialHashedPassword = "$y$j9T$bh0qHa7NdcwmdzYc8CjQj.$HUOFYiehqVxeTXtkFs2fAQZuohSp8uvonYB1Bbkf567";
         openssh.authorizedKeys.keys = [
