@@ -118,6 +118,8 @@
         };
     };
 
+    services.karakeep.enable = true;
+
     environment.systemPackages = with pkgs; [
         git 
         curl
