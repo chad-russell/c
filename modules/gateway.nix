@@ -52,20 +52,6 @@
         pkgs.tailscale
         pkgs.curl
         pkgs.jq
-        (pkgs.writeShellScriptBin "tailscale-api-test" ''
-        #!/bin/bash
-        # Example script showing how to use the SOPS secrets
-        CLIENT_ID=$(cat ${config.sops.secrets.tailscale-oauth-client-id.path})
-        CLIENT_SECRET=$(cat ${config.sops.secrets.tailscale-oauth-client-secret.path})
-        
-        echo "Testing Tailscale API access..."
-        echo "Client ID: $CLIENT_ID"
-        echo "Client Secret: [REDACTED]"
-        
-        # Example API call to get tailnet info
-        ${pkgs.curl}/bin/curl -u "$CLIENT_ID:$CLIENT_SECRET" \
-            "https://api.tailscale.com/api/v2/tailnet/-/devices"
-        '')
     ];
 
     services.adguardhome = {
