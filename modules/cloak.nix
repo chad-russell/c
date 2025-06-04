@@ -1,6 +1,6 @@
 { sops-nix }: { pkgs, config, lib, ... }: {
     imports = [
-        (./beszel-agent.nix { inherit sops-nix pkgs config; })
+        ((import ./beszel-agent.nix) { inherit sops-nix pkgs config; })
     ];
 
     networking.hostName = "vm-cloak";
