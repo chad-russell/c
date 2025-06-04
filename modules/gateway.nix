@@ -211,15 +211,15 @@
                     entryPoints = [ "websecure" ];
                 };
 
-                "nas-internal" = {
-                    rule = "Host(`nas.internal.crussell.io`)";
-                    service = "nas-svc";
+                "adguard-internal" = {
+                    rule = "Host(`adguard.internal.crussell.io`)";
+                    service = "adguard-svc";
                     entryPoints = [ "websecure" ];
                 };
 
-                "root-domain-public" = {
-                    rule = "Host(`crussell.io`)";
-                    service = "homeassistant-svc";
+                "nas-internal" = {
+                    rule = "Host(`nas.internal.crussell.io`)";
+                    service = "nas-svc";
                     entryPoints = [ "websecure" ];
                 };
             };
@@ -236,6 +236,7 @@
                 "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:9696"; }]; };
                 "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.204:8080"; }]; };
                 "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.55:80"; }]; };
+                "adguard-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.201:3000"; }]; };
             };
         };
         };
