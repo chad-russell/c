@@ -49,7 +49,7 @@
             "--accept-dns=false"
         ];
         extraSetFlags = [
-            "--exit-node=us-mia-wg-002.mullvad.ts.net"
+            "--exit-node=100.84.251.68" # Mullvad exit node (Miami, FL)
             "--exit-node-allow-lan-access"
         ];
     };
