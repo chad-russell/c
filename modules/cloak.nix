@@ -42,7 +42,13 @@
     };
 
     # Enable Tailscale
-    services.tailscale.enable = true;
+    services.tailscale = {
+        enable = true;
+        extraUpFlags = [
+            "--exit-node=us-mia-wg-002.mullvad.ts.net"
+            "--exit-node-allow-lan-access"
+        ];
+    };
 
     # Enable Podman for qBittorrent container
     virtualisation = {
