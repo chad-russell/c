@@ -1,5 +1,6 @@
-{ sops-nix, includeBootConfig ? false }: { pkgs, lib, ... }: {
+{ sops-nix, includeBootConfig ? false }: { pkgs, lib, config, ... }: {
     imports = [ sops-nix.nixosModules.sops ];
+
     networking.hostName = "vm-test";
     networking.firewall.allowedTCPPorts = [ 22 80 9925 ];
     networking.useDHCP = false;
