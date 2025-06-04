@@ -1,4 +1,4 @@
-{ sops-nix, includeBootConfig ? false }: { pkgs, lib, config, ... }: {
+{ sops-nix }: { pkgs, lib, config, ... }: {
     imports = [ sops-nix.nixosModules.sops ];
 
     networking.hostName = "vm-test";
@@ -14,21 +14,17 @@
         }];
     };
 
-    # Boot and filesystem configuration - only included for nixosSystem builds
-    fileSystems."/" = lib.mkIf includeBootConfig {
+    # Boot and filesystem configuration
+    fileSystems."/" = {
         device = "/dev/vda1";
         fsType = "ext4";
     };
 
-    boot = lib.mkIf includeBootConfig {
+    boot = {
         loader.grub.enable = true;
         loader.grub.devices = [ "/dev/vda" ];
         initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
         initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
-        kernel.sysctl = {
-        "net.ipv6.conf.all.disable_ipv6" = "1";
-        "net.ipv6.conf.default.disable_ipv6" = "1";
-        };
     };
 
     services.openssh.enable = true;
