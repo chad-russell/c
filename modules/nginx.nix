@@ -64,7 +64,7 @@
                 beszel = {
                     image = "henrygd/beszel:latest";
                     autoStart = true;
-                    user = "${toString config.users.users.crussell.uid}";
+                    user = "1000";
                     ports = [ "8090:8090" ];
                     volumes = [
                         "/var/lib/beszel_data:/beszel_data"
@@ -75,7 +75,7 @@
                 beszel-agent = {
                     image = "henrygd/beszel-agent:latest";
                     autoStart = true;
-                    user = "${toString config.users.users.crussell.uid}";
+                    user = "1000";
                     volumes = [
                         "/var/lib/beszel_socket:/beszel_socket"
                     ];
