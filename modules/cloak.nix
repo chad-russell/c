@@ -70,13 +70,14 @@
                         PGID = "1000";
                         TZ = "America/New_York";
                         WEBUI_PORT = "8080";
+                        QB_USERNAME = "admin";
+                        QB_PASSWORD = "changeme";
                     };
                     volumes = [
                         "/var/lib/qbittorrent/config:/config"
                         "/mnt/media/Downloads:/downloads"
                     ];
                     extraOptions = [
-                        "--memory=1000M"
                         "--network=host"  # For VPN compatibility
                     ];
                 };
