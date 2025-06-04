@@ -300,36 +300,26 @@
         age.keyFile = "/etc/sops/age/keys.txt";
         
         secrets = {
-        tailscale-oauth-client-id = {
-            owner = "root";
-            group = "root";
-            mode = "0400";
-        };
-        tailscale-oauth-client-secret = {
-            owner = "root";
-            group = "root";
-            mode = "0400";
-        };
-        aws-access-key-id = {
-            owner = "traefik";
-            group = "traefik";
-            mode = "0400";
-        };
-        aws-secret-access-key = {
-            owner = "traefik";
-            group = "traefik";
-            mode = "0400";
-        };
-        letsencrypt-email = {
-            owner = "traefik";
-            group = "traefik";
-            mode = "0400";
-        };
-        aws-hosted-zone-id = { # Add if you want to manage via SOPS
-            owner = "traefik";
-            group = "traefik";
-            mode = "0400";
-        };
+            aws-access-key-id = {
+                owner = "traefik";
+                group = "traefik";
+                mode = "0400";
+            };
+            aws-secret-access-key = {
+                owner = "traefik";
+                group = "traefik";
+                mode = "0400";
+            };
+            letsencrypt-email = {
+                owner = "traefik";
+                group = "traefik";
+                mode = "0400";
+            };
+            aws-hosted-zone-id = { # Add if you want to manage via SOPS
+                owner = "traefik";
+                group = "traefik";
+                mode = "0400";
+            };
         };
     };
 }
