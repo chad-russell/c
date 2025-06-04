@@ -75,7 +75,7 @@
 
         nginx = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ (makeNginxModule { }) ];
+          modules = [ (makeNginxModule { inherit sops-nix; }) ];
         };
 
         jellyfin = nixpkgs.lib.nixosSystem {

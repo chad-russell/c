@@ -1,4 +1,5 @@
-{ includeBootConfig ? false }: { pkgs, lib, ... }: {
+{ sops-nix, includeBootConfig ? false }: { pkgs, lib, ... }: {
+    imports = [ sops-nix.nixosModules.sops ];
     networking.hostName = "vm-test";
     networking.firewall.allowedTCPPorts = [ 22 80 9925 ];
     networking.useDHCP = false;
@@ -62,6 +63,34 @@
                         "--memory=1000M"
                     ];
                 };
+
+                beszel = {
+                    image = "henrygd/beszel:latest";
+                    autoStart = true;
+                    ports = [ "8090:8090" ];
+                    volumes = [
+                        "/var/lib/beszel_data:/beszel_data"
+                        "/var/lib/beszel_socket:/beszel_socket"
+                    ];
+                    restartPolicy = "unless-stopped";
+                };
+
+                beszel-agent = {
+                    image = "henrygd/beszel-agent:latest";
+                    autoStart = true;
+                    volumes = [
+                        "/var/lib/beszel_socket:/beszel_socket"
+                        "/var/run/docker.sock:/var/run/docker.sock:ro"
+                    ];
+                    environment = {
+                        LISTEN = "/beszel_socket/beszel.sock";
+                    };
+                    environmentFiles = [ config.sops.templates."beszel-agent-env".path ];
+                    extraOptions = [
+                        "--network=host"
+                    ];
+                    restartPolicy = "unless-stopped";
+                };
             };
         };
     };
@@ -69,6 +98,8 @@
     # Create Mealie data directory
     systemd.tmpfiles.rules = [
         "d /var/lib/mealie 0755 root root -"
+        "d /var/lib/beszel_data 0755 root root -"
+        "d /var/lib/beszel_socket 0755 root root -"
     ];
 
     # Configure Nginx as reverse proxy for Mealie
@@ -129,4 +160,21 @@
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     system.stateVersion = "25.05";
+
+    # SOPS secret for beszel-agent key
+    sops.secrets.beszel-agent-key = {
+        owner = "root";
+        group = "root";
+        mode = "0400";
+    };
+
+    # SOPS template for beszel-agent env file
+    sops.templates."beszel-agent-env" = {
+        content = ''
+            KEY=${config.sops.placeholder.beszel-agent-key}
+        '';
+        owner = "root";
+        group = "root";
+        mode = "0444";
+    };
 }
