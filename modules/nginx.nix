@@ -9,8 +9,8 @@
 
     networking.interfaces.ens18 = {
         ipv4.addresses = [{
-        address = "192.168.1.202";
-        prefixLength = 24;
+            address = "192.168.1.202";
+            prefixLength = 24;
         }];
     };
 
@@ -73,7 +73,6 @@
                         "/var/lib/beszel_data:/beszel_data"
                         "/var/lib/beszel_socket:/beszel_socket"
                     ];
-                    restartPolicy = "unless-stopped";
                 };
 
                 beszel-agent = {
@@ -90,7 +89,6 @@
                     extraOptions = [
                         "--network=host"
                     ];
-                    restartPolicy = "unless-stopped";
                 };
             };
         };
