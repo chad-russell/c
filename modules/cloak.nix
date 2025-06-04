@@ -1,6 +1,7 @@
 { pkgs, config, lib, ... }: {
     networking.hostName = "vm-cloak";
     networking.firewall.allowedTCPPorts = [ 22 8080 ]; # SSH and qBittorrent web UI
+    networking.firewall.checkReversePath = "loose";
     networking.useDHCP = false;
 
     networking.interfaces.ens18 = {
@@ -41,14 +42,14 @@
     # Enable Tailscale
     services.tailscale = {
         enable = true;
-        # extraUpFlags = [
-        #     "--accept-routes"
-        #     "--accept-dns=false"
-        # ];
-        # extraSetFlags = [
-        #     "--exit-node=100.84.251.68" # Mullvad exit node (Miami, FL)
-        #     "--exit-node-allow-lan-access"
-        # ];
+        extraUpFlags = [
+            "--accept-routes"
+            "--accept-dns=true"
+        ];
+        extraSetFlags = [
+            "--exit-node=100.84.251.68" # Mullvad exit node (Miami, FL)
+            "--exit-node-allow-lan-access"
+        ];
     };
 
     # Enable Podman for qBittorrent container
