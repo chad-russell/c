@@ -3,7 +3,7 @@
     networking.firewall.allowedTCPPorts = [ 22 8080 ]; # SSH and qBittorrent web UI
     networking.useDHCP = false;
     networking.defaultGateway = "192.168.1.1";
-    networking.nameservers = [ "192.168.1.201" ];
+    networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
     networking.interfaces.ens18 = {
         ipv4.addresses = [{
