@@ -64,6 +64,7 @@
                 beszel = {
                     image = "henrygd/beszel:latest";
                     autoStart = true;
+                    user = "${config.users.users.crussell.id}";
                     ports = [ "8090:8090" ];
                     volumes = [
                         "/var/lib/beszel_data:/beszel_data"
@@ -74,9 +75,9 @@
                 beszel-agent = {
                     image = "henrygd/beszel-agent:latest";
                     autoStart = true;
+                    user = "${config.users.users.crussell.id}";
                     volumes = [
                         "/var/lib/beszel_socket:/beszel_socket"
-                        "/var/run/docker.sock:/var/run/docker.sock:ro"
                     ];
                     environment = {
                         LISTEN = "/beszel_socket/beszel.sock";
