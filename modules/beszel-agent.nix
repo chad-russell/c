@@ -17,7 +17,7 @@
             "/var/lib/beszel_socket:/beszel_socket"
           ];
           environment = {
-            LISTEN = "/beszel_socket/beszel.sock";
+            LISTEN = "0.0.0.0:45876";
           };
           environmentFiles = [ config.sops.templates."beszel-agent-env".path ];
           extraOptions = [
@@ -32,6 +32,9 @@
     "d /var/lib/beszel_socket 0755 crussell users -" # Ensure crussell (UID 1000) has access
     "Z /var/lib/beszel_socket 0755 crussell users -"
   ];
+
+  # Open firewall port for the agent
+  networking.firewall.allowedTCPPorts = [ 45876 ];
 
   # SOPS secret for beszel-agent key
   sops.secrets.beszel-agent-key = {
