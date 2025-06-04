@@ -120,6 +120,11 @@
 
     services.karakeep.enable = true;
 
+    services.ntfy-sh = {
+        enable = true;
+        settings.base-url = "https://ntfy.internal.crussell.io";
+    };
+
     environment.systemPackages = with pkgs; [
         git 
         curl
