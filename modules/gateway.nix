@@ -1,5 +1,8 @@
 { sops-nix }: { pkgs, config, lib, ... }: {
-    imports = [ sops-nix.nixosModules.sops ];
+    imports = [
+        sops-nix.nixosModules.sops
+        (./beszel-agent.nix { inherit sops-nix pkgs config; })
+    ];
     
     networking.hostName = "vm-gateway";
     networking.firewall.allowedTCPPorts = [ 80 443 22 3000 8080 ];

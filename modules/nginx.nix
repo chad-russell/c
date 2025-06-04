@@ -1,5 +1,8 @@
 { sops-nix }: { pkgs, lib, config, ... }: {
-    imports = [ sops-nix.nixosModules.sops ];
+    imports = [
+        sops-nix.nixosModules.sops
+        (./beszel-agent.nix { inherit sops-nix pkgs config; })
+    ];
 
     networking.hostName = "vm-test";
     networking.firewall.allowedTCPPorts = [ 22 80 9925 8090 ];
@@ -68,23 +71,6 @@
                     ports = [ "8090:8090" ];
                     volumes = [
                         "/var/lib/beszel_data:/beszel_data"
-                        "/var/lib/beszel_socket:/beszel_socket"
-                    ];
-                };
-
-                beszel-agent = {
-                    image = "henrygd/beszel-agent:latest";
-                    autoStart = true;
-                    user = "1000";
-                    volumes = [
-                        "/var/lib/beszel_socket:/beszel_socket"
-                    ];
-                    environment = {
-                        LISTEN = "/beszel_socket/beszel.sock";
-                    };
-                    environmentFiles = [ config.sops.templates."beszel-agent-env".path ];
-                    extraOptions = [
-                        "--network=host"
                     ];
                 };
             };
@@ -95,10 +81,8 @@
     systemd.tmpfiles.rules = [
         "d /var/lib/mealie 0755 root root -"
         "d /var/lib/beszel_data 0755 crussell users -"
-        "d /var/lib/beszel_socket 0755 crussell users -"
         # Fix ownership of existing directories
         "Z /var/lib/beszel_data 0755 crussell users -"
-        "Z /var/lib/beszel_socket 0755 crussell users -"
     ];
 
     # Configure Nginx as reverse proxy for Mealie
@@ -165,23 +149,6 @@
     sops.defaultSopsFile = ../secrets.yaml;
     sops.defaultSopsFormat = "yaml";
     sops.age.keyFile = "/etc/sops/age/keys.txt";
-
-    # SOPS secret for beszel-agent key
-    sops.secrets.beszel-agent-key = {
-        owner = "root";
-        group = "root";
-        mode = "0400";
-    };
-
-    # SOPS template for beszel-agent env file
-    sops.templates."beszel-agent-env" = {
-        content = ''
-            KEY=${config.sops.placeholder.beszel-agent-key}
-        '';
-        owner = "root";
-        group = "root";
-        mode = "0444";
-    };
 
     # Enable Podman user socket for crussell user
     systemd.user.sockets.podman = {

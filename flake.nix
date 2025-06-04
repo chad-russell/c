@@ -18,9 +18,9 @@
       # Import service modules
       makeNginxModule = import ./modules/nginx.nix;
       makeGatewayModule = import ./modules/gateway.nix;
-      jellyfinModule = import ./modules/jellyfin.nix;
+      makeJellyfinModule = import ./modules/jellyfin.nix;
       cloudProxyModule = import ./modules/cloud-proxy.nix;
-      cloakModule = import ./modules/cloak.nix;
+      makeCloakModule = import ./modules/cloak.nix;
       
       # Bootstrap module - minimal base system for Proxmox
       proxmoxBootstrapModule = import ./modules/proxmox-bootstrap.nix;
@@ -80,12 +80,12 @@
 
         jellyfin = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ jellyfinModule ];
+          modules = [ (makeJellyfinModule { inherit sops-nix; }) ];
         };
 
         cloak = nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = [ cloakModule ];
+          modules = [ (makeCloakModule { inherit sops-nix; }) ];
         };
         
         # NixOS configuration for Hetzner VPS (used by nixos-anywhere)

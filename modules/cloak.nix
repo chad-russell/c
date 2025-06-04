@@ -1,4 +1,8 @@
-{ pkgs, config, lib, ... }: {
+{ sops-nix }: { pkgs, config, lib, ... }: {
+    imports = [
+        (./beszel-agent.nix { inherit sops-nix pkgs config; })
+    ];
+
     networking.hostName = "vm-cloak";
     networking.firewall.allowedTCPPorts = [ 22 8080 ]; # SSH and qBittorrent web UI
     networking.firewall.checkReversePath = "loose";
