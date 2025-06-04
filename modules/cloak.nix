@@ -61,6 +61,9 @@
         oci-containers = {
             backend = "podman";
             containers = {
+                # After initial start, check the logs for the credentials
+                # > sudo podman logs qbittorrent
+                # Look for a line like: "The WebUI administrator password was not set. A temporary password is provided for this session: ABC123Whatever"
                 qbittorrent = {
                     image = "lscr.io/linuxserver/qbittorrent:latest";
                     autoStart = true;
@@ -70,8 +73,6 @@
                         PGID = "1000";
                         TZ = "America/New_York";
                         WEBUI_PORT = "8080";
-                        QB_USERNAME = "admin";
-                        QB_PASSWORD = "changeme";
                     };
                     volumes = [
                         "/var/lib/qbittorrent/config:/config"

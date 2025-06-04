@@ -82,10 +82,10 @@
         user = "crussell";  # Run as our user to access media files easily
     };
 
-    services.jellyseerr = {
-        enable = true;
-        openFirewall = true;
-    };
+    # services.jellyseerr = {
+    #     enable = true;
+    #     openFirewall = true;
+    # };
 
     services.radarr = {
         enable = true;
