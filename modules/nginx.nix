@@ -2,7 +2,7 @@
     imports = [ sops-nix.nixosModules.sops ];
 
     networking.hostName = "vm-test";
-    networking.firewall.allowedTCPPorts = [ 22 80 9925 ];
+    networking.firewall.allowedTCPPorts = [ 22 80 9925 8090 ];
     networking.useDHCP = false;
     networking.defaultGateway = "192.168.1.1";
     networking.nameservers = [ "192.168.1.201" ];
@@ -94,8 +94,8 @@
     # Create Mealie data directory
     systemd.tmpfiles.rules = [
         "d /var/lib/mealie 0755 root root -"
-        "d /var/lib/beszel_data 0755 root root -"
-        "d /var/lib/beszel_socket 0755 root root -"
+        "d /var/lib/beszel_data 0755 crussell users -"
+        "d /var/lib/beszel_socket 0755 crussell users -"
     ];
 
     # Configure Nginx as reverse proxy for Mealie
