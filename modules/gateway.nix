@@ -217,6 +217,12 @@
                     service = "karakeep-svc";
                     entryPoints = [ "websecure" ];
                 };
+
+                "ntfy-internal" = {
+                    rule = "Host(`ntfy.internal.crussell.io`)";
+                    service = "ntfy-svc";
+                    entryPoints = [ "websecure" ];
+                };
             };
 
             services = {
@@ -233,6 +239,7 @@
                 "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.55:80"; }]; };
                 "adguard-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.201:3000"; }]; };
                 "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:3000"; }]; };
+                "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:8080"; }]; };
             };
         };
         };
