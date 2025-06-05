@@ -218,6 +218,12 @@
                     entryPoints = [ "websecure" ];
                 };
 
+                "beszel-internal" = {
+                    rule = "Host(`beszel.internal.crussell.io`)";
+                    service = "beszel-svc";
+                    entryPoints = [ "websecure" ];
+                };
+
                 "ntfy-internal" = {
                     rule = "Host(`ntfy.internal.crussell.io`)";
                     service = "ntfy-svc";
@@ -240,6 +246,7 @@
                 "adguard-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.201:3000"; }]; };
                 "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:3000"; }]; };
                 "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:8080"; }]; };
+                "beszel-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:8090"; }]; };
             };
         };
         };
