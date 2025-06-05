@@ -180,3 +180,6 @@ echo "options vfio-pci ids=8086:3e92" >> /etc/modprobe.d/vfio.conf
 update-initramfs -u -k all
 reboot
 ```
+
+## Remote Building
+sudo nixos-rebuild --flake .#nginx --build-host crussell@192.168.1.64 switch

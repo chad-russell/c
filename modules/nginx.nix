@@ -5,7 +5,7 @@
     ];
 
     networking.hostName = "vm-test";
-    networking.firewall.allowedTCPPorts = [ 22 80 9925 8090 3000 ];
+    networking.firewall.allowedTCPPorts = [ 22 80 9925 8090 3000 8080 ];
     networking.useDHCP = false;
     networking.defaultGateway = "192.168.1.1";
     networking.nameservers = [ "192.168.1.201" ];
