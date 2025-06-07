@@ -42,46 +42,19 @@
     PasswordAuthentication = true;
   };
 
-  # Podman/OCI containers
-  virtualisation = {
-    podman = {
-      enable = true;
-      dockerCompat = true;
+  services.paperless = {
+    enable = true;
+    database.createLocally = true;
+    environmentFile = config.sops.templates."paperless-db-pass".path;
+    settings = {
+        PAPERLESS_URL = "https://paperless.internal.crussell.io";
+        PAPERLESS_TIME_ZONE = "America/New_York";
+        PAPERLESS_OCR_LANGUAGE = "eng";
     };
-    oci-containers = {
-      backend = "podman";
-      containers = {
-        paperless-ngx = {
-          image = "ghcr.io/paperless-ngx/paperless-ngx:latest";
-          autoStart = true;
-          ports = [ "8000:8000" ];
-          environment = {
-            PAPERLESS_REDIS = "redis://localhost:6379";
-            PAPERLESS_DBHOST = "localhost";
-            PAPERLESS_DBUSER = "paperless";
-            PAPERLESS_DBNAME = "paperless";
-          };
-          environmentFiles = [ config.sops.templates."paperless-ngx-env".path ];
-          volumes = [
-            "/var/lib/paperless/data:/usr/src/paperless/data"
-            "/var/lib/paperless/media:/usr/src/paperless/media"
-            "/var/lib/paperless/export:/usr/src/paperless/export"
-            "/var/lib/paperless/consume:/usr/src/paperless/consume"
-          ];
-        };
-        # Add more containers here as needed
-      };
-    };
+    exporter.enable = true;
+    configureTika = true;
+    address = "0.0.0.0";
   };
-
-  # Create Paperless-ngx data directories
-  systemd.tmpfiles.rules = [
-    "d /var/lib/paperless 0755 crussell users -"
-    "d /var/lib/paperless/data 0755 crussell users -"
-    "d /var/lib/paperless/media 0755 crussell users -"
-    "d /var/lib/paperless/export 0755 crussell users -"
-    "d /var/lib/paperless/consume 0755 crussell users -"
-  ];
 
   environment.systemPackages = with pkgs; [
     git
