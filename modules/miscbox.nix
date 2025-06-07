@@ -113,6 +113,18 @@
 
   system.stateVersion = "25.05";
 
+  # SOPS secrets for Paperless-ngx
+  sops.secrets.paperless-secret-key = {
+    owner = "root";
+    group = "root";
+    mode = "0400";
+  };
+  sops.secrets.paperless-db-password = {
+    owner = "root";
+    group = "root";
+    mode = "0400";
+  };
+
   # SOPS template for Paperless-ngx env file
   sops.templates."paperless-ngx-env" = {
     content = ''
