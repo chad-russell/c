@@ -45,7 +45,7 @@
   services.paperless = {
     enable = true;
     database.createLocally = true;
-    environmentFile = config.sops.templates."paperless-db-pass".path;
+    environmentFile = config.sops.templates."paperless-ngx-env".path;
     settings = {
         PAPERLESS_URL = "https://paperless.internal.crussell.io";
         PAPERLESS_TIME_ZONE = "America/New_York";
