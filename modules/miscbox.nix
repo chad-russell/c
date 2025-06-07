@@ -74,6 +74,11 @@
     };
   };
 
+  systemd.services."podman-paperless-ngx" = {
+    after = [ "sops-rendered-secrets.target" ];
+    requires = [ "sops-rendered-secrets.target" ];
+  };
+
   # Create Paperless-ngx data directories
   systemd.tmpfiles.rules = [
     "d /var/lib/paperless 0755 crussell users -"

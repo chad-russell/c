@@ -63,4 +63,9 @@
 
   # Ensure podman is available
   environment.systemPackages = [ pkgs.podman ];
+
+  systemd.services."podman-beszel-agent" = {
+    after = [ "sops-rendered-secrets.target" ];
+    requires = [ "sops-rendered-secrets.target" ];
+  };
 } 
