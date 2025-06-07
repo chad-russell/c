@@ -2,12 +2,12 @@
     networking.hostName = "vm-bootstrap";
     networking.firewall.allowedTCPPorts = [ 22 ];
     networking.useDHCP = false;
-    networking.defaultGateway = "192.168.1.1";
+    networking.defaultGateway = "192.168.20.1";
     networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
     networking.interfaces.ens18 = {
         ipv4.addresses = [{
-          address = "192.168.1.254";
+          address = "192.168.20.254";
           prefixLength = 24;
         }];
     };

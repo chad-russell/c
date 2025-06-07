@@ -7,12 +7,12 @@
     networking.hostName = "vm-test";
     networking.firewall.allowedTCPPorts = [ 22 80 9925 8090 3000 8080 ];
     networking.useDHCP = false;
-    networking.defaultGateway = "192.168.1.1";
-    networking.nameservers = [ "192.168.1.201" ];
+    networking.defaultGateway = "192.168.20.1";
+    networking.nameservers = [ "192.168.20.201" ];
 
     networking.interfaces.ens18 = {
         ipv4.addresses = [{
-            address = "192.168.1.202";
+            address = "192.168.20.202";
             prefixLength = 24;
         }];
     };

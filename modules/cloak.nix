@@ -10,12 +10,12 @@
 
     networking.interfaces.ens18 = {
         ipv4.addresses = [{
-            address = "192.168.1.204";
+            address = "192.168.20.204";
             prefixLength = 24;
         }];
     };
 
-    networking.defaultGateway = "192.168.1.1";
+    networking.defaultGateway = "192.168.20.1";
     networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
     # Boot and filesystem configuration
@@ -25,7 +25,7 @@
     };
 
     fileSystems."/mnt/media" = {
-        device = "192.168.1.55:/mnt/tank/media";
+        device = "192.168.20.31:/mnt/tank/media";
         fsType = "nfs";
         options = [ "x-systemd.automount" "noatime" "nfsvers=4" ];
     };

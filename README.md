@@ -80,7 +80,7 @@ sudo nixos-rebuild switch --flake .#<service-name>
 ## Service Details
 
 ### Jellyfin VM
-- **IP**: 192.168.1.203
+- **IP**: 192.168.20.203
 - **Ports**: 8096 (Jellyfin), 5055 (Jellyseerr)
 - **Features**: Intel GPU hardware acceleration, Podman containers
 - **Storage**: `/media` for content, `/var/lib/jellyfin` for config
@@ -100,7 +100,7 @@ sudo nixos-rebuild switch --flake .#<service-name>
 
 ## Network Configuration
 
-Services use static IP assignments in the 192.168.1.x range. Adjust IP addresses in the respective module files as needed for your network.
+Services use static IP assignments in the 192.168.20.x range. Adjust IP addresses in the respective module files as needed for your network.
 
 ## To Build on NixOS
 ```bash
@@ -182,4 +182,4 @@ reboot
 ```
 
 ## Remote Building
-sudo nixos-rebuild --flake .#nginx --build-host crussell@192.168.1.64 switch
+sudo nixos-rebuild --flake .#nginx --build-host crussell@192.168.20.15 switch

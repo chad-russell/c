@@ -8,12 +8,12 @@
     networking.firewall.allowedTCPPorts = [ 80 443 22 3000 8080 ];
     networking.firewall.allowedUDPPorts = [ 53 ];
     networking.useDHCP = false;
-    networking.defaultGateway = "192.168.1.1";
+    networking.defaultGateway = "192.168.20.1";
     networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
     networking.interfaces.ens18 = {
         ipv4.addresses = [{
-            address = "192.168.1.201";
+            address = "192.168.20.201";
             prefixLength = 24;
         }];
     };
@@ -69,8 +69,8 @@
         filtering = {
             enabled = true;
             rewrites = [
-            { domain = "*.internal.crussell.io"; answer = "192.168.1.201"; }
-            { domain = "*.crussell.io"; answer = "192.168.1.201"; }
+            { domain = "*.internal.crussell.io"; answer = "192.168.20.201"; }
+            { domain = "*.crussell.io"; answer = "192.168.20.201"; }
             ];
         };
         };
@@ -232,21 +232,21 @@
             };
 
             services = {
-                "test-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:80"; }]; };
-                "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:9925"; }]; };
-                "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.51:8123"; }]; };
-                "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:8096"; }]; };
-                "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:8989"; }]; };
-                "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:7878"; }]; };
-                "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:9117"; }]; };
-                "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:5055"; }]; };
-                "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.203:9696"; }]; };
-                "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.204:8080"; }]; };
-                "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.55:80"; }]; };
-                "adguard-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.201:3000"; }]; };
-                "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:3000"; }]; };
-                "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:8080"; }]; };
-                "beszel-svc" = { loadBalancer.servers = [{ url = "http://192.168.1.202:8090"; }]; };
+                "test-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:80"; }]; };
+                "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:9925"; }]; };
+                "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.51:8123"; }]; };
+                "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
+                "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8989"; }]; };
+                "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:7878"; }]; };
+                "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:9117"; }]; };
+                "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:5055"; }]; };
+                "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:9696"; }]; };
+                "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
+                "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
+                "adguard-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.201:3000"; }]; };
+                "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:3000"; }]; };
+                "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:8080"; }]; };
+                "beszel-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:8090"; }]; };
             };
         };
         };

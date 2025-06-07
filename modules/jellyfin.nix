@@ -6,13 +6,13 @@
     networking.hostName = "vm-jellyfin";
     networking.firewall.allowedTCPPorts = [ 22 8096 5055 ];
     networking.useDHCP = false;
-    networking.defaultGateway = "192.168.1.1";
-    networking.nameservers = [ "192.168.1.201" ];
+    networking.defaultGateway = "192.168.20.1";
+    networking.nameservers = [ "192.168.20.201" ];
 
     # More flexible network interface configuration that works with both i440fx and q35
     networking.interfaces = {
         enp6s18.ipv4.addresses = [{
-            address = "192.168.1.203";
+            address = "192.168.20.203";
             prefixLength = 24;
         }];
     };
@@ -24,7 +24,7 @@
     };
 
     fileSystems."/mnt/media" = {
-        device = "192.168.1.55:/mnt/tank/media";
+        device = "192.168.20.31:/mnt/tank/media";
         fsType = "nfs";
         options = [ "x-systemd.automount" "noatime" "nfsvers=4" ];
     };
