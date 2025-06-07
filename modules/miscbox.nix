@@ -119,7 +119,7 @@
     group = "root";
     mode = "0400";
   };
-  sops.secrets.paperless-db-password = {
+  sops.secrets.paperless-db-pass = {
     owner = "root";
     group = "root";
     mode = "0400";
@@ -129,7 +129,7 @@
   sops.templates."paperless-ngx-env" = {
     content = ''
       PAPERLESS_SECRET_KEY=${config.sops.placeholder.paperless-secret-key}
-      PAPERLESS_DBPASS=${config.sops.placeholder.paperless-db-password}
+      PAPERLESS_DBPASS=${config.sops.placeholder.paperless-db-pass}
     '';
     owner = "root";
     group = "root";
