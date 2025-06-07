@@ -5,7 +5,7 @@
   ];
 
   networking.hostName = "vm-miscbox";
-  networking.firewall.allowedTCPPorts = [ 22 8000 9000 ]; # SSH, Paperless-ngx, and placeholder
+  networking.firewall.allowedTCPPorts = [ 22 8000 ];
   networking.useDHCP = false;
   networking.defaultGateway = "192.168.20.1";
   networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
