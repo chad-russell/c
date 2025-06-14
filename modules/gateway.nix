@@ -71,7 +71,7 @@
             rewrites = [
                 { domain = "*.internal.crussell.io"; answer = "192.168.20.201"; }
                 { domain = "*.crussell.io"; answer = "192.168.20.201"; }
-                { domain = "*.k3s.crussell.io"; answer = "192.168.20.201"; }
+                { domain = "*.k3s.crussell.io"; answer = "192.168.20.240"; }
                 { domain = "homeassistant.crussell.io"; answer = "192.168.20.51"; }
                 { domain = "truenas.crussell.io"; answer = "192.168.20.31"; }
             ];
