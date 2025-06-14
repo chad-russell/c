@@ -69,8 +69,11 @@
         filtering = {
             enabled = true;
             rewrites = [
-            { domain = "*.internal.crussell.io"; answer = "192.168.20.201"; }
-            { domain = "*.crussell.io"; answer = "192.168.20.201"; }
+                { domain = "*.internal.crussell.io"; answer = "192.168.20.201"; }
+                { domain = "*.crussell.io"; answer = "192.168.20.201"; }
+                { domain = "*.k3s.crussell.io"; answer = "192.168.20.201"; }
+                { domain = "homeassistant.crussell.io"; answer = "192.168.20.51"; }
+                { domain = "truenas.crussell.io"; answer = "192.168.20.31"; }
             ];
         };
         };
@@ -103,6 +106,7 @@
                     domains = [
                         { main = "crussell.io"; sans = ["*.crussell.io"]; }
                         { main = "internal.crussell.io"; sans = ["*.internal.crussell.io"]; }
+                        { main = "k3s.crussell.io"; sans = ["*.k3s.crussell.io"]; }
                     ];
                 };
             };
