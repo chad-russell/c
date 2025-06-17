@@ -146,11 +146,11 @@
                         entryPoints = [ "websecure" ];
                     };
 
-                    # "jackett-internal" = {
-                    #     rule = "Host(`jackett.internal.crussell.io`)";
-                    #     service = "jackett-svc";
-                    #     entryPoints = [ "websecure" ];
-                    # };
+                    "jackett-internal" = {
+                        rule = "Host(`jackett.internal.crussell.io`)";
+                        service = "jackett-svc";
+                        entryPoints = [ "websecure" ];
+                    };
 
                     "prowlarr-internal" = {
                         rule = "Host(`prowlarr.internal.crussell.io`)";
