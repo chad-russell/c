@@ -148,11 +148,11 @@
                     #     entryPoints = [ "websecure" ];
                     # };
 
-                    # "radarr-internal" = {
-                    #     rule = "Host(`radarr.internal.crussell.io`)";
-                    #     service = "radarr-svc";
-                    #     entryPoints = [ "websecure" ];
-                    # };
+                    "radarr-internal" = {
+                        rule = "Host(`radarr.internal.crussell.io`)";
+                        service = "radarr-svc";
+                        entryPoints = [ "websecure" ];
+                    };
 
                     # "jackett-internal" = {
                     #     rule = "Host(`jackett.internal.crussell.io`)";
@@ -262,7 +262,7 @@
                     "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.51:8123"; }]; };
                     # "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
                     # "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    # "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     # "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     # "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     # "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
