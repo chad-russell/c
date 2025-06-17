@@ -244,12 +244,6 @@
                         service = "grafana-svc";
                         entryPoints = [ "websecure" ];
                     };
-
-                    "prox1-internal" = {
-                        rule = "Host(`prox1.internal.crussell.io`)";
-                        service = "prox1-svc";
-                        entryPoints = [ "websecure" ];
-                    };
                 };
 
                 services = {
@@ -274,7 +268,6 @@
                     "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "open-webui-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "grafana-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "prox1-svc" = { loadBalancer.servers = [{ url = "https://192.168.20.11:8006"; }]; };
                 };
             };
         };
