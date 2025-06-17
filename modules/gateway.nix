@@ -1,7 +1,6 @@
 { sops-nix }: { pkgs, config, lib, ... }: {
     imports = [
         sops-nix.nixosModules.sops
-        ((import ./beszel-agent.nix) { inherit sops-nix pkgs config; })
     ];
     
     networking.hostName = "vm-gateway";
@@ -54,205 +53,165 @@
         pkgs.jq
     ];
 
-    services.adguardhome = {
-        enable = true;
-        settings = {
-        http.address = "0.0.0.0:3000";
-        dns = {
-            bind_hosts = [ "0.0.0.0" ];
-            port = 53;
-            upstream_dns = [
-            "1.1.1.1"
-            "8.8.8.8"
-            ];
-        };
-        filtering = {
-            enabled = true;
-            rewrites = [
-                { domain = "*.internal.crussell.io"; answer = "192.168.20.201"; }
-                { domain = "*.crussell.io"; answer = "192.168.20.201"; }
-                { domain = "*.k3s.crussell.io"; answer = "192.168.20.240"; }
-                { domain = "homeassistant.crussell.io"; answer = "192.168.20.51"; }
-                { domain = "truenas.crussell.io"; answer = "192.168.20.31"; }
-            ];
-        };
-        };
-    };
-
     services.traefik = {
         enable = true;
         staticConfigOptions = {
-        entryPoints = {
-            web = {
-                address = ":80";
-                proxyProtocol = {
-                    trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
+            entryPoints = {
+                web = {
+                    address = ":80";
+                    proxyProtocol = {
+                        trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
+                    };
+                    http.redirections = {
+                        entryPoint = {
+                            to = "websecure";
+                            scheme = "https";
+                            permanent = true;
+                        };
+                    };
                 };
-                http.redirections = {
-                    entryPoint = {
-                        to = "websecure";
-                        scheme = "https";
-                        permanent = true;
+                websecure = {
+                    address = ":443";
+                    proxyProtocol = {
+                        trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
+                    };
+                    http.tls = {
+                        certResolver = "letsencrypt";
+                        domains = [
+                            { main = "crussell.io"; sans = ["*.crussell.io"]; }
+                            { main = "internal.crussell.io"; sans = ["*.internal.crussell.io"]; }
+                            { main = "k3s.crussell.io"; sans = ["*.k3s.crussell.io"]; }
+                        ];
                     };
                 };
             };
-            websecure = {
-                address = ":443";
-                proxyProtocol = {
-                    trustedIPs = [ "100.74.176.46" ]; # Tailscale IP of cloud-proxy
-                };
-                http.tls = {
-                    certResolver = "letsencrypt";
-                    domains = [
-                        { main = "crussell.io"; sans = ["*.crussell.io"]; }
-                        { main = "internal.crussell.io"; sans = ["*.internal.crussell.io"]; }
-                        { main = "k3s.crussell.io"; sans = ["*.k3s.crussell.io"]; }
-                    ];
+            api = {
+                dashboard = true;
+            };
+            certificatesResolvers.letsencrypt.acme = {
+                storage = "/var/lib/traefik/acme.json";
+                caServer = "https://acme-v02.api.letsencrypt.org/directory";
+                dnsChallenge = {
+                    provider = "route53";
+                    delayBeforeCheck = 240;
+                    resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
                 };
             };
-        };
-        api = {
-            dashboard = true;
-        };
-        certificatesResolvers.letsencrypt.acme = {
-            storage = "/var/lib/traefik/acme.json";
-            caServer = "https://acme-v02.api.letsencrypt.org/directory";
-            dnsChallenge = {
-                provider = "route53";
-                delayBeforeCheck = 240;
-                resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
-            };
-        };
-        log.level = "DEBUG";
+            log.level = "DEBUG";
         };
         dynamicConfigOptions = {
-        http = {
-            middlewares = {
-            "traefik-dashboard-auth" = {
-                basicAuth.users = [
-                "crussell:$apr1$yjZbgjgW$5elC5.hoQDRIg5Y.yyAaR."
-                ];
+            http = {
+                middlewares = {
+                "traefik-dashboard-auth" = {
+                    basicAuth.users = [
+                        "crussell:$apr1$yjZbgjgW$5elC5.hoQDRIg5Y.yyAaR."
+                    ];
+                };
+                };
+                routers = {
+                    # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
+                    "traefik-dashboard-internal" = {
+                        rule = "Host(`traefik.internal.crussell.io`)";
+                        service = "api@internal"; # Special service for Traefik API/dashboard
+                        entryPoints = [ "web" "websecure" ]; 
+                        middlewares = [ "traefik-dashboard-auth" ];
+                        # TLS will be handled by the websecure entrypoint's global TLS config
+                    };
+
+                    "homeassistant-public" = {
+                        rule = "Host(`homeassistant.crussell.io`)";
+                        service = "homeassistant-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "mealie-public" = {
+                        rule = "Host(`mealie.crussell.io`)";
+                        service = "mealie-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "jellyfin-public" = {
+                        rule = "Host(`jellyfin.crussell.io`)";
+                        service = "jellyfin-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "sonarr-internal" = {
+                        rule = "Host(`sonarr.internal.crussell.io`)";
+                        service = "sonarr-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "radarr-internal" = {
+                        rule = "Host(`radarr.internal.crussell.io`)";
+                        service = "radarr-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "jackett-internal" = {
+                        rule = "Host(`jackett.internal.crussell.io`)";
+                        service = "jackett-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "jellyseerr-internal" = {
+                        rule = "Host(`jellyseerr.internal.crussell.io`)";
+                        service = "jellyseerr-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "prowlarr-internal" = {
+                        rule = "Host(`prowlarr.internal.crussell.io`)";
+                        service = "prowlarr-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "qbittorrent-internal" = {
+                        rule = "Host(`qbittorrent.internal.crussell.io`)";
+                        service = "qbittorrent-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "adguard-internal" = {
+                        rule = "Host(`adguard.internal.crussell.io`)";
+                        service = "adguard-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "nas-internal" = {
+                        rule = "Host(`nas.internal.crussell.io`)";
+                        service = "nas-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "karakeep-internal" = {
+                        rule = "Host(`karakeep.internal.crussell.io`)";
+                        service = "karakeep-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "ntfy-internal" = {
+                        rule = "Host(`ntfy.internal.crussell.io`)";
+                        service = "ntfy-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+                };
+
+                services = {
+                    "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.51:8123"; }]; };
+                    "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
+                    "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
+                    "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
+                    "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                };
             };
-            };
-            routers = {
-                # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
-                "traefik-dashboard-internal" = {
-                    rule = "Host(`traefik.internal.crussell.io`)";
-                    service = "api@internal"; # Special service for Traefik API/dashboard
-                    entryPoints = [ "web" "websecure" ]; 
-                    middlewares = [ "traefik-dashboard-auth" ];
-                    # TLS will be handled by the websecure entrypoint's global TLS config
-                };
-
-                "test-internal" = {
-                    rule = "Host(`test.internal.crussell.io`)";
-                    service = "test-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "homeassistant-public" = {
-                    rule = "Host(`homeassistant.crussell.io`)";
-                    service = "homeassistant-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "mealie-public" = {
-                    rule = "Host(`mealie.crussell.io`)";
-                    service = "mealie-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "jellyfin-public" = {
-                    rule = "Host(`jellyfin.crussell.io`)";
-                    service = "jellyfin-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "sonarr-internal" = {
-                    rule = "Host(`sonarr.internal.crussell.io`)";
-                    service = "sonarr-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "radarr-internal" = {
-                    rule = "Host(`radarr.internal.crussell.io`)";
-                    service = "radarr-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "jackett-internal" = {
-                    rule = "Host(`jackett.internal.crussell.io`)";
-                    service = "jackett-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "jellyseerr-internal" = {
-                    rule = "Host(`jellyseerr.internal.crussell.io`)";
-                    service = "jellyseerr-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "prowlarr-internal" = {
-                    rule = "Host(`prowlarr.internal.crussell.io`)";
-                    service = "prowlarr-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "qbittorrent-internal" = {
-                    rule = "Host(`qbittorrent.internal.crussell.io`)";
-                    service = "qbittorrent-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "adguard-internal" = {
-                    rule = "Host(`adguard.internal.crussell.io`)";
-                    service = "adguard-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "nas-internal" = {
-                    rule = "Host(`nas.internal.crussell.io`)";
-                    service = "nas-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "karakeep-internal" = {
-                    rule = "Host(`karakeep.internal.crussell.io`)";
-                    service = "karakeep-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "beszel-internal" = {
-                    rule = "Host(`beszel.internal.crussell.io`)";
-                    service = "beszel-svc";
-                    entryPoints = [ "websecure" ];
-                };
-
-                "ntfy-internal" = {
-                    rule = "Host(`ntfy.internal.crussell.io`)";
-                    service = "ntfy-svc";
-                    entryPoints = [ "websecure" ];
-                };
-            };
-
-            services = {
-                "test-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:80"; }]; };
-                "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:9925"; }]; };
-                "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.51:8123"; }]; };
-                "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
-                "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8989"; }]; };
-                "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:7878"; }]; };
-                "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:9117"; }]; };
-                "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:5055"; }]; };
-                "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:9696"; }]; };
-                "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
-                "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
-                "adguard-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.201:3000"; }]; };
-                "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:3000"; }]; };
-                "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:8080"; }]; };
-                "beszel-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.202:8090"; }]; };
-            };
-        };
         };
     };
 
