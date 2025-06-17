@@ -249,6 +249,12 @@
                         service = "opnsense-svc";
                         entryPoints = [ "websecure" ];
                     };
+
+                    "prox1-internal" = {
+                        rule = "Host(`prox1.internal.crussell.io`)";
+                        service = "prox1-svc";
+                        entryPoints = [ "websecure" ];
+                    };
                 };
 
                 services = {
@@ -277,13 +283,20 @@
                     "opnsense-svc" = {
                       loadBalancer = {
                         servers = [{ url = "https://192.168.10.1"; }];
-                        serversTransport = "insecure-opnsense";
+                        serversTransport = "insecure-transport";
                       };
+                    };
+
+                    "prox1-svc" = {
+                        loadBalancer = {
+                            servers = [{ url = "https://192.168.20.11:8006"; }];
+                            serversTransport = "insecure-transport";
+                        };
                     };
                 };
 
                 serversTransports = {
-                  "insecure-opnsense" = {
+                  "insecure-transport" = {
                     insecureSkipVerify = true;
                   };
                 };
