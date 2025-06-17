@@ -102,11 +102,17 @@
         dynamicConfigOptions = {
             http = {
                 middlewares = {
-                "traefik-dashboard-auth" = {
-                    basicAuth.users = [
-                        "crussell:$apr1$yjZbgjgW$5elC5.hoQDRIg5Y.yyAaR."
-                    ];
+                    "traefik-dashboard-auth" = {
+                        basicAuth.users = [
+                            "crussell:$apr1$yjZbgjgW$5elC5.hoQDRIg5Y.yyAaR."
+                        ];
+                    };
                 };
+
+                serversTransports = {
+                    "insecure" = {
+                        insecureSkipVerify = true;
+                    };
                 };
 
                 routers = {
@@ -274,8 +280,7 @@
                     "grafana-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "opnsense-svc" = {
                         loadBalancer.servers = [{ url = "https://192.168.10.1"; }];
-                        loadBalancer.server.scheme = "https";
-                        loadBalancer.server.insecureSkipVerify = true;
+                        serversTransport = "insecure";
                     };
                 };
             };
