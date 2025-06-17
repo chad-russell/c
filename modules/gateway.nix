@@ -241,6 +241,12 @@
                         service = "grafana-svc";
                         entryPoints = [ "websecure" ];
                     };
+
+                    "opnsense-internal" = {
+                        rule = "Host(`opnsense.internal.crussell.io`)";
+                        service = "opnsense-svc";
+                        entryPoints = [ "websecure" ];
+                    };
                 };
 
                 services = {
@@ -266,6 +272,7 @@
                     "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "open-webui-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "grafana-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "opnsense-svc" = { loadBalancer.servers = [{ url = "http://192.168.10.1"; }]; };
                 };
             };
         };
