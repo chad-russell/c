@@ -110,15 +110,6 @@
                 };
 
                 routers = {
-                    # # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
-                    # "traefik-dashboard-internal" = {
-                    #     rule = "Host(`traefik.internal.crussell.io`)";
-                    #     service = "api@internal"; # Special service for Traefik API/dashboard
-                    #     entryPoints = [ "web" "websecure" ]; 
-                    #     middlewares = [ "traefik-dashboard-auth" ];
-                    #     # TLS will be handled by the websecure entrypoint's global TLS config
-                    # };
-
                     "homeassistant-public" = {
                         rule = "Host(`homeassistant.crussell.io`)";
                         service = "homeassistant-svc";
