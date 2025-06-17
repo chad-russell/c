@@ -109,12 +109,6 @@
                     };
                 };
 
-                serversTransports = {
-                    "insecure" = {
-                        insecureSkipVerify = true;
-                    };
-                };
-
                 routers = {
                     "homeassistant-public" = {
                         rule = "Host(`homeassistant.crussell.io`)";
@@ -279,9 +273,17 @@
                     "open-webui-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "grafana-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "opnsense-svc" = {
-                        loadBalancer.servers = [{ url = "https://192.168.10.1"; }];
-                        serversTransport = "insecure";
+                      loadBalancer = {
+                        servers = [{ url = "https://192.168.10.1"; }];
+                        serversTransport = "insecure-opnsense";
+                      };
                     };
+                };
+
+                serversTransports = {
+                  "insecure-opnsense" = {
+                    insecureSkipVerify = true;
+                  };
                 };
             };
         };
