@@ -202,6 +202,60 @@
                         entryPoints = [ "websecure" ];
                     };
 
+                    "forgejo-internal" = {
+                        rule = "Host(`forgejo.internal.crussell.io`)";
+                        service = "forgejo-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "ittools-internal" = {
+                        rule = "Host(`ittools.internal.crussell.io`)";
+                        service = "ittools-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "n8n-internal" = {
+                        rule = "Host(`n8n.internal.crussell.io`)";
+                        service = "n8n-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "s3-internal" = {
+                        rule = "Host(`s3.internal.crussell.io`)";
+                        service = "s3-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "minio-internal" = {
+                        rule = "Host(`minio.internal.crussell.io`)";
+                        service = "minio-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "pgadmin-internal" = {
+                        rule = "Host(`pgadmin.internal.crussell.io`)";
+                        service = "pgadmin-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "traefik-internal" = {
+                        rule = "Host(`traefik.internal.crussell.io`)";
+                        service = "traefik-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "open-webui-internal" = {
+                        rule = "Host(`open-webui.internal.crussell.io`)";
+                        service = "open-webui-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+                    
+                    "grafana-internal" = {
+                        rule = "Host(`grafana.internal.crussell.io`)";
+                        service = "grafana-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
                     "prox1-internal" = {
                         rule = "Host(`prox1.internal.crussell.io`)";
                         service = "prox1-svc";
@@ -222,6 +276,13 @@
                     "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
                     "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "forgejo-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "ittools-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "n8n-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "s3-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9000"; }]; };
+                    "minio-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9002"; }]; };
+                    "pgadmin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "traefik-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "prox1-svc" = { 
                         loadBalancer = {
