@@ -128,6 +128,12 @@
                         entryPoints = [ "websecure" ];
                     };
 
+                    "jellyseerr-public" = {
+                        rule = "Host(`jellyseerr.crussell.io`)";
+                        service = "jellyseerr-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
                     "sonarr-internal" = {
                         rule = "Host(`sonarr.internal.crussell.io`)";
                         service = "sonarr-svc";
@@ -140,11 +146,11 @@
                         entryPoints = [ "websecure" ];
                     };
 
-                    "jackett-internal" = {
-                        rule = "Host(`jackett.internal.crussell.io`)";
-                        service = "jackett-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "jackett-internal" = {
+                    #     rule = "Host(`jackett.internal.crussell.io`)";
+                    #     service = "jackett-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
                     "jellyseerr-internal" = {
                         rule = "Host(`jellyseerr.internal.crussell.io`)";
@@ -247,9 +253,10 @@
                     "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.51:8123"; }]; };
                     "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
+                    "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
