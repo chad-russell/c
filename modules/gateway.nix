@@ -194,6 +194,12 @@
                         entryPoints = [ "websecure" ];
                     };
 
+                    "longhorn-internal" = {
+                        rule = "Host(`longhorn.internal.crussell.io`)";
+                        service = "longhorn-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
                     "ittools-internal" = {
                         rule = "Host(`ittools.internal.crussell.io`)";
                         service = "ittools-svc";
@@ -251,6 +257,7 @@
                     "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "forgejo-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "longhorn-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "ittools-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "n8n-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "s3-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9000"; }]; };
