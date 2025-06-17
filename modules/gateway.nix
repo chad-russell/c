@@ -238,12 +238,6 @@
                         entryPoints = [ "websecure" ];
                     };
 
-                    "traefik-internal" = {
-                        rule = "Host(`traefik.internal.crussell.io`)";
-                        service = "traefik-svc";
-                        entryPoints = [ "websecure" ];
-                    };
-
                     "open-webui-internal" = {
                         rule = "Host(`open-webui.internal.crussell.io`)";
                         service = "open-webui-svc";
@@ -282,8 +276,9 @@
                     "s3-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9000"; }]; };
                     "minio-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9002"; }]; };
                     "pgadmin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "traefik-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "open-webui-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "grafana-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "prox1-svc" = { 
                         loadBalancer = {
                             servers = [{ url = "https://192.168.20.11:8006"; }];
