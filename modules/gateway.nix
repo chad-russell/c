@@ -255,6 +255,24 @@
                         service = "prox1-svc";
                         entryPoints = [ "websecure" ];
                     };
+
+                    "prox2-internal" = {
+                        rule = "Host(`prox2.internal.crussell.io`)";
+                        service = "prox2-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "prox3-internal" = {
+                        rule = "Host(`prox3.internal.crussell.io`)";
+                        service = "prox3-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "prox4-internal" = {
+                        rule = "Host(`prox4.internal.crussell.io`)";
+                        service = "prox4-svc";
+                        entryPoints = [ "websecure" ];
+                    };
                 };
 
                 services = {
@@ -290,6 +308,27 @@
                     "prox1-svc" = {
                         loadBalancer = {
                             servers = [{ url = "https://192.168.20.11:8006"; }];
+                            serversTransport = "insecure-transport";
+                        };
+                    };
+
+                    "prox2-svc" = {
+                        loadBalancer = {
+                            servers = [{ url = "https://192.168.20.12:8006"; }];
+                            serversTransport = "insecure-transport";
+                        };
+                    };
+
+                    "prox3-svc" = {
+                        loadBalancer = {
+                            servers = [{ url = "https://192.168.20.13:8006"; }];
+                            serversTransport = "insecure-transport";
+                        };
+                    };
+
+                    "prox4-svc" = {
+                        loadBalancer = {
+                            servers = [{ url = "https://192.168.20.14:8006"; }];
                             serversTransport = "insecure-transport";
                         };
                     };
