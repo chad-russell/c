@@ -249,7 +249,7 @@
                     "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
                     "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    # "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
