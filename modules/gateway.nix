@@ -272,7 +272,11 @@
                     "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "open-webui-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "grafana-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "opnsense-svc" = { loadBalancer.servers = [{ url = "http://192.168.10.1"; }]; };
+                    "opnsense-svc" = {
+                        loadBalancer.servers = [{ url = "https://192.168.10.1"; }];
+                        loadBalancer.server.scheme = "https";
+                        loadBalancer.server.insecureSkipVerify = true;
+                    };
                 };
             };
         };
