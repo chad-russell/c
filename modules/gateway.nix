@@ -29,6 +29,7 @@
         initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" ];
         initrd.kernelModules = [ "virtio_pci" "virtio_ring" "virtio_blk" ];
         kernel.sysctl = {
+        "net.ipv4.ip_forward" = "1";
         "net.ipv6.conf.all.disable_ipv6" = "1";
         "net.ipv6.conf.default.disable_ipv6" = "1";
         };
@@ -43,7 +44,10 @@
     services.resolved.enable = false;
 
     # Install Tailscale
-    services.tailscale.enable = true;
+    services.tailscale = {
+      enable = true;
+      extraUpFlags = [ "--advertise-routes=192.168.10.0/24,192.168.20.0/24" ];
+    };
 
     # Example script that uses the OAuth credentials
     environment.systemPackages = [
