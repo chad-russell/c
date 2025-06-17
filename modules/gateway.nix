@@ -189,6 +189,12 @@
                         service = "ntfy-svc";
                         entryPoints = [ "websecure" ];
                     };
+
+                    "paperless-internal" = {
+                        rule = "Host(`paperless.internal.crussell.io`)";
+                        service = "paperless-svc";
+                        entryPoints = [ "websecure" ];
+                    };
                 };
 
                 services = {
@@ -204,6 +210,7 @@
                     "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
                     "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                 };
             };
         };
