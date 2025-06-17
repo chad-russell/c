@@ -130,11 +130,11 @@
                         entryPoints = [ "websecure" ];
                     };
 
-                    # "mealie-public" = {
-                    #     rule = "Host(`mealie.crussell.io`)";
-                    #     service = "mealie-svc";
-                    #     entryPoints = [ "websecure" ];
-                    # };
+                    "mealie-public" = {
+                        rule = "Host(`mealie.crussell.io`)";
+                        service = "mealie-svc";
+                        entryPoints = [ "websecure" ];
+                    };
 
                     # "jellyfin-public" = {
                     #     rule = "Host(`jellyfin.crussell.io`)";
@@ -258,7 +258,7 @@
                 };
 
                 services = {
-                    # "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.51:8123"; }]; };
                     # "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
                     # "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
