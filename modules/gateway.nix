@@ -172,12 +172,6 @@
                         entryPoints = [ "websecure" ];
                     };
 
-                    "adguard-internal" = {
-                        rule = "Host(`adguard.internal.crussell.io`)";
-                        service = "adguard-svc";
-                        entryPoints = [ "websecure" ];
-                    };
-
                     "nas-internal" = {
                         rule = "Host(`nas.internal.crussell.io`)";
                         service = "nas-svc";
