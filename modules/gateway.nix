@@ -115,14 +115,14 @@
                     };
                 };
                 routers = {
-                    # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
-                    "traefik-dashboard-internal" = {
-                        rule = "Host(`traefik.internal.crussell.io`)";
-                        service = "api@internal"; # Special service for Traefik API/dashboard
-                        entryPoints = [ "web" "websecure" ]; 
-                        middlewares = [ "traefik-dashboard-auth" ];
-                        # TLS will be handled by the websecure entrypoint's global TLS config
-                    };
+                    # # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
+                    # "traefik-dashboard-internal" = {
+                    #     rule = "Host(`traefik.internal.crussell.io`)";
+                    #     service = "api@internal"; # Special service for Traefik API/dashboard
+                    #     entryPoints = [ "web" "websecure" ]; 
+                    #     middlewares = [ "traefik-dashboard-auth" ];
+                    #     # TLS will be handled by the websecure entrypoint's global TLS config
+                    # };
 
                     "homeassistant-public" = {
                         rule = "Host(`homeassistant.crussell.io`)";
@@ -130,161 +130,161 @@
                         entryPoints = [ "websecure" ];
                     };
 
-                    "mealie-public" = {
-                        rule = "Host(`mealie.crussell.io`)";
-                        service = "mealie-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "mealie-public" = {
+                    #     rule = "Host(`mealie.crussell.io`)";
+                    #     service = "mealie-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "jellyfin-public" = {
-                        rule = "Host(`jellyfin.crussell.io`)";
-                        service = "jellyfin-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "jellyfin-public" = {
+                    #     rule = "Host(`jellyfin.crussell.io`)";
+                    #     service = "jellyfin-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "sonarr-internal" = {
-                        rule = "Host(`sonarr.internal.crussell.io`)";
-                        service = "sonarr-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "sonarr-internal" = {
+                    #     rule = "Host(`sonarr.internal.crussell.io`)";
+                    #     service = "sonarr-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "radarr-internal" = {
-                        rule = "Host(`radarr.internal.crussell.io`)";
-                        service = "radarr-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "radarr-internal" = {
+                    #     rule = "Host(`radarr.internal.crussell.io`)";
+                    #     service = "radarr-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "jackett-internal" = {
-                        rule = "Host(`jackett.internal.crussell.io`)";
-                        service = "jackett-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "jackett-internal" = {
+                    #     rule = "Host(`jackett.internal.crussell.io`)";
+                    #     service = "jackett-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "jellyseerr-internal" = {
-                        rule = "Host(`jellyseerr.internal.crussell.io`)";
-                        service = "jellyseerr-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "jellyseerr-internal" = {
+                    #     rule = "Host(`jellyseerr.internal.crussell.io`)";
+                    #     service = "jellyseerr-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "prowlarr-internal" = {
-                        rule = "Host(`prowlarr.internal.crussell.io`)";
-                        service = "prowlarr-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "prowlarr-internal" = {
+                    #     rule = "Host(`prowlarr.internal.crussell.io`)";
+                    #     service = "prowlarr-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "qbittorrent-internal" = {
-                        rule = "Host(`qbittorrent.internal.crussell.io`)";
-                        service = "qbittorrent-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "qbittorrent-internal" = {
+                    #     rule = "Host(`qbittorrent.internal.crussell.io`)";
+                    #     service = "qbittorrent-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "nas-internal" = {
-                        rule = "Host(`nas.internal.crussell.io`)";
-                        service = "nas-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "nas-internal" = {
+                    #     rule = "Host(`nas.internal.crussell.io`)";
+                    #     service = "nas-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "karakeep-internal" = {
-                        rule = "Host(`karakeep.internal.crussell.io`)";
-                        service = "karakeep-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "karakeep-internal" = {
+                    #     rule = "Host(`karakeep.internal.crussell.io`)";
+                    #     service = "karakeep-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "ntfy-internal" = {
-                        rule = "Host(`ntfy.internal.crussell.io`)";
-                        service = "ntfy-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "ntfy-internal" = {
+                    #     rule = "Host(`ntfy.internal.crussell.io`)";
+                    #     service = "ntfy-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "paperless-internal" = {
-                        rule = "Host(`paperless.internal.crussell.io`)";
-                        service = "paperless-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "paperless-internal" = {
+                    #     rule = "Host(`paperless.internal.crussell.io`)";
+                    #     service = "paperless-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "forgejo-internal" = {
-                        rule = "Host(`forgejo.internal.crussell.io`)";
-                        service = "forgejo-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "forgejo-internal" = {
+                    #     rule = "Host(`forgejo.internal.crussell.io`)";
+                    #     service = "forgejo-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "ittools-internal" = {
-                        rule = "Host(`ittools.internal.crussell.io`)";
-                        service = "ittools-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "ittools-internal" = {
+                    #     rule = "Host(`ittools.internal.crussell.io`)";
+                    #     service = "ittools-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "n8n-internal" = {
-                        rule = "Host(`n8n.internal.crussell.io`)";
-                        service = "n8n-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "n8n-internal" = {
+                    #     rule = "Host(`n8n.crussell.io`)";
+                    #     service = "n8n-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "s3-internal" = {
-                        rule = "Host(`s3.internal.crussell.io`)";
-                        service = "s3-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "s3-internal" = {
+                    #     rule = "Host(`s3.internal.crussell.io`)";
+                    #     service = "s3-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "minio-internal" = {
-                        rule = "Host(`minio.internal.crussell.io`)";
-                        service = "minio-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "minio-internal" = {
+                    #     rule = "Host(`minio.internal.crussell.io`)";
+                    #     service = "minio-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "pgadmin-internal" = {
-                        rule = "Host(`pgadmin.internal.crussell.io`)";
-                        service = "pgadmin-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "pgadmin-internal" = {
+                    #     rule = "Host(`pgadmin.internal.crussell.io`)";
+                    #     service = "pgadmin-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "open-webui-internal" = {
-                        rule = "Host(`open-webui.internal.crussell.io`)";
-                        service = "open-webui-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "open-webui-internal" = {
+                    #     rule = "Host(`open-webui.internal.crussell.io`)";
+                    #     service = "open-webui-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
                     
-                    "grafana-internal" = {
-                        rule = "Host(`grafana.internal.crussell.io`)";
-                        service = "grafana-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "grafana-internal" = {
+                    #     rule = "Host(`grafana.internal.crussell.io`)";
+                    #     service = "grafana-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
 
-                    "prox1-internal" = {
-                        rule = "Host(`prox1.internal.crussell.io`)";
-                        service = "prox1-svc";
-                        entryPoints = [ "websecure" ];
-                    };
+                    # "prox1-internal" = {
+                    #     rule = "Host(`prox1.internal.crussell.io`)";
+                    #     service = "prox1-svc";
+                    #     entryPoints = [ "websecure" ];
+                    # };
                 };
 
                 services = {
-                    "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "mealie-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "homeassistant-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.51:8123"; }]; };
-                    "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
-                    "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
-                    "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
-                    "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "forgejo-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "ittools-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "n8n-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "s3-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9000"; }]; };
-                    "minio-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9002"; }]; };
-                    "pgadmin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "open-webui-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "grafana-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "prox1-svc" = { 
-                        loadBalancer = {
-                            servers = [{ url = "https://192.168.20.11:8006"; }];
-                        };
-                        serversTransport = "http-transport";
-                    };
+                    # "jellyfin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.203:8096"; }]; };
+                    # "sonarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "radarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "jackett-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "jellyseerr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "prowlarr-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
+                    # "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
+                    # "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "forgejo-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "ittools-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "n8n-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "s3-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9000"; }]; };
+                    # "minio-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:9002"; }]; };
+                    # "pgadmin-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "open-webui-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "grafana-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    # "prox1-svc" = { 
+                    #     loadBalancer = {
+                    #         servers = [{ url = "https://192.168.20.11:8006"; }];
+                    #     };
+                    #     serversTransport = "http-transport";
+                    # };
                 };
             };
         };
