@@ -108,6 +108,12 @@
                     ];
                 };
                 };
+                serversTransports = {
+                    "http-transport" = {
+                        serverName = "";
+                        insecureSkipVerify = true;
+                    };
+                };
                 routers = {
                     # --- Routers for *.internal.crussell.io (Primarily LAN access) ---
                     "traefik-dashboard-internal" = {
@@ -217,7 +223,12 @@
                     "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "paperless-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "prox1-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.11:8006"; }]; };
+                    "prox1-svc" = { 
+                        loadBalancer = {
+                            servers = [{ url = "https://192.168.20.11:8006"; }];
+                        };
+                        serversTransport = "http-transport";
+                    };
                 };
             };
         };
