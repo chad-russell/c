@@ -89,6 +89,7 @@
             };
             api = {
                 dashboard = true;
+                insecure = true;  # Enables API on port 8080
             };
             certificatesResolvers.letsencrypt.acme = {
                 storage = "/var/lib/traefik/acme.json";
@@ -112,6 +113,14 @@
                 };
 
                 routers = {
+                    # Traefik Dashboard
+                    "traefik-dashboard" = {
+                        rule = "Host(`traefik.internal.crussell.io`)";
+                        service = "api@internal";
+                        entryPoints = [ "websecure" ];
+                        middlewares = [ "traefik-dashboard-auth" ];
+                    };
+
                     "homeassistant-public" = {
                         rule = "Host(`homeassistant.crussell.io`)";
                         service = "homeassistant-svc";
@@ -175,6 +184,12 @@
                     "karakeep-internal" = {
                         rule = "Host(`karakeep.internal.crussell.io`)";
                         service = "karakeep-svc";
+                        entryPoints = [ "websecure" ];
+                    };
+
+                    "linkwarden-internal" = {
+                        rule = "Host(`linkwarden.internal.crussell.io`)";
+                        service = "linkwarden-svc";
                         entryPoints = [ "websecure" ];
                     };
 
@@ -287,6 +302,7 @@
                     "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
                     "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
                     "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
+                    "linkwarden-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "forgejo-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "longhorn-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
