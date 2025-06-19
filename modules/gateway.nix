@@ -187,12 +187,6 @@
                         entryPoints = [ "websecure" ];
                     };
 
-                    "linkwarden-internal" = {
-                        rule = "Host(`linkwarden.internal.crussell.io`)";
-                        service = "linkwarden-svc";
-                        entryPoints = [ "websecure" ];
-                    };
-
                     "ntfy-internal" = {
                         rule = "Host(`ntfy.internal.crussell.io`)";
                         service = "ntfy-svc";
@@ -302,7 +296,6 @@
                     "qbittorrent-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.204:8080"; }]; };
                     "nas-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.31:80"; }]; };
                     "karakeep-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
-                    "linkwarden-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "ntfy-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "forgejo-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
                     "longhorn-svc" = { loadBalancer.servers = [{ url = "http://192.168.20.240"; }]; };
