@@ -1,8 +1,4 @@
 { sops-nix }: { config, pkgs, lib, ... }: {
-    imports = [
-        ((import ./beszel-agent.nix) { inherit sops-nix pkgs config; })
-    ];
-
     networking.hostName = "vm-jellyfin";
     networking.firewall.allowedTCPPorts = [ 22 8096 5055 ];
     networking.useDHCP = false;

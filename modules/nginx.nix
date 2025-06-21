@@ -1,7 +1,6 @@
 { sops-nix }: { pkgs, lib, config, ... }: {
     imports = [
         sops-nix.nixosModules.sops
-        ((import ./beszel-agent.nix) { inherit sops-nix pkgs config; })
     ];
 
     networking.hostName = "vm-test";

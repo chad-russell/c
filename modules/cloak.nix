@@ -1,8 +1,4 @@
 { sops-nix }: { pkgs, config, lib, ... }: {
-    imports = [
-        ((import ./beszel-agent.nix) { inherit sops-nix pkgs config; })
-    ];
-
     networking.hostName = "vm-cloak";
     networking.firewall.allowedTCPPorts = [ 22 8080 ]; # SSH and qBittorrent web UI
     networking.firewall.checkReversePath = "loose";
@@ -17,6 +13,7 @@
 
     networking.defaultGateway = "192.168.20.1";
     networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    networking.firewall.enable = false;
 
     # Boot and filesystem configuration
     fileSystems."/" = {
