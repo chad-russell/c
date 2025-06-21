@@ -43,10 +43,7 @@
     # Enable Tailscale
     services.tailscale = {
         enable = true;
-        extraUpFlags = [
-            "--accept-routes"
-            "--accept-dns=true"
-        ];
+        extraUpFlags = [ ];
         extraSetFlags = [
             "--exit-node=100.84.251.68" # Mullvad exit node (Miami, FL)
             "--exit-node-allow-lan-access"
