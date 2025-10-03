@@ -91,6 +91,7 @@ export interface CommandOptions {
   dryRun?: boolean;
   verbose?: boolean;
   service?: string;
+  yes?: boolean;
 }
 
 /**

@@ -151,9 +151,10 @@ export async function listRemoteFiles(
   directory: string,
   pattern?: string
 ): Promise<string[]> {
+  // Expand tilde in shell for proper path resolution
   const command = pattern 
-    ? `ls -1 "${directory}"/${pattern} 2>/dev/null || true`
-    : `ls -1 "${directory}" 2>/dev/null || true`;
+    ? `ls -1 ${directory}/${pattern} 2>/dev/null || true`
+    : `ls -1 ${directory} 2>/dev/null || true`;
   
   const result = await executeCommand(ssh, command);
   

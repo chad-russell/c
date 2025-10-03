@@ -251,6 +251,59 @@ export async function ensureSystemdUserDir(
 }
 
 /**
+ * Get all systemd services matching a pattern (e.g., all services starting with "pinepods")
+ */
+export async function listSystemdServices(
+  ssh: NodeSSH,
+  pattern: string
+): Promise<string[]> {
+  const result = await executeCommand(
+    ssh,
+    `systemctl --user list-units --all --no-pager --no-legend '${pattern}*' | awk '{print $1}' | grep -v '●' || true`
+  );
+  
+  if (!result.stdout.trim()) {
+    return [];
+  }
+  
+  return result.stdout
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line && line.endsWith('.service'))
+    .map(line => line.replace('.service', ''));
+}
+
+/**
+ * Stop all services related to a service name (including generated services)
+ */
+export async function stopAllRelatedServices(
+  ssh: NodeSSH,
+  serviceName: string,
+  options?: { verbose?: boolean }
+): Promise<string[]> {
+  // Find all services that start with the service name
+  const services = await listSystemdServices(ssh, serviceName);
+  const stoppedServices: string[] = [];
+  
+  for (const service of services) {
+    try {
+      if (options?.verbose) {
+        console.log(`  Stopping ${service}.service...`);
+      }
+      await stopService(ssh, service, { verbose: false });
+      stoppedServices.push(service);
+    } catch (error) {
+      // Service might not be running, that's ok
+      if (options?.verbose && error instanceof Error) {
+        console.log(`    (${error.message})`);
+      }
+    }
+  }
+  
+  return stoppedServices;
+}
+
+/**
  * Remove quadlet files for a service
  */
 export async function removeServiceFiles(
@@ -280,4 +333,3 @@ export async function removeServiceFiles(
   
   return removedFiles;
 }
-

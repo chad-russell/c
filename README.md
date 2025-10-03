@@ -27,27 +27,34 @@ machines:
       - pinepods
 ```
 
-### 2. Deploy Services
+### 2. Sync Services (Terraform-style)
 
 ```bash
 # List configured machines
 bun run src/index.ts list
 
-# Deploy all services to a machine
-bun run src/index.ts deploy homelab-main
+# Sync machine state with configuration (shows plan, asks for confirmation)
+bun run src/index.ts sync homelab-main
 
-# Deploy specific service
-bun run src/index.ts deploy homelab-main --service pinepods
+# Sync without confirmation
+bun run src/index.ts sync homelab-main --yes
 
-# Dry-run (see what would happen)
-bun run src/index.ts deploy homelab-main --dry-run
+# Dry-run (see what would change)
+bun run src/index.ts sync homelab-main --dry-run
+
+# Sync specific service only
+bun run src/index.ts sync homelab-main --service pinepods
 
 # Check deployment status
 bun run src/index.ts status homelab-main
-
-# Remove services
-bun run src/index.ts undeploy homelab-main --service pinepods
 ```
+
+The `sync` command:
+- Shows you what will be added/removed (like Terraform plan)
+- Asks for confirmation before making changes
+- Removes services no longer in configuration
+- Adds new services from configuration
+- Properly stops all related systemd services before cleanup
 
 ## Services
 

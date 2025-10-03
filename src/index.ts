@@ -11,6 +11,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { listCommand } from './commands/list.ts';
 import { deployCommand } from './commands/deploy.ts';
+import { syncCommand } from './commands/sync.ts';
 
 const program = new Command();
 
@@ -19,10 +20,21 @@ program
   .description('Declarative deployment system for Podman Quadlet services')
   .version('0.1.0');
 
-// Deploy command
+// Sync command (main command - Terraform-style)
+program
+  .command('sync')
+  .description('Sync machine state with configuration (shows plan and asks for confirmation)')
+  .argument('<machine>', 'target machine name from machines.yaml')
+  .option('-y, --yes', 'skip confirmation prompt and apply changes immediately')
+  .option('-d, --dry-run', 'show plan without making any changes')
+  .option('-s, --service <name>', 'sync only a specific service')
+  .option('-v, --verbose', 'show detailed output')
+  .action(syncCommand);
+
+// Deploy command (kept for backwards compatibility)
 program
   .command('deploy')
-  .description('Deploy services to a machine')
+  .description('Deploy services to a machine (legacy - use sync instead)')
   .argument('<machine>', 'target machine name from machines.yaml')
   .option('-d, --dry-run', 'show what would be deployed without making changes')
   .option('-s, --service <name>', 'deploy only a specific service')

@@ -7,7 +7,7 @@ machines:
   k3:
     hostname: k3
     user: crussell
-    description: "Primary homelab server"
+    description: "k3"
     services:
       - pinepods
 
