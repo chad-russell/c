@@ -15,10 +15,11 @@ export async function createSSHConnection(options: SSHConnectionOptions): Promis
   const ssh = new NodeSSH();
   
   try {
+    // Use SSH agent for authentication (handles encrypted keys)
     await ssh.connect({
       host: options.host,
       username: options.username,
-      privateKeyPath: options.privateKeyPath || resolve(homedir(), '.ssh', 'id_rsa'),
+      agent: process.env.SSH_AUTH_SOCK,
       port: options.port || 22,
       readyTimeout: options.timeout || 30000,
     });

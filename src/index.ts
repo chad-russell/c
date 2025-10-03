@@ -10,6 +10,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { listCommand } from './commands/list.ts';
+import { deployCommand } from './commands/deploy.ts';
 
 const program = new Command();
 
@@ -26,15 +27,7 @@ program
   .option('-d, --dry-run', 'show what would be deployed without making changes')
   .option('-s, --service <name>', 'deploy only a specific service')
   .option('-v, --verbose', 'show detailed output')
-  .action(async (machine: string, options) => {
-    console.log(chalk.blue('🚀 Deploy command'));
-    console.log(chalk.gray(`Machine: ${machine}`));
-    if (options.dryRun) console.log(chalk.yellow('  (dry-run mode)'));
-    if (options.service) console.log(chalk.gray(`Service: ${options.service}`));
-    
-    // TODO: Implement deploy logic
-    console.log(chalk.yellow('\n⚠️  Deploy command not yet implemented'));
-  });
+  .action(deployCommand);
 
 // Status command
 program

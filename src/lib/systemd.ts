@@ -8,7 +8,7 @@ import { executeCommand, listRemoteFiles } from './ssh.ts';
 import type { QuadletFile, ServiceStatus } from '../types.ts';
 import { basename, extname } from 'path';
 
-const SYSTEMD_USER_DIR = '~/.config/containers/systemd';
+const SYSTEMD_USER_DIR = '.config/containers/systemd';
 const QUADLET_EXTENSIONS = ['.container', '.network', '.volume', '.pod', '.kube', '.build', '.image'];
 
 /**
@@ -19,7 +19,7 @@ export async function listDeployedQuadletFiles(ssh: NodeSSH): Promise<QuadletFil
   
   for (const ext of QUADLET_EXTENSIONS) {
     const pattern = `*${ext}`;
-    const remoteFiles = await listRemoteFiles(ssh, SYSTEMD_USER_DIR, pattern);
+    const remoteFiles = await listRemoteFiles(ssh, '~/.config/containers/systemd', pattern);
     
     for (const filename of remoteFiles) {
       const file = basename(filename);
@@ -30,7 +30,7 @@ export async function listDeployedQuadletFiles(ssh: NodeSSH): Promise<QuadletFil
         filename: file,
         type,
         serviceName,
-        path: `${SYSTEMD_USER_DIR}/${file}`,
+        path: `~/.config/containers/systemd/${file}`,
       });
     }
   }
@@ -244,10 +244,10 @@ export async function ensureSystemdUserDir(
   options?: { verbose?: boolean }
 ): Promise<void> {
   if (options?.verbose) {
-    console.log(`Ensuring ${SYSTEMD_USER_DIR} exists...`);
+    console.log(`Ensuring ~/.config/containers/systemd exists...`);
   }
   
-  await executeCommand(ssh, `mkdir -p ${SYSTEMD_USER_DIR}`, options);
+  await executeCommand(ssh, `mkdir -p ~/.config/containers/systemd`, options);
 }
 
 /**
@@ -269,7 +269,7 @@ export async function removeServiceFiles(
   for (const file of serviceFiles) {
     const result = await executeCommand(
       ssh,
-      `rm -f "${SYSTEMD_USER_DIR}/${file.filename}"`,
+      `rm -f ~/.config/containers/systemd/${file.filename}`,
       options
     );
     
