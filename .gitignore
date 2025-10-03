@@ -21,3 +21,12 @@ Thumbs.db
 test/
 tmp/
 
+# Node/Bun dependencies and build artifacts
+node_modules/
+dist/
+*.log
+.bun/
+
+# TypeScript build info
+*.tsbuildinfo
+
