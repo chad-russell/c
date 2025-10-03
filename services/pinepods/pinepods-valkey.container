@@ -1,0 +1,16 @@
+[Unit]
+Description=PinePods Valkey Cache
+After=pinepods.network
+
+[Container]
+ContainerName=pinepods-valkey
+Image=docker.io/valkey/valkey:8-alpine
+Network=pinepods.network
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target
+

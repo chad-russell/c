@@ -1,0 +1,8 @@
+[Unit]
+Description=PinePods Network
+
+[Network]
+# Creates a custom network for PinePods services
+# This allows containers to communicate via container names
+NetworkName=pinepods
+

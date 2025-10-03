@@ -1,0 +1,6 @@
+[Unit]
+Description=PinePods Backups Volume
+
+[Volume]
+VolumeName=pinepods-backups
+

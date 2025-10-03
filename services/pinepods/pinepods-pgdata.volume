@@ -1,0 +1,6 @@
+[Unit]
+Description=PinePods PostgreSQL Data Volume
+
+[Volume]
+VolumeName=pinepods-pgdata
+

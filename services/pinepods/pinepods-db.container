@@ -1,0 +1,25 @@
+[Unit]
+Description=PinePods PostgreSQL Database
+After=pinepods.network
+
+[Container]
+ContainerName=pinepods-db
+Image=docker.io/library/postgres:17
+Network=pinepods.network
+
+# Environment variables
+Environment=POSTGRES_DB=pinepods_database
+Environment=POSTGRES_USER=postgres
+Environment=POSTGRES_PASSWORD=myS3curepass
+Environment=PGDATA=/var/lib/postgresql/data/pgdata
+
+# Mount the PostgreSQL data volume
+Volume=pinepods-pgdata.volume:/var/lib/postgresql/data
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target
+

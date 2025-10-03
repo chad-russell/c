@@ -1,0 +1,23 @@
+# Ignore environment-specific files
+*.env
+.env.local
+
+# Ignore backup files
+*.bak
+*~
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore local test directories
+test/
+tmp/
+
