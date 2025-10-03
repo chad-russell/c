@@ -1,0 +1,56 @@
+[Unit]
+Description=Karakeep Bookmark Manager
+After=karakeep-meilisearch.container karakeep-chrome.container
+Requires=karakeep-meilisearch.container karakeep-chrome.container
+
+[Container]
+ContainerName=karakeep
+Image=ghcr.io/karakeep-app/karakeep:release
+Network=karakeep.network
+PublishPort=3322:3000
+
+# Data Persistence - SQLite database and uploaded assets
+Volume=karakeep-app-data.volume:/data
+
+# Basic Configuration
+# CHANGE THIS: Generate a secure secret with: openssl rand -base64 36
+Environment=NEXTAUTH_SECRET=FLGHUFil//n1atELBxGFD7FNF9D8Jpom9cFLHrB1JFFWmuyp
+
+# CHANGE THIS: Set to your actual server URL (e.g., http://k4.local:3000 or https://karakeep.yourdomain.com)
+Environment=NEXTAUTH_URL=https://karakeep.internal.crussell.io
+
+# Data directory (tells Karakeep where to store the database)
+Environment=DATA_DIR=/data
+
+# Meilisearch Configuration
+Environment=MEILI_ADDR=http://karakeep-meilisearch:7700
+# This must match the MEILI_MASTER_KEY in karakeep-meilisearch.container
+Environment=MEILI_MASTER_KEY=IrLHvlILqJDWOufv/wweLQondy1+rq3JufEOXoJg/2sMjkGS
+
+# Chrome Configuration (for web scraping and screenshots)
+Environment=BROWSER_WEB_URL=http://karakeep-chrome:9222
+
+# Optional: OpenAI Configuration (for automatic tagging)
+# Uncomment and set your OpenAI API key to enable AI-powered tagging
+# Environment=OPENAI_API_KEY=your_openai_api_key_here
+
+# Optional: Ollama Configuration (for local AI inference instead of OpenAI)
+# Uncomment these if you want to use Ollama running on your host
+# Environment=OLLAMA_BASE_URL=http://host.containers.internal:11434
+# Environment=INFERENCE_TEXT_MODEL=llama3.1
+# Environment=INFERENCE_IMAGE_MODEL=llava
+# Environment=INFERENCE_CONTEXT_LENGTH=3000
+
+# Optional: Additional Configuration
+# Uncomment and customize as needed
+# Environment=MAX_ASSET_SIZE_MB=50
+# Environment=INFERENCE_LANG=english
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target
+
+

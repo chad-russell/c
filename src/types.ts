@@ -109,3 +109,50 @@ export interface ServiceStatus {
   }>;
 }
 
+/**
+ * Options for fetching logs
+ */
+export interface LogOptions {
+  follow?: boolean;
+  since?: string;
+  until?: string;
+  lines?: number;
+  verbose?: boolean;
+}
+
+/**
+ * Container metrics
+ */
+export interface ContainerMetrics {
+  name: string;
+  cpu: string;
+  memory: string;
+  memoryUsage: string;
+  network: string;
+}
+
+/**
+ * Service metrics
+ */
+export interface ServiceMetrics {
+  serviceName: string;
+  containers: ContainerMetrics[];
+}
+
+/**
+ * Enhanced status result with metrics and drift
+ */
+export interface StatusResult {
+  machine: string;
+  services: Array<{
+    name: string;
+    status: ServiceStatus;
+    metrics?: ServiceMetrics;
+    inConfig: boolean;
+  }>;
+  drift: {
+    shouldBeDeployed: string[];
+    orphaned: string[];
+  };
+}
+

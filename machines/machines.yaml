@@ -10,6 +10,13 @@ machines:
     description: "k3"
     services:
       - pinepods
+  
+  k4:
+    hostname: k4
+    user: crussell
+    description: "k4"
+    services:
+      - karakeep
 
   # Example machine configuration
   # homelab-main:

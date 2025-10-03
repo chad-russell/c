@@ -84,3 +84,19 @@ export function getServiceDir(serviceName: string): string {
   return resolve(getServicesDir(), serviceName);
 }
 
+/**
+ * Find which machine(s) have a specific service configured
+ */
+export function findMachineForService(serviceName: string): string[] {
+  const config = loadMachinesConfig();
+  const machinesWithService: string[] = [];
+  
+  for (const [machineName, machineConfig] of Object.entries(config.machines)) {
+    if (machineConfig.services.includes(serviceName)) {
+      machinesWithService.push(machineName);
+    }
+  }
+  
+  return machinesWithService;
+}
+

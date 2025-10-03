@@ -182,3 +182,18 @@ export async function getRemoteFileChecksum(
   return result.stdout.split(/\s+/)[0] || null;
 }
 
+/**
+ * Compare local and remote file checksums to detect drift
+ * Returns true if files differ or remote file doesn't exist
+ */
+export async function hasFileDrift(
+  ssh: NodeSSH,
+  localChecksum: string,
+  remotePath: string
+): Promise<boolean> {
+  const remoteChecksum = await getRemoteFileChecksum(ssh, remotePath);
+  
+  // If remote file doesn't exist or checksums differ, there's drift
+  return remoteChecksum === null || remoteChecksum !== localChecksum;
+}
+

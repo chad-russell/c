@@ -12,6 +12,8 @@ import chalk from 'chalk';
 import { listCommand } from './commands/list.ts';
 import { deployCommand } from './commands/deploy.ts';
 import { syncCommand } from './commands/sync.ts';
+import { logsCommand } from './commands/logs.ts';
+import { statusCommand } from './commands/status.ts';
 
 const program = new Command();
 
@@ -26,6 +28,7 @@ program
   .description('Sync machine state with configuration (shows plan and asks for confirmation)')
   .argument('<machine>', 'target machine name from machines.yaml')
   .option('-y, --yes', 'skip confirmation prompt and apply changes immediately')
+  .option('-f, --force', 'force re-upload of all services (skip drift detection)')
   .option('-d, --dry-run', 'show plan without making any changes')
   .option('-s, --service <name>', 'sync only a specific service')
   .option('-v, --verbose', 'show detailed output')
@@ -44,16 +47,11 @@ program
 // Status command
 program
   .command('status')
-  .description('Check deployment status on a machine')
+  .description('Check deployment status with metrics and drift detection')
   .argument('<machine>', 'target machine name from machines.yaml')
   .option('-v, --verbose', 'show detailed output')
-  .action(async (machine: string, options) => {
-    console.log(chalk.blue('📊 Status command'));
-    console.log(chalk.gray(`Machine: ${machine}`));
-    
-    // TODO: Implement status logic
-    console.log(chalk.yellow('\n⚠️  Status command not yet implemented'));
-  });
+  .option('-m, --metrics', 'show container metrics (CPU, memory, network)')
+  .action(statusCommand);
 
 // Undeploy command
 program
@@ -76,6 +74,19 @@ program
   .command('list')
   .description('List all configured machines')
   .action(listCommand);
+
+// Logs command
+program
+  .command('logs')
+  .description('Fetch logs from remote services')
+  .option('-m, --machine <name>', 'show logs from a specific machine')
+  .option('-s, --service <name>', 'show logs for a specific service (auto-discovers machine)')
+  .option('-f, --follow', 'follow logs in real-time')
+  .option('--since <time>', 'show logs since timestamp (e.g., "1 hour ago", "2024-01-01")')
+  .option('--until <time>', 'show logs until timestamp')
+  .option('-n, --lines <number>', 'number of lines to show', (val) => parseInt(val, 10), 50)
+  .option('-v, --verbose', 'show detailed output')
+  .action(logsCommand);
 
 // Parse command line arguments
 program.parse();

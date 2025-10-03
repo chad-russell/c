@@ -1,0 +1,7 @@
+[Unit]
+Description=Karakeep Meilisearch Data Volume
+
+[Volume]
+VolumeName=karakeep-data
+
+

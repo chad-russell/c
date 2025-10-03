@@ -99,12 +99,13 @@ A lightweight, declarative deployment system for managing Podman Quadlet service
   - [x] All sync features but without confirmation prompt ✅
   - [x] Marked as legacy in help text ✅
 
-#### Status Command
-- [ ] `bun run status <machine>` - Check deployment status
-  - [ ] List deployed services
-  - [ ] Show systemd service status
-  - [ ] Compare with machines.yaml (drift detection)
-  - [ ] Show service health (running/failed/stopped)
+#### Status Command ✅
+- [x] `bun run status <machine>` - Check deployment status ✅
+  - [x] List deployed services ✅
+  - [x] Show systemd service status ✅
+  - [x] Compare with machines.yaml (drift detection) ✅
+  - [x] Show service health (running/failed/stopped) ✅
+  - [x] Show container metrics (CPU, memory, network) ✅
 
 #### Undeploy Command
 - [ ] `bun run undeploy <machine>` - Remove services
@@ -193,44 +194,35 @@ A lightweight, declarative deployment system for managing Podman Quadlet service
 ### Phase 3: Backup & Recovery
 
 - [ ] Volume backup commands
-  - [ ] `scripts/backup` - Backup volumes from a machine
+  - [ ] `bun run backup` - Backup volumes from a machine
   - [ ] Configurable backup destinations
   - [ ] Incremental backups (rsync-based)
-- [ ] Configuration snapshot/restore
-  - [ ] Snapshot current state before deployment
-  - [ ] Rollback to previous configuration
 - [ ] Disaster recovery documentation
 
-### Phase 4: Health Checks & Monitoring
+### Phase 4: Logs & Observability ✅ **COMPLETE**
+
+- [x] `bun run logs` - Fetch logs from remote services ✅
+  - [x] Follow logs in real-time ✅
+  - [x] Time-range filtering; use standard systemd syntax ✅
+  - [x] Get logs for individual services ✅
+    - [x] Search across machines; auto-discover via config which machine to search ✅
+  - [x] Get logs for individual machines ✅
+- [x] Metrics collection (podman stats) ✅
+- [x] Enhanced `bun run status` command with metrics and drift detection ✅
+- [ ] Log aggregation to central location (out of scope)
+
+### Phase 5: Health Checks & Monitoring
 
 - [ ] Service health check definitions
   - [ ] HTTP endpoint checks
   - [ ] Port availability checks
   - [ ] Container health status
-- [ ] `scripts/healthcheck` - Run health checks across machines
+- [ ] `bun run healthcheck` - Run health checks across machines
 - [ ] Alerting on failures (email, webhook, etc.)
 - [ ] Dashboard/status page generation
 
-### Phase 5: Logs & Observability
-
-- [ ] `scripts/logs` - Fetch logs from remote services
-  - [ ] Follow logs in real-time
-  - [ ] Search across machines
-  - [ ] Time-range filtering
-- [ ] Log aggregation to central location
-- [ ] Log rotation management
-- [ ] Metrics collection (podman stats)
-
 ### Phase 6: Advanced Features
 
-- [ ] Pre/post deployment hooks
-  - [ ] Per-service hooks
-  - [ ] Per-machine hooks
-  - [ ] Custom validation scripts
-- [ ] Service templates (parameterized services)
-- [ ] Environment-specific configs (dev/staging/prod)
-- [ ] Canary deployments (deploy to one machine, verify, then others)
-- [ ] Machine groups (deploy to multiple machines at once)
 - [ ] Web UI for deployment management
 - [ ] Notification integrations (Discord, Slack, etc.)
 
@@ -415,3 +407,50 @@ bun build --compile src/index.ts --outfile homelab
 # Creates standalone executable, no bun runtime needed
 ```
 
+
+
+
+## Bugs:
+
+- When a deploy fails, don't put the green checkbox and say `Sync complete!`
+```
+crussell@bee:~/Code/c$ bun run ./src/index.ts sync k4
+
+🔄 Syncing k4
+
+  Connecting to k4...
+  ✓ Connected
+
+
+📋 Sync Plan for k4
+
+Plan: 1 to add, 0 to remove, 0 unchanged
+
+Services to add:
+  + karakeep
+
+Apply these changes? (yes/no): yes
+
+🚀 Applying changes...
+
+Adding 1 service(s)...
+
+  karakeep
+    Uploading 5 file(s)...
+    ✓ Uploaded
+
+Reloading systemd daemon...
+✓ Daemon reloaded
+
+Starting new services...
+
+  Starting karakeep...
+  ✗ Failed to start karakeep: Failed to start karakeep: Job for karakeep.service failed because the control process exited with error code.
+See "systemctl --user status karakeep.service" and "journalctl --user -xeu karakeep.service" for details.
+
+✅ Sync complete!
+
+Summary: 1 added
+
+crussell@bee:~/Code/c$ 
+```

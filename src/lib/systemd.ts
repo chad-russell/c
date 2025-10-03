@@ -333,3 +333,137 @@ export async function removeServiceFiles(
   
   return removedFiles;
 }
+
+/**
+ * Get logs from a service using journalctl
+ */
+export async function getServiceLogs(
+  ssh: NodeSSH,
+  serviceName: string,
+  options?: {
+    follow?: boolean;
+    since?: string;
+    until?: string;
+    lines?: number;
+    verbose?: boolean;
+  }
+): Promise<void> {
+  const args: string[] = ['journalctl', '--user', '-u', `${serviceName}.service`];
+  
+  // Add follow flag
+  if (options?.follow) {
+    args.push('-f');
+  }
+  
+  // Add time filters
+  if (options?.since) {
+    args.push('--since', `"${options.since}"`);
+  }
+  
+  if (options?.until) {
+    args.push('--until', `"${options.until}"`);
+  }
+  
+  // Add line limit
+  if (options?.lines) {
+    args.push('-n', options.lines.toString());
+  }
+  
+  // No pager for better output
+  args.push('--no-pager');
+  
+  const command = args.join(' ');
+  
+  if (options?.verbose) {
+    console.log(`Executing: ${command}`);
+  }
+  
+  // For follow mode, we need to stream output
+  if (options?.follow) {
+    const connection = ssh.connection;
+    if (!connection) {
+      throw new Error('SSH connection not established');
+    }
+    
+    return new Promise<void>((resolve, reject) => {
+      connection.exec(command, (err: Error | undefined, stream: any) => {
+        if (err) {
+          reject(new Error(`Failed to execute command: ${err.message}`));
+          return;
+        }
+        
+        stream.on('close', () => {
+          resolve();
+        });
+        
+        stream.on('data', (data: Buffer) => {
+          process.stdout.write(data);
+        });
+        
+        stream.stderr.on('data', (data: Buffer) => {
+          process.stderr.write(data);
+        });
+      });
+    });
+  } else {
+    // For non-follow mode, just execute and return
+    const result = await executeCommand(ssh, command, options);
+    if (result.stdout) {
+      console.log(result.stdout);
+    }
+    if (result.stderr) {
+      console.error(result.stderr);
+    }
+  }
+}
+
+/**
+ * Get metrics for containers associated with a service
+ */
+export async function getServiceMetrics(
+  ssh: NodeSSH,
+  serviceName: string
+): Promise<import('../types.ts').ServiceMetrics | null> {
+  // Get list of containers for this service
+  const psResult = await executeCommand(
+    ssh,
+    `podman ps --filter "name=${serviceName}" --format "{{.Names}}" 2>/dev/null || true`
+  );
+  
+  const containerNames = psResult.stdout
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+  
+  if (containerNames.length === 0) {
+    return null;
+  }
+  
+  const containers: import('../types.ts').ContainerMetrics[] = [];
+  
+  // Get stats for each container
+  for (const containerName of containerNames) {
+    const statsResult = await executeCommand(
+      ssh,
+      `podman stats --no-stream --format "{{.CPU}}|{{.MemUsage}}|{{.NetIO}}" ${containerName} 2>/dev/null || true`
+    );
+    
+    if (statsResult.stdout.trim()) {
+      const parts = statsResult.stdout.trim().split('|');
+      if (parts.length >= 3) {
+        containers.push({
+          name: containerName,
+          cpu: parts[0]!.trim(),
+          memory: parts[1]!.trim(),
+          memoryUsage: parts[1]!.trim(),
+          network: parts[2]!.trim(),
+        });
+      }
+    }
+  }
+  
+  return {
+    serviceName,
+    containers,
+  };
+}
