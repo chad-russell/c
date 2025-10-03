@@ -16,7 +16,7 @@ Temporary quadlets, usually used for testing:
 
 System administrator’s defined quadlets:
 
-* /etc/containers/systemd/
+* ~/.config/containers/systemd/
 
 Distribution defined quadlets:
 
@@ -28,8 +28,8 @@ Quadlet files for non-root users can be placed in the following directories:
 
 * $XDG\_RUNTIME\_DIR/containers/systemd/
 * $XDG\_CONFIG\_HOME/containers/systemd/ or ~/.config/containers/systemd/
-* /etc/containers/systemd/users/$(UID)
-* /etc/containers/systemd/users/
+* ~/.config/containers/systemd/users/$(UID)
+* ~/.config/containers/systemd/users/
 
 ## Using symbolic links[¶](#using-symbolic-links "Link to this heading")
 
@@ -68,12 +68,12 @@ further down the hierarchy override those further up (`foo-bar-baz.container.d/1
 to alter or add configuration settings for a unit, without having to modify unit files.
 
 For rootless containers, when administrators place Quadlet files in the
-/etc/containers/systemd/users directory, all users’ sessions execute the
+~/.config/containers/systemd/users directory, all users’ sessions execute the
 Quadlet when the login session begins. If the administrator places a Quadlet
-file in the /etc/containers/systemd/users/${UID}/ directory, then only the
+file in the ~/.config/containers/systemd/users/${UID}/ directory, then only the
 user with the matching UID executes the Quadlet when the login
 session gets started. For unit files placed in subdirectories within
-/etc/containers/systemd/user/${UID}/ and the other user unit search paths,
+~/.config/containers/systemd/user/${UID}/ and the other user unit search paths,
 Quadlet will recursively search and run the unit files present in these subdirectories.
 
 Note that Quadlet units do not support running as a non-root user by defining the

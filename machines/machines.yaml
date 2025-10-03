@@ -4,6 +4,13 @@
 # should be deployed to each machine.
 
 machines:
+  k3:
+    hostname: k3
+    user: crussell
+    description: "Primary homelab server"
+    services:
+      - pinepods
+
   # Example machine configuration
   # homelab-main:
   #   hostname: 192.168.1.10

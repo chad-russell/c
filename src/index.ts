@@ -9,6 +9,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { listCommand } from './commands/list.ts';
 
 const program = new Command();
 
@@ -69,12 +70,7 @@ program
 program
   .command('list')
   .description('List all configured machines')
-  .action(async () => {
-    console.log(chalk.blue('📋 Configured machines'));
-    
-    // TODO: Implement list logic
-    console.log(chalk.yellow('\n⚠️  List command not yet implemented'));
-  });
+  .action(listCommand);
 
 // Parse command line arguments
 program.parse();

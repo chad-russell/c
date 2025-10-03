@@ -48,7 +48,7 @@ This directory contains Podman Quadlet files for running PinePods, a Rust-based 
 
 1. Copy the quadlet files to the system systemd directory:
    ```bash
-   sudo cp services/pinepods/*.{container,network,volume} /etc/containers/systemd/
+   sudo cp services/pinepods/*.{container,network,volume} ~/.config/containers/systemd/
    ```
 
 2. Reload systemd:
