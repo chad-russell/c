@@ -1,0 +1,9 @@
+[Unit]
+Description=Memos Network
+
+[Network]
+# Creates a custom network for Memos
+NetworkName=memos
+
+
+

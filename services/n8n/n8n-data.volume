@@ -1,0 +1,8 @@
+[Unit]
+Description=n8n Data Volume (SQLite database and encryption key)
+
+[Volume]
+VolumeName=n8n-data
+
+
+

@@ -1,0 +1,9 @@
+[Unit]
+Description=n8n Network
+
+[Network]
+# Creates a custom network for n8n
+NetworkName=n8n
+
+
+

@@ -1,0 +1,8 @@
+[Unit]
+Description=n8n Local Files Volume (for Read/Write Files from Disk node)
+
+[Volume]
+VolumeName=n8n-files
+
+
+

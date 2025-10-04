@@ -1,0 +1,8 @@
+[Unit]
+Description=Memos Data Volume
+
+[Volume]
+VolumeName=memos-data
+
+
+

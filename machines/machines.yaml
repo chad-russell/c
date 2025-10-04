@@ -1,5 +1,5 @@
 # Homelab Machines Configuration
-# 
+#
 # This file defines all machines in your homelab and which services
 # should be deployed to each machine.
 
@@ -10,13 +10,16 @@ machines:
     description: "k3"
     services:
       - pinepods
-  
+      - n8n
+
   k4:
     hostname: k4
     user: crussell
     description: "k4"
     services:
       - karakeep
+      - karakeep-homedash
+      - memos
 
   # Example machine configuration
   # homelab-main:
@@ -28,7 +31,7 @@ machines:
   #     - nextcloud
 
   # Uncomment and configure your actual machines below:
-  
+
   # homelab-media:
   #   hostname: 192.168.1.20
   #   user: crussell
@@ -36,13 +39,12 @@ machines:
   #   services:
   #     - jellyfin
   #     - sonarr
-  
+
   # homelab-dev:
   #   hostname: dev.local
   #   user: crussell
   #   description: "Development and testing"
   #   services: []
-
 # Service Naming Convention:
 # - Each service corresponds to a directory under services/
 # - Service files should follow the pattern:
