@@ -18,31 +18,49 @@ This directory contains Podman Quadlet files for running PinePods, a Rust-based 
 - `pinepods-valkey.container` - Valkey cache container
 - `pinepods.container` - Main PinePods application
 
+## Prerequisites
+
+- Your reverse proxy must handle HTTPS/TLS termination
+- Domain: `pinepods.internal.crussell.io` pointing to k3:8040
+
 ## Installation
 
-### For rootless (recommended)
+### Step 1: Enable User Service Persistence
 
-1. Copy the quadlet files to your user systemd directory:
-   ```bash
-   mkdir -p ~/.config/containers/systemd/
-   cp services/pinepods/*.{container,network,volume} ~/.config/containers/systemd/
-   ```
+```bash
+ssh k3 'loginctl enable-linger $USER'
+```
 
-2. Reload systemd to pick up the new units:
-   ```bash
-   systemctl --user daemon-reload
-   ```
+### Step 2: Deploy the Service
 
-3. Start the services:
-   ```bash
-   systemctl --user start pinepods.service
-   ```
+Using the deployment tool:
 
-4. Enable services to start on boot (requires loginctl enable-linger):
-   ```bash
-   loginctl enable-linger $USER
-   systemctl --user enable pinepods.service
-   ```
+```bash
+# Add pinepods to k3 in machines/machines.yaml
+# Then sync:
+bun run src/index.ts sync k3
+```
+
+Or manually for rootless deployment:
+
+```bash
+mkdir -p ~/.config/containers/systemd/
+cp services/pinepods/*.{container,network,volume} ~/.config/containers/systemd/
+loginctl enable-linger $USER  # IMPORTANT: Enable service persistence
+systemctl --user daemon-reload
+systemctl --user start pinepods.service
+systemctl --user enable pinepods.service
+```
+
+### Step 3: Configure Reverse Proxy
+
+Point `pinepods.internal.crussell.io` to `k3:8040` in your Caddy configuration:
+
+```
+pinepods.internal.crussell.io {
+    reverse_proxy k3:8040
+}
+```
 
 ### For rootful
 
@@ -74,10 +92,10 @@ This directory contains Podman Quadlet files for running PinePods, a Rust-based 
 
 Edit `pinepods.container` to customize:
 
-- **HOSTNAME**: The URL where you'll access PinePods (change from `http://localhost:8040`)
+- **HOSTNAME**: The URL where you'll access PinePods (currently `https://pinepods.internal.crussell.io`)
 - **TZ**: Your timezone (currently `America/New_York`)
 - **PUID/PGID**: User/Group IDs for file permissions (currently `911`)
-- **Port**: Change `PublishPort=8040:8040` if you need a different host port
+- **Port**: Change `PublishPort=8040:8040` if you need a different host port (remember to update reverse proxy too)
 
 ### Optional: Set Admin User
 
@@ -91,7 +109,7 @@ Environment=EMAIL=admin@example.com
 
 ## Accessing PinePods
 
-Once running, access PinePods at: http://localhost:8040
+Once running and your reverse proxy is configured, access PinePods at: **https://pinepods.internal.crussell.io**
 
 On first boot (without admin environment variables), you'll be prompted to create an admin account.
 

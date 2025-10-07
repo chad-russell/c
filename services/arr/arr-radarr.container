@@ -1,0 +1,31 @@
+[Unit]
+Description=Radarr - Movie Management
+After=arr.network
+
+[Container]
+ContainerName=radarr
+Image=lscr.io/linuxserver/radarr:latest
+Network=arr.network
+PublishPort=7878:7878
+
+# Config persistence
+Volume=arr-radarr-config.volume:/config
+
+# Media library access - MUST match paths in qBittorrent and Jellyfin
+# Your NAS is mounted at /mnt/media on the host
+Volume=/mnt/media:/media
+
+# Environment variables for LinuxServer image
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=America/New_York
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target
+
+
+

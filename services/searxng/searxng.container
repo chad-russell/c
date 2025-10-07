@@ -1,0 +1,30 @@
+[Unit]
+Description=SearXNG - Privacy-respecting metasearch engine
+After=searxng.network searxng-valkey.container
+Requires=searxng-valkey.container
+
+[Container]
+ContainerName=searxng
+Image=docker.io/searxng/searxng:latest
+Network=searxng.network
+PublishPort=8080:8080
+
+# Configuration volume (settings.yml, limiter.toml)
+Volume=searxng-config.volume:/etc/searxng
+
+# Cache volume
+Volume=searxng-cache.volume:/var/cache/searxng
+
+# Base URL for SearXNG
+# CHANGE THIS: Set to your actual SearXNG URL
+Environment=SEARXNG_BASE_URL=https://searxng.internal.crussell.io/
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target
+
+
+

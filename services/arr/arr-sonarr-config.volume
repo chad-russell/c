@@ -1,0 +1,8 @@
+[Unit]
+Description=Sonarr Config Volume
+
+[Volume]
+VolumeName=sonarr-config
+
+
+

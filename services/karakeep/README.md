@@ -1,97 +1,62 @@
-# Karakeep Quadlet Setup
+# KaraKeep HomeDash Quadlet Setup
 
-This directory contains Podman Quadlet files for running Karakeep, a self-hosted bookmark manager with AI-powered tagging.
+This directory contains Podman Quadlet files for running KaraKeep HomeDash, a compact dashboard for browsing your [KaraKeep](https://github.com/karakeep-app/karakeep) bookmarks.
+
+## Overview
+
+KaraKeep HomeDash provides a clean, single-page view of all your bookmarks organized by lists. It's designed to be a simple, uncluttered dashboard that complements the full KaraKeep app.
+
+## Features
+
+- 📚 **Masonry Layout** - Pinterest-style columns for efficient space use
+- 🔍 **Real-time Search** - Instantly filter bookmarks as you type
+- 🖱️ **Drag & Drop** - Reorder lists to your preference
+- 📱 **Responsive** - Works beautifully on desktop, tablet, and mobile
+- 🚀 **Fast** - SQLite WASM runs entirely in your browser
+- 🔒 **Privacy-First** - Your data never leaves your device
 
 ## Architecture
 
-- **Meilisearch v1.10** - Fast search engine for bookmarks
-- **Chrome (headless)** - Browser for web scraping and screenshots
-- **Karakeep** - Main Next.js web application
+KaraKeep HomeDash is a companion app that reads your KaraKeep database in read-only mode to display a dashboard view.
 
 ## Files
 
-- `karakeep.network` - Dedicated network for Karakeep services
-- `karakeep-data.volume` - Meilisearch data persistence
-- `karakeep-app-data.volume` - Karakeep application data (SQLite database and assets)
-- `karakeep-chrome.container` - Headless Chrome container for web scraping
-- `karakeep-meilisearch.container` - Meilisearch search engine
-- `karakeep.container` - Main Karakeep application
+- `karakeep-homedash-config.volume` - Config persistence (dashboard preferences, column order)
+- `karakeep-homedash.container` - Main dashboard application
+
+## Prerequisites
+
+**IMPORTANT**: KaraKeep must be installed and running before deploying HomeDash!
+
+HomeDash requires:
+1. A running KaraKeep instance (see `services/karakeep/`)
+2. Access to the KaraKeep database volume (`karakeep-app-data`)
+3. Both services must be on the same network (`karakeep.network`)
 
 ## Installation
 
-### Prerequisites
+### 1. Ensure KaraKeep is Running
 
-Before deploying, you must configure security credentials in the container files.
-
-### 1. Generate Secure Random Strings
-
-Generate two random strings for security:
+Make sure KaraKeep is already deployed and working:
 
 ```bash
-openssl rand -base64 36
-openssl rand -base64 36
+systemctl --user status karakeep.service
 ```
 
-### 2. Configure Security Settings
+### 2. Configure HomeDash Settings
 
-Edit the following files and replace `CHANGE_THIS_TO_A_SECURE_RANDOM_STRING` with the generated values:
+Edit `karakeep-homedash.container` and set:
 
-**In `karakeep-meilisearch.container`:**
-- Set `MEILI_MASTER_KEY` to your first random string
+**KARAKEEP_URL**: Set to your KaraKeep instance URL (e.g., `http://k4:3322` or `https://karakeep.yourdomain.com`)
 
-**In `karakeep.container`:**
-- Set `NEXTAUTH_SECRET` to your second random string
-- Set `MEILI_MASTER_KEY` to the **same value** as in karakeep-meilisearch.container
-- Set `NEXTAUTH_URL` to your server's URL (e.g., `http://k4:3000` or `https://karakeep.yourdomain.com`)
+This URL is used for the "Go to KaraKeep" link in the dashboard interface.
 
-### 3. Optional: Enable AI Tagging
-
-Karakeep can automatically tag your bookmarks using AI.
-
-#### Option A: OpenAI (Cloud)
-
-1. Get an API key from [OpenAI](https://platform.openai.com/api-keys)
-2. Uncomment and set in `karakeep.container`:
-   ```
-   Environment=OPENAI_API_KEY=your_api_key_here
-   ```
-
-See [OpenAI Costs](https://docs.karakeep.app/openai_costs) for pricing details.
-
-#### Option B: Ollama (Local)
-
-1. Install and run [Ollama](https://ollama.com/) on your host
-2. Pull the models:
-   ```bash
-   ollama pull llama3.1
-   ollama pull llava
-   ```
-3. Uncomment these lines in `karakeep.container`:
-   ```
-   Environment=OLLAMA_BASE_URL=http://host.containers.internal:11434
-   Environment=INFERENCE_TEXT_MODEL=llama3.1
-   Environment=INFERENCE_IMAGE_MODEL=llava
-   Environment=INFERENCE_CONTEXT_LENGTH=3000
-   ```
-
-**Note:** Local inference quality depends on your model choice. Adjust `INFERENCE_CONTEXT_LENGTH` for better tags (higher = better quality but slower).
-
-### 4. Enable User Service Persistence (IMPORTANT)
-
-For rootless Podman services to persist across logins, you must enable linger:
-
-```bash
-ssh your-machine 'loginctl enable-linger $USER'
-```
-
-Without this, services will stop when you log out!
-
-### 5. Deploy with Your Tool
+### 3. Deploy with Your Tool
 
 If you're using the homelab deployment tool:
 
 ```bash
-# Add karakeep to your machine in machines/machines.yaml
+# Add karakeep-homedash to your machine in machines/machines.yaml
 # Then sync:
 bun run src/index.ts sync k4
 ```
@@ -100,145 +65,141 @@ Or manually for rootless deployment:
 
 ```bash
 mkdir -p ~/.config/containers/systemd/
-cp services/karakeep/*.{container,network,volume} ~/.config/containers/systemd/
-loginctl enable-linger $USER  # IMPORTANT: Enable service persistence
+cp services/karakeep-homedash/*.{container,volume} ~/.config/containers/systemd/
 systemctl --user daemon-reload
-systemctl --user start karakeep.service
-systemctl --user enable karakeep.service
+systemctl --user start karakeep-homedash.service
+systemctl --user enable karakeep-homedash.service
 ```
 
-## Accessing Karakeep
+## Accessing KaraKeep HomeDash
 
-Once running, access Karakeep at: **http://localhost:3000** (or your configured NEXTAUTH_URL)
+Once running, access the dashboard at: **http://k4:8595** (or http://localhost:8595)
 
-On first visit, you'll be prompted to create an admin account.
-
-## Browser Extensions & Mobile Apps
-
-Karakeep provides browser extensions and mobile apps for quick bookmark saving:
-
-- [Chrome Extension](https://chromewebstore.google.com/detail/karakeep/jdohnbnlnhcnodlhldmfpknnkjncgmhf)
-- [Firefox Extension](https://addons.mozilla.org/en-US/firefox/addon/karakeep/)
-- iOS App (search "Karakeep" in App Store)
-- Android App (available via GitHub releases)
-
-See the [Quick Sharing Extensions](https://docs.karakeep.app/quick_sharing) docs for setup.
+The dashboard will automatically load your KaraKeep bookmarks organized by lists.
 
 ## Managing Services
 
 Check status:
 ```bash
-systemctl --user status karakeep.service
-systemctl --user status karakeep-meilisearch.service
-systemctl --user status karakeep-chrome.service
+systemctl --user status karakeep-homedash.service
 ```
 
 View logs:
 ```bash
-journalctl --user -u karakeep.service -f
-journalctl --user -u karakeep-meilisearch.service -f
+journalctl --user -u karakeep-homedash.service -f
 ```
 
-Stop services:
+Stop service:
 ```bash
-systemctl --user stop karakeep.service
+systemctl --user stop karakeep-homedash.service
 ```
 
 ## Configuration Options
 
-Edit `karakeep.container` to customize:
+Edit `karakeep-homedash.container` to customize:
 
-### Required Settings
-- **NEXTAUTH_SECRET**: Random secret for session encryption
-- **NEXTAUTH_URL**: Your server URL (change from `http://localhost:3000`)
-- **MEILI_MASTER_KEY**: Secure key for Meilisearch (must match in both files)
+### Basic Settings
+- **Port**: Change `PublishPort=8595:8595` if you need a different host port
+- **KARAKEEP_URL**: URL to your KaraKeep instance (for navigation links)
 
-### Optional Settings
-- **MAX_ASSET_SIZE_MB**: Maximum size for archived assets (default: 50)
-- **INFERENCE_LANG**: Language for AI inference (default: english)
-- **Port**: Change `PublishPort=3000:3000` if you need a different host port
+### Dashboard Preferences
 
-## Data Persistence
+Dashboard preferences (like column order from drag-and-drop) are automatically saved to the `karakeep-homedash-config` volume via the web interface.
 
-All data is stored in named volumes:
-- `karakeep-data` - Meilisearch index data
-- `karakeep-app-data` - Karakeep SQLite database and uploaded assets
+## Data Access
 
-View volumes:
-```bash
-podman volume ls | grep karakeep
-```
+HomeDash mounts the KaraKeep database volume in **read-only mode**:
+- **Volume**: `karakeep-app-data` (shared with KaraKeep)
+- **Mount Point**: `/mnt/karakeep-data` in HomeDash container
+- **Database Path**: A symbolic link is created from `/mnt/karakeep-data/db.db` to `/app/db.db` at startup
+- **Mode**: Read-only (`:ro`) - HomeDash never modifies your data
 
-Inspect volumes:
-```bash
-podman volume inspect karakeep-data
-podman volume inspect karakeep-app-data
-```
+All bookmark management should be done through the main KaraKeep app.
 
-## Updating Karakeep
+## How It Works
+
+1. **Database Access**: HomeDash reads the KaraKeep SQLite database directly using SQLite WASM in your browser
+2. **Client-Side Processing**: All database queries run in your browser - the server just serves static files
+3. **Privacy-First**: Your bookmark data never leaves your device
+4. **Auto-Updates**: Refresh the page to see new bookmarks added via KaraKeep
+
+## Updating HomeDash
 
 To update to the latest version:
 
 ```bash
-# If using the release tag
-podman pull ghcr.io/karakeep-app/karakeep:release
-systemctl --user restart karakeep.service
+podman pull ghcr.io/codejawn/karakeep-homedash:latest
+systemctl --user restart karakeep-homedash.service
 ```
-
-Or pin to a specific version by changing the image tag in `karakeep.container`:
-```
-Image=ghcr.io/karakeep-app/karakeep:0.27.0
-```
-
-For Meilisearch upgrades, see the [Karakeep troubleshooting docs](https://docs.karakeep.app/troubleshooting).
 
 ## Troubleshooting
 
 ### Service won't start
 
-Check if the images pulled successfully:
+Check if the image pulled successfully:
 ```bash
-podman pull ghcr.io/karakeep-app/karakeep:release
-podman pull docker.io/getmeili/meilisearch:v1.10
-podman pull gcr.io/zenika-hub/alpine-chrome:123
+podman pull ghcr.io/codejawn/karakeep-homedash:latest
 ```
 
-### Can't log in / Session issues
+Verify KaraKeep is running:
+```bash
+systemctl --user status karakeep.service
+```
+
+### "Could not find db.db"
 
 Make sure:
-1. `NEXTAUTH_SECRET` is set to a secure random string
-2. `NEXTAUTH_URL` matches the URL you're accessing in your browser
+1. KaraKeep is running and has created its database
+2. The `karakeep-app-data` volume exists and contains data
+3. Check the volume mount: `podman inspect karakeep-homedash | grep -A 10 Mounts`
 
-### Web scraping not working
+### Bookmarks not showing
 
-Check if Chrome container is running:
+1. Verify KaraKeep has bookmarks by logging into the main app
+2. Check the database file exists:
+   ```bash
+   podman volume inspect karakeep-app-data
+   # Note the Mountpoint path, then check for db.db
+   ```
+3. Check browser console for errors (F12 in most browsers)
+4. Refresh the page to reload the database
+
+### Drag and drop not saving
+
+Verify the config volume is writable:
 ```bash
-systemctl --user status karakeep-chrome.service
-podman logs karakeep-chrome
+podman volume inspect karakeep-homedash-config
 ```
 
-### Search not working
-
-Verify Meilisearch is running and the keys match:
+Check container logs for permission errors:
 ```bash
-systemctl --user status karakeep-meilisearch.service
-# Check that MEILI_MASTER_KEY is the same in both container files
+journalctl --user -u karakeep-homedash.service -f
 ```
 
 ### Container logs
 
 View container logs directly:
 ```bash
-podman logs karakeep
-podman logs karakeep-meilisearch
-podman logs karakeep-chrome
+podman logs karakeep-homedash
+journalctl --user -u karakeep-homedash.service -f
 ```
+
+## Network Configuration
+
+HomeDash runs on the same network as KaraKeep (`karakeep.network`). This allows:
+- Shared network namespace for container communication
+- Access to the same volumes
+- Simplified deployment on the same host
+
+If you need to access HomeDash from a different machine, consider using a reverse proxy or adjusting the `PublishPort` configuration.
 
 ## References
 
-- [Karakeep Documentation](https://docs.karakeep.app/)
-- [Karakeep GitHub](https://github.com/karakeep-app/karakeep)
-- [Docker Compose Installation Guide](https://docs.karakeep.app/installation/docker)
+- [KaraKeep HomeDash GitHub](https://github.com/CodeJawn/karakeep-homedash)
+- [KaraKeep Main App](https://github.com/karakeep-app/karakeep)
+- [KaraKeep Documentation](https://docs.karakeep.app/)
+- [SQLite WASM](https://sqlite.org/wasm/doc/trunk/index.md)
 - [Podman Quadlet Documentation](../../docs/quadlet.md)
+
 
 

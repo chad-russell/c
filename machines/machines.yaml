@@ -4,6 +4,19 @@
 # should be deployed to each machine.
 
 machines:
+  k1:
+    hostname: k1
+    user: crussell
+    description: "k1"
+    services:
+      - arr
+
+  k2:
+    hostname: k2
+    user: crussell
+    description: "k2"
+    services: []
+
   k3:
     hostname: k3
     user: crussell
@@ -11,6 +24,7 @@ machines:
     services:
       - pinepods
       - n8n
+      - searxng
 
   k4:
     hostname: k4
@@ -18,41 +32,5 @@ machines:
     description: "k4"
     services:
       - karakeep
-      - karakeep-homedash
       - memos
-
-  # Example machine configuration
-  # homelab-main:
-  #   hostname: 192.168.1.10
-  #   user: crussell
-  #   description: "Main server - high uptime services"
-  #   services:
-  #     - pinepods
-  #     - nextcloud
-
-  # Uncomment and configure your actual machines below:
-
-  # homelab-media:
-  #   hostname: 192.168.1.20
-  #   user: crussell
-  #   description: "Media server"
-  #   services:
-  #     - jellyfin
-  #     - sonarr
-
-  # homelab-dev:
-  #   hostname: dev.local
-  #   user: crussell
-  #   description: "Development and testing"
-  #   services: []
-# Service Naming Convention:
-# - Each service corresponds to a directory under services/
-# - Service files should follow the pattern:
-#   - servicename.container (main container)
-#   - servicename-*.container (additional containers)
-#   - servicename.network
-#   - servicename-*.volume
-#   - servicename.pod
-#
-# Example: The 'pinepods' service includes all files in services/pinepods/
-
+      - papra

@@ -1,0 +1,8 @@
+[Unit]
+Description=SearXNG Valkey Data Volume
+
+[Volume]
+VolumeName=searxng-valkey-data
+
+
+

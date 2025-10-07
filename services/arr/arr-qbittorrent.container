@@ -1,0 +1,30 @@
+[Unit]
+Description=qBittorrent - BitTorrent Client
+After=arr.network
+
+[Container]
+ContainerName=qbittorrent
+Image=lscr.io/linuxserver/qbittorrent:latest
+Network=arr.network
+PublishPort=8080:8080
+PublishPort=51413:51413
+
+# Data persistence - uses existing directories
+Volume=%h/.config/qbittorrent:/config
+
+# Full NAS access - matches Sonarr/Radarr/Jellyfin paths
+Volume=/mnt/media:/media
+
+# Environment variables
+Environment=TZ=America/New_York
+Environment=WEBUI_PORT=8080
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target
+
+
+

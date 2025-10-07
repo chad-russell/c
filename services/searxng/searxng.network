@@ -1,0 +1,9 @@
+[Unit]
+Description=SearXNG Network
+
+[Network]
+# Creates a custom network for SearXNG services
+NetworkName=searxng
+
+
+

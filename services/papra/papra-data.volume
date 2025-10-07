@@ -1,0 +1,8 @@
+[Unit]
+Description=Papra Data Volume (database and documents)
+
+[Volume]
+VolumeName=papra-data
+
+
+
