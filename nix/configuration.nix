@@ -111,6 +111,9 @@
     };
   };
 
+  # Enable experimental Nix features
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # This is required by NixOS.
   system.stateVersion = "25.05";
 }
