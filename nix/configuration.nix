@@ -49,7 +49,7 @@
 
   # Enable Podman
   virtualisation.podman.enable = true;
-  virtualisation.podman.dockerSocket.enable = true; # Enable Docker-compatible socket
+  # Note: dockerSocket.enable conflicts with Docker, so we'll use Docker as primary
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
 
   # Define your user account.
