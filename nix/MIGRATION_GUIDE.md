@@ -51,18 +51,18 @@ nix/
 Before deploying, review each service module and update the following:
 
 #### Karakeep (`services/karakeep.nix`)
-- [ ] `NEXTAUTH_SECRET` - Generate new: `openssl rand -base64 36`
-- [ ] `NEXTAUTH_URL` - Update to k2's URL
-- [ ] `MEILI_MASTER_KEY` - Generate new: `openssl rand -base64 36`
-- [ ] `KARAKEEP_URL` - Update HomeDash URL reference
+- [x] `NEXTAUTH_SECRET` - Generate new: `openssl rand -base64 36`
+- [x] `NEXTAUTH_URL` - Update to k2's URL
+- [x] `MEILI_MASTER_KEY` - Generate new: `openssl rand -base64 36`
+- [x] `KARAKEEP_URL` - Update HomeDash URL reference
 
 #### Memos (`services/memos.nix`)
-- [ ] Port configuration (default: 5230)
-- [ ] Optional: Database configuration if using PostgreSQL/MySQL
+- [x] Port configuration (default: 5230)
+- [x] Optional: Database configuration if using PostgreSQL/MySQL
 
 #### Papra (`services/papra.nix`)
-- [ ] `APP_BASE_URL` - Update to k2's URL
-- [ ] `TZ` - Verify timezone (currently: America/New_York)
+- [x] `APP_BASE_URL` - Update to k2's URL
+- [x] `TZ` - Verify timezone (currently: America/New_York)
 
 ### Step 3: Update flake.lock
 
@@ -103,21 +103,21 @@ SSH into k2 and verify the services:
 ssh crussell@k2
 
 # Check systemd services
-systemctl status karakeep.service
-systemctl status karakeep-chrome.service
-systemctl status karakeep-meilisearch.service
-systemctl status karakeep-homedash.service
-systemctl status memos.service
-systemctl status papra.service
+sudo systemctl status karakeep.service
+sudo systemctl status karakeep-chrome.service
+sudo systemctl status karakeep-meilisearch.service
+sudo systemctl status karakeep-homedash.service
+sudo systemctl status memos.service
+sudo systemctl status papra.service
 
 # Check container status
-podman ps
+sudo podman ps
 
 # Check networks
-podman network ls
+sudo podman network ls
 
 # Check volumes
-podman volume ls
+sudo podman volume ls
 ```
 
 ### Step 7: Migrate Data from k4 to k2
