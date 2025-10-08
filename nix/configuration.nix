@@ -5,6 +5,10 @@
     # It's best practice to let nixos-anywhere generate a hardware-specific
     # configuration for your bare-metal machine.
     ./hardware-configuration.nix
+    # Service modules
+    ./services/karakeep.nix
+    ./services/memos.nix
+    ./services/papra.nix
   ];
 
   # Use the systemd-boot EFI boot loader.
@@ -52,6 +56,10 @@
   virtualisation.podman.enable = true;
   # Note: dockerSocket.enable conflicts with Docker, so we'll use Docker as primary
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
+
+  # Enable quadlet-nix for declarative container management
+  virtualisation.quadlet.enable = true;
+  virtualisation.quadlet.autoEscape = true;
 
   # Enable passwordless sudo for wheel group members (prevents lockout)
   security.sudo.wheelNeedsPassword = false;
