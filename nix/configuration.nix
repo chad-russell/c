@@ -8,6 +8,7 @@
     # Service modules
     ./services/karakeep.nix
     ./services/memos.nix
+    ./services/ntfy.nix
     ./services/papra.nix
   ];
 
