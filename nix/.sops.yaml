@@ -1,0 +1,12 @@
+---
+# This is the .sops.yaml configuration file
+# It defines which keys are used to encrypt/decrypt which files
+
+# Default creation rules for all files
+creation_rules:
+  # By default, encrypt with the age key that will be generated
+  # We'll update this with the actual public key after generation
+  - path_regex: secrets/.*\.yaml$
+    key_groups:
+      - age:
+          - &user_key age1unm4667a2wutetjzugg6z8ve4k6xj8skld04geh3avefcufyup7s8jduy7

@@ -1,0 +1,203 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "name": "Nix Files",
+      "pattern": "**/*.nix",
+      "actions": {
+        "formatOnSave": true,
+        "formatCommand": "nix fmt ${file}",
+        "indentSize": 2,
+        "tabSize": 2,
+        "insertSpaces": true,
+        "trimTrailingWhitespace": true,
+        "insertFinalNewline": true
+      }
+    },
+    {
+      "name": "YAML Files",
+      "pattern": "**/*.{yaml,yml}",
+      "actions": {
+        "formatOnSave": true,
+        "indentSize": 2,
+        "tabSize": 2,
+        "insertSpaces": true,
+        "trimTrailingWhitespace": true,
+        "insertFinalNewline": true
+      }
+    },
+    {
+      "name": "Shell Scripts",
+      "pattern": "**/*.{sh,zsh,bash}",
+      "actions": {
+        "formatOnSave": true,
+        "indentSize": 2,
+        "tabSize": 2,
+        "insertSpaces": true,
+        "trimTrailingWhitespace": true,
+        "insertFinalNewline": true
+      }
+    },
+    {
+      "name": "Ignore Build Artifacts",
+      "pattern": "**/result*/**",
+      "actions": {
+        "exclude": true
+      }
+    },
+    {
+      "name": "Ignore Nix Store",
+      "pattern": "**/nix/store/**",
+      "actions": {
+        "exclude": true
+      }
+    },
+    {
+      "name": "Ignore Secrets",
+      "pattern": "**/secrets/**",
+      "actions": {
+        "exclude": true,
+        "formatOnSave": false
+      }
+    },
+    {
+      "name": "Flake Lock",
+      "pattern": "**/flake.lock",
+      "actions": {
+        "formatOnSave": false,
+        "readonly": true
+      }
+    },
+    {
+      "name": "Machine Configurations",
+      "pattern": "**/machines/**/*.nix",
+      "actions": {
+        "formatOnSave": true,
+        "indentSize": 2,
+        "tabSize": 2,
+        "insertSpaces": true
+      }
+    },
+    {
+      "name": "Module Configurations",
+      "pattern": "**/modules/**/*.nix",
+      "actions": {
+        "formatOnSave": true,
+        "indentSize": 2,
+        "tabSize": 2,
+        "insertSpaces": true
+      }
+    },
+    {
+      "name": "Overlays",
+      "pattern": "**/overlays/**/*.nix",
+      "actions": {
+        "formatOnSave": true,
+        "indentSize": 2,
+        "tabSize": 2,
+        "insertSpaces": true
+      }
+    }
+  ],
+  "search": {
+    "exclude": [
+      "**/result*/**",
+      "**/nix/store/**",
+      "**/.git/**",
+      "**/flake.lock"
+    ]
+  },
+  "editor": {
+    "defaultFormatter": null,
+    "wordWrap": "off",
+    "rulers": [100],
+    "formatOnSave": true,
+    "tabSize": 2,
+    "indentSize": 2,
+    "insertSpaces": true,
+    "detectIndentation": false,
+    "trimTrailingWhitespace": true,
+    "insertFinalNewline": true
+  },
+  "terminal": {
+    "shell": "/run/current-system/sw/bin/zsh",
+    "shellArgs": []
+  },
+  "snippets": {
+    "nix": {
+      "module": {
+        "prefix": "module",
+        "body": ["{ config, lib, pkgs, self, ... }:", "", "{", "  $0", "}"],
+        "description": "Basic Nix module structure with self parameter"
+      },
+      "flakeInput": {
+        "prefix": "input",
+        "body": [
+          "${1:name} = {",
+          "  url = \"github:${2:owner}/${3:repo}\";",
+          "  inputs.nixpkgs.follows = \"nixpkgs\";",
+          "};"
+        ],
+        "description": "Flake input with nixpkgs follows"
+      },
+      "homeModule": {
+        "prefix": "homemodule",
+        "body": [
+          "{ config, lib, pkgs, self, ... }:",
+          "",
+          "{",
+          "  home.packages = with pkgs; [",
+          "    $0",
+          "  ];",
+          "}"
+        ],
+        "description": "Home Manager module template with self parameter"
+      },
+      "nixosModule": {
+        "prefix": "nixosmodule",
+        "body": ["{ config, lib, pkgs, self, ... }:", "", "{", "  $0", "}"],
+        "description": "NixOS module template with self parameter"
+      },
+      "importNixosModule": {
+        "prefix": "importnixosmodule",
+        "body": ["(self.lib.modules.getNixosModule \"${1:path}\")"],
+        "description": "Import a NixOS module using helper function"
+      },
+      "importNixosModuleDir": {
+        "prefix": "importnixosmoduledir",
+        "body": ["(self.lib.modules.getNixosModuleDir \"${1:path}\")"],
+        "description": "Import a NixOS module directory using helper function"
+      },
+      "importHomeModule": {
+        "prefix": "importhomemodule",
+        "body": ["(self.lib.modules.getHomeModule \"${1:path}\")"],
+        "description": "Import a Home Manager module using helper function"
+      },
+      "importHomeModuleDir": {
+        "prefix": "importhomemoduledir",
+        "body": ["(self.lib.modules.getHomeModuleDir \"${1:path}\")"],
+        "description": "Import a Home Manager module directory using helper function"
+      },
+      "importProfile": {
+        "prefix": "importprofile",
+        "body": ["(self.lib.modules.getProfileNixos \"${1:name}\")"],
+        "description": "Import a NixOS profile using helper function"
+      },
+      "importHomeProfile": {
+        "prefix": "importhomeprofile",
+        "body": ["(self.lib.modules.getProfileHome \"${1:name}\")"],
+        "description": "Import a Home Manager profile using helper function"
+      }
+    }
+  },
+  "linter": {
+    "rules": [
+      {
+        "name": "Prefer helper functions for imports",
+        "pattern": "\\.\\.\\/(\\.\\.\\/)*(modules)\\/",
+        "message": "Use helper functions like self.lib.modules.getNixosModule instead of relative paths",
+        "severity": "warning"
+      }
+    ]
+  }
+}
