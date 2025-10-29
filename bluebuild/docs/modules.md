@@ -1,0 +1,23 @@
+The following modules are available. It is highly encouraged to use a module if one exists for the use case you need, rather than writing something yourself. Please ask the user if you need to know more about any of them, or how they work:
+
+- akmods
+- bling
+- brew
+- chezmoi
+- containerfile
+- copy
+- default-flatpaks
+- dnf
+- files
+- fonts
+- gschema-overrides
+- initramfs
+- justfiles
+- kargs
+- os-release
+- rpm-ostree
+- script
+- signing
+- soar
+- systemd
+- yafti

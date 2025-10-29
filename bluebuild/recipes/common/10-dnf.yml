@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
+modules:
+  - type: dnf
+    repos:
+      files:
+        - https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+        - https://download.docker.com/linux/fedora/docker-ce.repo
+    install:
+      packages:
+        - containerd.io
+        - distrobox
+        - docker-ce
+        - docker-ce-cli
+        - micro
+        - zsh
+        - tailscale
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
