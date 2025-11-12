@@ -30,7 +30,6 @@
       containerConfig = {
         image = "docker.io/library/postgres:17";
         networks = [ networks.pinepods.ref ];
-        networkAliases = [ "pinepods-db" ];
         volumes = [ "${volumes.pinepods-pgdata.ref}:/var/lib/postgresql/data" ];
         environments = {
           POSTGRES_DB = "pinepods_database";
@@ -38,6 +37,7 @@
           POSTGRES_PASSWORD = "myS3curepass";
           PGDATA = "/var/lib/postgresql/data/pgdata";
         };
+        extraPodmanArgs = [ "--network-alias=pinepods-db" ];
       };
       serviceConfig = {
         Restart = "always";
@@ -50,7 +50,7 @@
       containerConfig = {
         image = "docker.io/valkey/valkey:8-alpine";
         networks = [ networks.pinepods.ref ];
-        networkAliases = [ "pinepods-valkey" ];
+        extraPodmanArgs = [ "--network-alias=pinepods-valkey" ];
       };
       serviceConfig = {
         Restart = "always";
