@@ -2,73 +2,50 @@
 
 {
   # SearXNG - Privacy-respecting metasearch engine
-  # Requires: Valkey for caching
+  # Using Docker via virtualisation.oci-containers for reliable DNS
   
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) containers networks volumes;
-  in {
-    # Network for SearXNG services
-    networks.searxng = {
-      networkConfig.name = "searxng";
+  # Create Docker network for SearXNG
+  systemd.services.init-searxng-network = {
+    description = "Create Docker network for SearXNG";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${config.virtualisation.docker.package}/bin/docker network inspect searxng >/dev/null 2>&1 || \
+      ${config.virtualisation.docker.package}/bin/docker network create searxng
+    '';
+  };
+
+  virtualisation.oci-containers.containers = {
+    searxng-valkey = {
+      image = "valkey/valkey:8-alpine";
+      autoStart = true;
+      extraOptions = [ "--network=searxng" ];
+      volumes = [ "searxng-valkey-data:/data" ];
+      cmd = [
+        "valkey-server"
+        "--save"
+        "30"
+        "1"
+        "--loglevel"
+        "warning"
+      ];
     };
 
-    # Volumes
-    volumes.searxng-config = {
-      volumeConfig.name = "searxng-config";
-    };
-
-    volumes.searxng-cache = {
-      volumeConfig.name = "searxng-cache";
-    };
-
-    volumes.searxng-valkey-data = {
-      volumeConfig.name = "searxng-valkey-data";
-    };
-
-    # Valkey cache for SearXNG
-    containers.searxng-valkey = {
-      containerConfig = {
-        image = "docker.io/valkey/valkey:8-alpine";
-        networks = [ networks.searxng.ref ];
-        volumes = [ "${volumes.searxng-valkey-data.ref}:/data" ];
-        exec = [
-          "valkey-server"
-          "--save"
-          "30"
-          "1"
-          "--loglevel"
-          "warning"
-        ];
+    searxng = {
+      image = "searxng/searxng:latest";
+      autoStart = true;
+      ports = [ "8080:8080" ];
+      extraOptions = [ "--network=searxng" ];
+      volumes = [
+        "searxng-config:/etc/searxng"
+        "searxng-cache:/var/cache/searxng"
+      ];
+      environment = {
+        # Base URL for SearXNG
+        SEARXNG_BASE_URL = "https://searxng.internal.crussell.io/";
       };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = "900";
-      };
-    };
-
-    # SearXNG container
-    containers.searxng = {
-      containerConfig = {
-        image = "docker.io/searxng/searxng:latest";
-        networks = [ networks.searxng.ref ];
-        publishPorts = [ "8080:8080" ];
-        volumes = [
-          "${volumes.searxng-config.ref}:/etc/searxng"
-          "${volumes.searxng-cache.ref}:/var/cache/searxng"
-        ];
-        environments = {
-          # Base URL for SearXNG
-          SEARXNG_BASE_URL = "https://searxng.internal.crussell.io/";
-        };
-      };
-      unitConfig = {
-        Requires = [ containers.searxng-valkey.ref ];
-        After = [ containers.searxng-valkey.ref ];
-      };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = "900";
-      };
+      dependsOn = [ "searxng-valkey" ];
     };
   };
 }

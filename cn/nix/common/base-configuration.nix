@@ -39,6 +39,9 @@
     # };
   };
 
+  # Use Docker for OCI containers (more reliable DNS than Podman)
+  virtualisation.oci-containers.backend = "docker";
+
   # Enable Podman
   virtualisation.podman.enable = true;
   # Note: dockerSocket.enable conflicts with Docker, so we'll use Docker as primary
