@@ -31,7 +31,6 @@
       containerConfig = {
         image = "docker.io/library/postgres:17";
         networks = [ networks.pinepods.ref ];
-        networkAliases = [ "pinepods-db" ];
         volumes = [ "${volumes.pinepods-pgdata.ref}:/var/lib/postgresql/data" ];
         environments = {
           POSTGRES_DB = "pinepods_database";
@@ -52,7 +51,6 @@
       containerConfig = {
         image = "docker.io/valkey/valkey:8-alpine";
         networks = [ networks.pinepods.ref ];
-        networkAliases = [ "pinepods-valkey" ];
       };
       serviceConfig = {
         Restart = "always";
