@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Restore script for k3 Podman volumes after NixOS migration
-# Run this script ON k3 after NixOS installation as the crussell user
+# Restore script for k3 Docker volumes after NixOS migration
+# Run this script ON k3 after NixOS installation
 
 set -e
 
@@ -23,7 +23,7 @@ if [ ! -d "${BACKUP_PATH}" ]; then
 fi
 
 echo "=================================================="
-echo "K3 Volume Restore Script"
+echo "K3 Volume Restore Script (Docker)"
 echo "=================================================="
 echo "Restoring from: ${BACKUP_PATH}"
 echo ""
@@ -35,8 +35,8 @@ if [ -f "${BACKUP_PATH}/MANIFEST.txt" ]; then
 fi
 
 # Stop all services first
-echo "Stopping all services..."
-sudo systemctl stop n8n.service pinepods.service pinepods-db.service pinepods-valkey.service searxng.service searxng-valkey.service 2>/dev/null || true
+echo "Stopping all Docker services..."
+sudo systemctl stop docker-n8n.service docker-pinepods.service docker-pinepods-db.service docker-pinepods-valkey.service docker-searxng.service docker-searxng-valkey.service 2>/dev/null || true
 sleep 5
 echo ""
 
@@ -48,13 +48,13 @@ for backup_file in "${BACKUP_PATH}"/*.tar.gz; do
         echo "Restoring volume: ${vol_name}"
         
         # Create the volume if it doesn't exist
-        podman volume exists "${vol_name}" || podman volume create "${vol_name}"
+        sudo docker volume inspect "${vol_name}" >/dev/null 2>&1 || sudo docker volume create "${vol_name}"
         
-        # Restore the data
-        podman run --rm \
+        # Restore the data using Docker
+        sudo docker run --rm \
             -v "${vol_name}:/target" \
             -v "${BACKUP_PATH}:/backup:ro" \
-            docker.io/library/alpine:latest \
+            alpine:latest \
             sh -c "cd /target && tar xzf /backup/${vol_name}.tar.gz"
         
         echo "  ✓ Restored ${vol_name}"
@@ -67,11 +67,11 @@ echo "Restore Complete!"
 echo "=================================================="
 echo ""
 echo "Starting services..."
-sudo systemctl start n8n.service pinepods.service searxng.service
+sudo systemctl start docker-n8n.service docker-pinepods.service docker-searxng.service
 echo ""
 echo "Checking service status..."
 sleep 5
-sudo systemctl status n8n.service pinepods.service searxng.service --no-pager
+sudo systemctl status docker-n8n.service docker-pinepods.service docker-searxng.service --no-pager
 echo ""
 echo "Restoration complete! Your services should now be running with restored data."
 
