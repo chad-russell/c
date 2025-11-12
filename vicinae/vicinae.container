@@ -1,0 +1,55 @@
+[Unit]
+Description=Vicinae Desktop Search and Launcher
+Documentation=https://vicinae.io
+Wants=network-online.target
+After=network-online.target graphical-session.target
+
+[Container]
+Image=localhost/vicinae-runtime:latest
+AutoUpdate=local
+
+# Environment variables
+Environment=WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+Environment=QT_QPA_PLATFORM=wayland
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%U/bus
+Environment=XDG_DATA_DIRS=/var/lib/flatpak/exports/share:%h/.local/share/flatpak/exports/share:/usr/local/share:/usr/share:%h/.local/share
+
+# Volume mounts
+Volume=${XDG_RUNTIME_DIR}:/run/user/%U:rw
+Volume=vicinae-config.volume:/home/vicinae/.config
+Volume=vicinae-data.volume:/home/vicinae/.local/share
+Volume=vicinae-cache.volume:/home/vicinae/.cache
+
+# Application discovery - mount host application directories (read-only)
+Volume=/usr/share/applications:/usr/share/applications:ro
+Volume=/var/lib/flatpak:/var/lib/flatpak:ro
+Volume=%h/.local/share/applications:%h/.local/share/applications:ro
+Volume=%h/.local/share/flatpak:%h/.local/share/flatpak:ro
+
+# Flatpak exports (where flatpak .desktop files actually live)
+Volume=/var/lib/flatpak/exports/share:/var/lib/flatpak/exports/share:ro
+Volume=%h/.local/share/flatpak/exports/share:%h/.local/share/flatpak/exports/share:ro
+
+# Icons - needed for application icons to display
+Volume=/usr/share/icons:/usr/share/icons:ro
+Volume=/usr/share/pixmaps:/usr/share/pixmaps:ro
+Volume=%h/.local/share/icons:%h/.local/share/icons:ro
+
+# Device access for GPU
+AddDevice=/dev/dri
+
+# Security options
+SecurityLabelDisable=true
+
+# User namespace mapping
+PodmanArgs=--userns=keep-id
+
+[Service]
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=90s
+
+[Install]
+WantedBy=default.target
+

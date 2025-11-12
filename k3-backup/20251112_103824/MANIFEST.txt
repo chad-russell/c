@@ -1,0 +1,21 @@
+K3 Volume Backup
+================
+Timestamp: 20251112_103824
+Date: Wed Nov 12 10:38:45 AM EST 2025
+Hostname: k3
+
+Volumes backed up:
+  n8n-data.tar.gz (44K)
+  n8n-files.tar.gz (4.0K)
+  pinepods-downloads.tar.gz (87M)
+  pinepods-backups.tar.gz (4.0K)
+  pinepods-pgdata.tar.gz (18M)
+  searxng-config.tar.gz (20K)
+  searxng-cache.tar.gz (4.0K)
+  searxng-valkey-data.tar.gz (4.0K)
+
+Restore Instructions:
+=====================
+After NixOS installation, run the restore script:
+  ./restore-k3-volumes.sh 20251112_103824
+

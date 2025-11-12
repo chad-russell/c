@@ -1,0 +1,138 @@
+# Containerfile
+#
+# Build Vicinae from source in a builder stage and copy the installed
+# artefacts into a lean runtime stage that can be run with Podman.
+
+ARG VICINAE_REPO=https://github.com/vicinaehq/vicinae.git
+ARG VICINAE_REF=main
+
+##############################
+## Build stage
+##############################
+FROM registry.fedoraproject.org/fedora:42 AS builder
+
+ARG VICINAE_REPO
+ARG VICINAE_REF
+
+ENV CCACHE_DIR=/tmp/ccache \
+    CCACHE_MAXSIZE=5G \
+    PATH=/usr/lib64/ccache:${PATH}
+
+RUN dnf -y upgrade \
+ && dnf -y install dnf-plugins-core \
+ && dnf -y copr enable quadratech188/cmark-gfm \
+ && dnf -y install \
+      git \
+      gcc \
+      gcc-c++ \
+      make \
+      cmake \
+      ninja-build \
+      pkgconf-pkg-config \
+      python3 \
+      nodejs \
+      ccache \
+      mold \
+      qt6-qtbase-devel \
+      qt6-qtsvg-devel \
+      qt6-qtbase-private-devel \
+      qt6-qtwayland-devel \
+      layer-shell-qt-devel \
+      libqalculate-devel \
+      minizip-devel \
+      rapidfuzz-cpp-devel \
+      qtkeychain-qt6-devel \
+      openssl-devel \
+      wayland-devel \
+      glibc-static \
+      libstdc++-static \
+      zlib-devel \
+     zlib-static \
+     abseil-cpp-devel \
+     protobuf-devel \
+     cmark-gfm-devel \
+ && dnf clean all
+
+RUN git clone --depth=1 ${VICINAE_REPO} /src/vicinae \
+ && if [ "${VICINAE_REF}" != "main" ]; then \
+      git -C /src/vicinae fetch --depth=1 origin ${VICINAE_REF}; \
+      git -C /src/vicinae checkout ${VICINAE_REF}; \
+    fi
+
+WORKDIR /src/vicinae
+
+RUN cmake -S . -B /tmp/build -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+  -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" \
+  -DCMAKE_INSTALL_PREFIX=/opt/vicinae \
+  -DUSE_SYSTEM_PROTOBUF=OFF \
+  -DUSE_SYSTEM_ABSEIL=OFF \
+  -DUSE_SYSTEM_CMARK_GFM=OFF \
+  -DUSE_SYSTEM_MINIZIP=OFF
+
+RUN cmake --build /tmp/build -- -j "$(nproc)"
+
+RUN cmake --install /tmp/build \
+ && rm -rf /tmp/build ${CCACHE_DIR}
+
+##############################
+## Runtime stage
+##############################
+FROM registry.fedoraproject.org/fedora:42 AS runtime
+
+RUN dnf -y upgrade \
+ && dnf -y install dnf-plugins-core \
+ && dnf -y copr enable quadratech188/cmark-gfm \
+ && dnf -y install \
+      qt6-qtbase \
+      qt6-qtsvg \
+      qt6-qtwayland \
+      layer-shell-qt \
+      libqalculate \
+      minizip \
+      qtkeychain-qt6 \
+      openssl \
+      wayland-devel \
+      abseil-cpp \
+      cmark-gfm \
+      zlib \
+      libstdc++ \
+      python3 \
+      nodejs \
+      procps-ng \
+      findutils \
+      dbus-x11 \
+      flatpak-spawn \
+ && dnf clean all
+
+ARG USERNAME=vicinae
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd --gid ${GID} ${USERNAME} \
+ && useradd --uid ${UID} --gid ${GID} --create-home --shell /usr/bin/zsh ${USERNAME}
+
+COPY --from=builder /opt/vicinae /opt/vicinae
+
+# Create wrapper scripts to execute host commands via flatpak-spawn
+# This allows .desktop files that reference /usr/bin/flatpak to work
+# Use --directory to avoid "Failed to change to directory" errors
+RUN printf '#!/bin/bash\nexec flatpak-spawn --host --directory=/tmp flatpak "$@"\n' > /usr/bin/flatpak \
+ && chmod +x /usr/bin/flatpak \
+ && printf '#!/bin/bash\nexec flatpak-spawn --host --directory=/tmp "$@"\n' > /usr/local/bin/host-exec \
+ && chmod +x /usr/local/bin/host-exec
+
+ENV PATH=/opt/vicinae/bin:${PATH} \
+    VICINAE_HOME=/opt/vicinae \
+    XDG_CONFIG_HOME=/home/${USERNAME}/.config \
+    XDG_DATA_HOME=/home/${USERNAME}/.local/share \
+    XDG_CACHE_HOME=/home/${USERNAME}/.cache
+
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}
+
+ENTRYPOINT ["/opt/vicinae/bin/vicinae"]
+CMD ["server"]
+

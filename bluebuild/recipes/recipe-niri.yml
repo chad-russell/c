@@ -3,7 +3,7 @@
 name: bluebuild-niri
 description: Silverblue-based image with a Niri session and GNOME fallback.
 base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 43
+image-version: 42
 modules:
   - from-file: common/00-files.yml
   - from-file: niri/00-files.yml
