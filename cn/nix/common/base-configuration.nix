@@ -43,7 +43,7 @@
   virtualisation.podman.enable = true;
   # Note: dockerSocket.enable conflicts with Docker, so we'll use Docker as primary
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-  virtualisation.podman.extraPackages = [ pkgs.dnsname-cni ];
+  virtualisation.podman.extraPackages = [ pkgs.aardvark-dns ];
 
   # Enable quadlet-nix for declarative container management
   virtualisation.quadlet.enable = true;
