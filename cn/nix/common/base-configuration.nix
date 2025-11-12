@@ -43,9 +43,6 @@
   virtualisation.podman.enable = true;
   # Note: dockerSocket.enable conflicts with Docker, so we'll use Docker as primary
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-  
-  # Enable Podman DNS resolution with netavark backend
-  virtualisation.podman.networkBackend = "netavark";
 
   # Enable quadlet-nix for declarative container management
   virtualisation.quadlet.enable = true;
