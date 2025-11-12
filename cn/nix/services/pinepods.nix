@@ -27,6 +27,7 @@
 
     # PostgreSQL database
     containers.pinepods-db = {
+      autoStart = true;
       containerConfig = {
         image = "docker.io/library/postgres:17";
         networks = [ networks.pinepods.ref ];
@@ -47,6 +48,7 @@
 
     # Valkey cache
     containers.pinepods-valkey = {
+      autoStart = true;
       containerConfig = {
         image = "docker.io/valkey/valkey:8-alpine";
         networks = [ networks.pinepods.ref ];
@@ -93,9 +95,14 @@
           TZ = "America/New_York";
         };
       };
-      unitConfig = {
-        Requires = [ containers.pinepods-db.ref containers.pinepods-valkey.ref ];
-        After = [ containers.pinepods-db.ref containers.pinepods-valkey.ref ];
+      unitConfig = let
+        dependencyServices = [
+          "pinepods-db.service"
+          "pinepods-valkey.service"
+        ];
+      in {
+        Requires = dependencyServices;
+        After = dependencyServices;
       };
       serviceConfig = {
         Restart = "always";
