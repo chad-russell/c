@@ -19,6 +19,10 @@
         
         # Port the agent listens on (default 45876)
         PORT = "45876";
+        
+        # Public key for authentication (from beszel hub)
+        # Override this in each machine's configuration.nix
+        KEY = config.services.beszel-agent-key or "";
       };
       extraOptions = [
         "--privileged"  # Needed for full system metrics
