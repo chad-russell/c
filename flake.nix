@@ -2,7 +2,7 @@
   description = "NixOS configurations for homelab cluster";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     disko.url = "github:nix-community/disko";
     nixos-anywhere.url = "github:nix-community/nixos-anywhere";
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
