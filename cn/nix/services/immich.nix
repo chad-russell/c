@@ -79,7 +79,7 @@
         TZ = "America/New_York";
         
         # Server URL
-        PUBLIC_IMMICH_SERVER_URL = "https://immich.internal.crussell.io";
+        PUBLIC_IMMICH_SERVER_URL = "https://immich.crussell.io";
       };
       dependsOn = [ "immich-postgres" "immich-redis" ];
     };
