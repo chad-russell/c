@@ -7,6 +7,8 @@
     ../common/hardware-watchdog.nix
     ../common/network-optimizations.nix
     # Service modules (shared)
+    ../services/beszel.nix
+    ../services/beszel-agent.nix
     ../services/n8n.nix
     ../services/pinepods.nix
     ../services/searxng.nix

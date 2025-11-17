@@ -7,6 +7,7 @@
     ../common/hardware-watchdog.nix
     ../common/network-optimizations.nix
     # Service modules (shared)
+    ../services/beszel-agent.nix
     ../services/karakeep.nix
     ../services/memos.nix
     ../services/ntfy.nix
