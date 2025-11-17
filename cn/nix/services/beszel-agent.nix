@@ -21,8 +21,8 @@
         PORT = "45876";
         
         # Public key for authentication (from beszel hub)
-        # Override this in each machine's configuration.nix
-        KEY = config.services.beszel-agent-key or "";
+        # Set in each machine's configuration.nix:
+        # virtualisation.oci-containers.containers.beszel-agent.environment.KEY = "ssh-ed25519 ...";
       };
       extraOptions = [
         "--privileged"  # Needed for full system metrics
