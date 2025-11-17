@@ -9,6 +9,7 @@
     # Service modules (shared)
     ../services/beszel.nix
     ../services/beszel-agent.nix
+    ../services/immich.nix
   ];
 
   # Set your hostname.
@@ -17,6 +18,23 @@
   # Beszel agent authentication key (get from beszel hub when adding system)
   virtualisation.oci-containers.containers.beszel-agent.environment.KEY = 
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZIx3DijQERcOTAbdQJmDSaTlI+20O8kE19iWyh8Fn5";
+
+  # Mount NFS share from TrueNAS for Immich photos
+  fileSystems."/mnt/immich" = {
+    device = "192.168.20.31:/mnt/tank/photos";
+    fsType = "nfs";
+    options = [ 
+      "nfsvers=4"
+      "rw"
+      "soft"
+      "intr"
+      "timeo=30"
+      "retrans=3"
+    ];
+  };
+
+  # Enable NFS client support
+  services.rpcbind.enable = true;
 
   # Configure network interface
   systemd.network.networks."40-eth0" = {

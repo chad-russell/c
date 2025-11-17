@@ -50,7 +50,7 @@ Ensure these files exist and are non-zero size:
 cd /home/crussell/Code/c/cn/nix
 
 # Run nixos-anywhere (this will WIPE k3)
-nixos-anywhere --flake .#k3 root@192.168.20.63
+nix run github:nix-community/nixos-anywhere -- --flake .#k4 root@192.168.20.64
 ```
 
 **Wait for completion (~10-15 minutes)**
