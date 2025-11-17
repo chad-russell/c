@@ -1,6 +1,6 @@
-# Migration Guide: k4 (Podman/Quadlet) → k2 (NixOS with quadlet-nix)
+# Migration Guide: k4 (Podman/Quadlet) → k2 (NixOS)
 
-This guide helps you migrate your Karakeep, Memos, and Papra services from your homegrown Podman/Quadlet setup on k4 to a declarative NixOS configuration on k2 using `quadlet-nix`.
+This guide helps you migrate your Karakeep, Memos, and Papra services from your homegrown Podman/Quadlet setup on k4 to a declarative NixOS configuration on k2.
 
 ## Overview
 
@@ -38,7 +38,7 @@ The configuration is already set up in this repository:
 
 ```
 nix/
-├── flake.nix                    # Updated with quadlet-nix input
+├── flake.nix                    
 ├── configuration.nix            # Updated to import service modules
 └── services/
     ├── karakeep.nix            # Karakeep service definition
@@ -72,8 +72,6 @@ On your local machine (where you have this repo):
 cd /Users/chadrussell/Code/c/nix
 nix flake update
 ```
-
-This will fetch the `quadlet-nix` flake and update all inputs.
 
 ### Step 4: Build and Test Locally (Optional)
 
@@ -258,7 +256,7 @@ systemctl --user disable memos papra
 # podman volume rm karakeep-app-data karakeep-data karakeep-homedash-config memos-data papra-data
 ```
 
-## Advantages of NixOS + quadlet-nix
+## Advantages of NixOS
 
 ### 1. Declarative Configuration
 - All services defined in version-controlled Nix files
@@ -407,7 +405,6 @@ find "$BACKUP_DIR" -name "*.tar" -mtime +7 -delete
 
 ## Additional Resources
 
-- [quadlet-nix Documentation](https://seiarotg.github.io/quadlet-nix)
 - [Podman Quadlet Documentation](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
 - [NixOS Manual](https://nixos.org/manual/nixos/stable/)
 - [Podman Documentation](https://docs.podman.io/)

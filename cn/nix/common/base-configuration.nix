@@ -48,10 +48,6 @@
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
   virtualisation.podman.extraPackages = [ pkgs.aardvark-dns ];
 
-  # Enable quadlet-nix for declarative container management
-  virtualisation.quadlet.enable = true;
-  virtualisation.quadlet.autoEscape = true;
-
   # Enable passwordless sudo for wheel group members (prevents lockout)
   security.sudo.wheelNeedsPassword = false;
 
