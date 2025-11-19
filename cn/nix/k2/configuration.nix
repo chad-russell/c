@@ -36,36 +36,36 @@
   # Configure container backups
   services.containerBackup = {
     enable = true;
-    backend = "podman";
+    backend = "docker";
     jobs = {
       karakeep-app = {
         containerName = "karakeep";
-        serviceName = "karakeep.service";
+        serviceName = "docker-karakeep.service";
         volumes = [ "karakeep-app-data" ];
       };
       karakeep-meili = {
         containerName = "karakeep-meilisearch";
-        serviceName = "karakeep-meilisearch.service";
+        serviceName = "docker-karakeep-meilisearch.service";
         volumes = [ "karakeep-data" ];
       };
       karakeep-homedash = {
         containerName = "karakeep-homedash";
-        serviceName = "karakeep-homedash.service";
+        serviceName = "docker-karakeep-homedash.service";
         volumes = [ "karakeep-homedash-config" ];
       };
       memos = {
         containerName = "memos";
-        serviceName = "memos.service";
+        serviceName = "docker-memos.service";
         volumes = [ "memos-data" ];
       };
       ntfy = {
         containerName = "ntfy";
-        serviceName = "ntfy.service";
+        serviceName = "docker-ntfy.service";
         volumes = [ "ntfy-config" "ntfy-cache" ];
       };
       papra = {
         containerName = "papra";
-        serviceName = "papra.service";
+        serviceName = "docker-papra.service";
         volumes = [ "papra-data" ];
       };
     };

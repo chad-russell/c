@@ -2,39 +2,34 @@
 
 {
   # Papra - Document Management System
+  # Using Docker via virtualisation.oci-containers for reliable DNS
   
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) networks volumes;
-  in {
-    # Network for Papra
-    networks.papra = {
-      networkConfig.name = "papra";
-    };
+  # Create Docker network for Papra
+  systemd.services.init-papra-network = {
+    description = "Create Docker network for Papra";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${config.virtualisation.docker.package}/bin/docker network inspect papra >/dev/null 2>&1 || \
+      ${config.virtualisation.docker.package}/bin/docker network create papra
+    '';
+  };
 
-    # Volume for data persistence (database and documents)
-    volumes.papra-data = {
-      volumeConfig.name = "papra-data";
-    };
-
-    # Papra container
-    containers.papra = {
-      containerConfig = {
-        image = "ghcr.io/papra-hq/papra:latest";
-        networks = [ networks.papra.ref ];
-        publishPorts = [ "1221:1221" ];
-        volumes = [ "${volumes.papra-data.ref}:/app/app-data" ];
-        environments = {
-          # CHANGE THIS: Set to your actual Papra URL
-          APP_BASE_URL = "https://papra.internal.crussell.io";
-          TZ = "America/New_York";
-          # Optional configuration:
-          # PAPRA_LOG_LEVEL = "info";
-          # PAPRA_MAX_UPLOAD_SIZE = "50MB";
-        };
-      };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = "900";
+  virtualisation.oci-containers.containers = {
+    papra = {
+      image = "ghcr.io/papra-hq/papra:latest";
+      autoStart = true;
+      ports = [ "1221:1221" ];
+      extraOptions = [ "--network=papra" ];
+      volumes = [ "papra-data:/app/app-data" ];
+      environment = {
+        # CHANGE THIS: Set to your actual Papra URL
+        APP_BASE_URL = "https://papra.internal.crussell.io";
+        TZ = "America/New_York";
+        # Optional configuration:
+        # PAPRA_LOG_LEVEL = "info";
+        # PAPRA_MAX_UPLOAD_SIZE = "50MB";
       };
     };
   };
