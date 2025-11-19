@@ -10,6 +10,7 @@
     ../services/beszel.nix
     ../services/beszel-agent.nix
     ../services/immich.nix
+    ../modules/container-backup.nix
   ];
 
   # Set your hostname.
@@ -45,5 +46,20 @@
       { routeConfig.Gateway = "192.168.20.1"; }
     ];
     dns = [ "192.168.10.1" "8.8.8.8" ];
+  };
+
+  # Configure container backups
+  services.containerBackup = {
+    enable = true;
+    jobs = {
+      beszel = {
+        containerName = "beszel";
+        volumes = [ "beszel-data" ];
+      };
+      immich-postgres = {
+        containerName = "immich-postgres";
+        volumes = [ "immich-pgdata" ];
+      };
+    };
   };
 }
