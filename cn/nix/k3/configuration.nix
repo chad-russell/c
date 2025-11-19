@@ -32,4 +32,27 @@
     ];
     dns = [ "192.168.10.1" "8.8.8.8" ];
   };
+
+  # Configure container backups
+  services.containerBackup = {
+    enable = true;
+    jobs = {
+      beszel = {
+        containerName = "beszel";
+        volumes = [ "beszel-data" ];
+      };
+      n8n = {
+        containerName = "n8n";
+        volumes = [ "n8n-data" "n8n-files" ];
+      };
+      pinepods-db = {
+        containerName = "pinepods-db";
+        volumes = [ "pinepods-pgdata" ];
+      };
+      searxng = {
+        containerName = "searxng";
+        volumes = [ "searxng-config" ];
+      };
+    };
+  };
 }
