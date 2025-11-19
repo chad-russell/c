@@ -39,18 +39,27 @@
     jobs = {
       beszel = {
         containerName = "beszel";
+        serviceName = "docker-beszel.service";
         volumes = [ "beszel-data" ];
       };
       n8n = {
         containerName = "n8n";
+        serviceName = "docker-n8n.service";
         volumes = [ "n8n-data" "n8n-files" ];
       };
       pinepods-db = {
         containerName = "pinepods-db";
+        serviceName = "docker-pinepods-db.service";
         volumes = [ "pinepods-pgdata" ];
+      };
+      searxng-valkey = {
+        containerName = "searxng-valkey";
+        serviceName = "docker-searxng-valkey.service";
+        volumes = [ "searxng-valkey-data" ];
       };
       searxng = {
         containerName = "searxng";
+        serviceName = "docker-searxng.service";
         volumes = [ "searxng-config" ];
       };
     };

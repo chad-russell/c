@@ -21,6 +21,11 @@ let
         default = 7;
         description = "Number of days to keep backups.";
       };
+      serviceName = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Systemd service name to stop/start (optional, overrides containerName for stop/start).";
+      };
     };
   };
 
@@ -78,7 +83,7 @@ in {
         Type = "oneshot";
         User = "root";
       };
-      path = with pkgs; [ docker gzip gnutar coreutils findutils ];
+      path = with pkgs; [ docker gzip gnutar coreutils findutils systemd ];
       script = ''
         set -euo pipefail
         
@@ -88,9 +93,14 @@ in {
 
         echo "Starting backup for ${name}..."
 
-        # Stop the container
-        echo "Stopping container ${job.containerName}..."
-        docker stop "${job.containerName}"
+        # Stop the container/service
+        if [ -n "${job.serviceName}" ]; then
+          echo "Stopping service ${job.serviceName}..."
+          systemctl stop "${job.serviceName}"
+        else
+          echo "Stopping container ${job.containerName}..."
+          docker stop "${job.containerName}"
+        fi
 
         # Backup volumes
         for vol in ${toString job.volumes}; do
@@ -104,9 +114,14 @@ in {
             tar czf "/backup/$TIMESTAMP-$vol.tar.gz" -C /data .
         done
 
-        # Start the container
-        echo "Starting container ${job.containerName}..."
-        docker start "${job.containerName}"
+        # Start the container/service
+        if [ -n "${job.serviceName}" ]; then
+          echo "Starting service ${job.serviceName}..."
+          systemctl start "${job.serviceName}"
+        else
+          echo "Starting container ${job.containerName}..."
+          docker start "${job.containerName}"
+        fi
 
         # Prune old backups
         echo "Pruning backups older than ${toString job.keepDays} days..."
