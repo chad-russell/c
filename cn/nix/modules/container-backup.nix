@@ -51,6 +51,12 @@ in {
       description = "Local mount point for the NFS share.";
     };
 
+    backend = mkOption {
+      type = types.enum [ "docker" "podman" ];
+      default = "docker";
+      description = "Container backend to use (docker or podman).";
+    };
+
     jobs = mkOption {
       type = types.attrsOf (types.submodule jobOptions);
       default = {};
@@ -77,21 +83,22 @@ in {
     # 2. Create the backup script and systemd service for each job
     systemd.services = mapAttrs' (name: job: nameValuePair "container-backup-${name}" {
       description = "Backup service for container ${job.containerName}";
-      requires = [ "docker.service" ];
-      after = [ "docker.service" "network.target" "remote-fs.target" ];
+      requires = if cfg.backend == "docker" then [ "docker.service" ] else [];
+      after = [ "network.target" "remote-fs.target" ] ++ (if cfg.backend == "docker" then [ "docker.service" ] else []);
       serviceConfig = {
         Type = "oneshot";
         User = "root";
       };
-      path = with pkgs; [ docker gzip gnutar coreutils findutils systemd ];
+      path = with pkgs; [ (if cfg.backend == "docker" then docker else podman) gzip gnutar coreutils findutils systemd ];
       script = ''
         set -euo pipefail
         
         BACKUP_DIR="${cfg.mountPoint}/containers/${name}"
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        BIN="${cfg.backend}"
         mkdir -p "$BACKUP_DIR"
 
-        echo "Starting backup for ${name}..."
+        echo "Starting backup for ${name} using $BIN..."
 
         # Stop the container/service
         if [ -n "${job.serviceName}" ]; then
@@ -99,7 +106,7 @@ in {
           systemctl stop "${job.serviceName}"
         else
           echo "Stopping container ${job.containerName}..."
-          docker stop "${job.containerName}"
+          $BIN stop "${job.containerName}"
         fi
 
         # Backup volumes
@@ -107,7 +114,7 @@ in {
           echo "Backing up volume $vol..."
           # Use a temporary alpine container to tar the volume
           # We mount the volume to /data and the backup dir to /backup
-          docker run --rm \
+          $BIN run --rm \
             -v "$vol":/data:ro \
             -v "$BACKUP_DIR":/backup \
             alpine:latest \
@@ -120,7 +127,7 @@ in {
           systemctl start "${job.serviceName}"
         else
           echo "Starting container ${job.containerName}..."
-          docker start "${job.containerName}"
+          $BIN start "${job.containerName}"
         fi
 
         # Prune old backups

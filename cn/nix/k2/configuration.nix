@@ -12,6 +12,7 @@
     ../services/memos.nix
     ../services/ntfy.nix
     ../services/papra.nix
+    ../modules/container-backup.nix
   ];
 
   # Set your hostname.
@@ -30,5 +31,43 @@
       { routeConfig.Gateway = "192.168.20.1"; }
     ];
     dns = [ "192.168.10.1" "8.8.8.8" ];
+  };
+
+  # Configure container backups
+  services.containerBackup = {
+    enable = true;
+    backend = "podman";
+    jobs = {
+      karakeep-app = {
+        containerName = "karakeep";
+        serviceName = "karakeep.service";
+        volumes = [ "karakeep-app-data" ];
+      };
+      karakeep-meili = {
+        containerName = "karakeep-meilisearch";
+        serviceName = "karakeep-meilisearch.service";
+        volumes = [ "karakeep-data" ];
+      };
+      karakeep-homedash = {
+        containerName = "karakeep-homedash";
+        serviceName = "karakeep-homedash.service";
+        volumes = [ "karakeep-homedash-config" ];
+      };
+      memos = {
+        containerName = "memos";
+        serviceName = "memos.service";
+        volumes = [ "memos-data" ];
+      };
+      ntfy = {
+        containerName = "ntfy";
+        serviceName = "ntfy.service";
+        volumes = [ "ntfy-config" "ntfy-cache" ];
+      };
+      papra = {
+        containerName = "papra";
+        serviceName = "papra.service";
+        volumes = [ "papra-data" ];
+      };
+    };
   };
 }
