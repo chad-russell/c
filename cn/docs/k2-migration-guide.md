@@ -168,6 +168,66 @@ sudo /cn/scripts/docker-backup.sh restore memos /mnt/backups/containers/memos
 
 ## Troubleshooting
 
+### 502 Bad Gateway from Caddy
+
+If you're getting 502 Bad Gateway errors after migration, check the following:
+
+#### 1. Verify ports are listening on the host
+```bash
+# Check if services are listening on the expected ports
+sudo ss -tlnp | grep -E '3322|5230|8090|8595|1221'
+
+# You should see output like:
+# LISTEN 0      4096         0.0.0.0:3322       0.0.0.0:*    users:(("docker-proxy",pid=...))
+# LISTEN 0      4096         0.0.0.0:5230       0.0.0.0:*    users:(("docker-proxy",pid=...))
+# etc.
+```
+
+#### 2. Check Docker port bindings
+```bash
+# Verify Docker containers have correct port mappings
+sudo docker ps --format "table {{.Names}}\t{{.Ports}}"
+
+# Expected output:
+# karakeep        0.0.0.0:3322->3000/tcp
+# memos           0.0.0.0:5230->5230/tcp
+# ntfy            0.0.0.0:8090->80/tcp
+# karakeep-homedash  0.0.0.0:8595->8595/tcp
+# papra           0.0.0.0:1221->1221/tcp
+```
+
+#### 3. Test local connectivity
+```bash
+# Test if services respond locally
+curl -v http://localhost:3322  # Karakeep
+curl -v http://localhost:5230  # Memos
+curl -v http://localhost:8090  # Ntfy
+curl -v http://localhost:8595  # Karakeep-homedash
+curl -v http://localhost:1221  # Papra
+
+# If these work but Caddy still gives 502, reload Caddy:
+cd ~/caddy
+docker compose restart
+```
+
+#### 4. Check if IPv6 is causing issues
+If ports show as `:::PORT` instead of `0.0.0.0:PORT`, Docker might be binding to IPv6 only. Fix by restarting Docker:
+
+```bash
+sudo systemctl restart docker
+# Wait a few seconds for containers to restart
+sudo docker ps
+```
+
+#### 5. Verify Caddy can reach the host
+```bash
+# From inside the Caddy container
+docker exec -it caddy-proxy sh
+apk add curl
+curl -v http://192.168.20.62:3322
+exit
+```
+
 ### Containers won't start
 ```bash
 # Check Docker service

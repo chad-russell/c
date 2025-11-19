@@ -33,6 +33,9 @@
     dns = [ "192.168.10.1" "8.8.8.8" ];
   };
 
+  # Open firewall for Caddy reverse proxy
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+
   # Configure container backups
   services.containerBackup = {
     enable = true;
