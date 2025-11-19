@@ -58,7 +58,15 @@ in {
     fileSystems."${cfg.mountPoint}" = {
       device = "${cfg.nfsServer}:${cfg.nfsPath}";
       fsType = "nfs";
-      options = [ "x-systemd.automount" "noauto" "timeo=14" ];
+      options = [ 
+        "x-systemd.automount" 
+        "noauto" 
+        "timeo=14" 
+        "nfsvers=4"
+        "rw"
+        "soft"
+        "intr"
+      ];
     };
 
     # 2. Create the backup script and systemd service for each job
