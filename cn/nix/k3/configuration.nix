@@ -12,6 +12,7 @@
     ../services/n8n.nix
     ../services/pinepods.nix
     ../services/searxng.nix
+    ../modules/container-backup.nix
   ];
 
   # Set your hostname.
