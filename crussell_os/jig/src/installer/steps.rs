@@ -21,9 +21,9 @@ impl InstallerStep for PartitionDisk {
         
         // sfdisk script:
         // label: gpt
-        // size=1G, type=UEFI
-        // type=linux
-        let script = "label: gpt\nsize=1G, type=UEFI\ntype=linux\n";
+        // size=1G, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B (EFI System Partition)
+        // type=0FC63DAF-8483-4772-8E79-3D69D8477DE4 (Linux Filesystem)
+        let script = "label: gpt\nsize=1G, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B\ntype=0FC63DAF-8483-4772-8E79-3D69D8477DE4\n";
 
         let mut child = Command::new("sfdisk")
             .arg(&self.disk)
