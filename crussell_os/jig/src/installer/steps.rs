@@ -98,7 +98,7 @@ impl InstallerStep for FormatPartitions {
         let status = Command::new("mkfs.btrfs")
             .arg("-f") // Force
             .arg("-L")
-            .arg("jigos")
+            .arg("ROOT")
             .arg(&p2)
             .status()
             .context("Failed to run mkfs.btrfs")?;

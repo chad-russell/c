@@ -13,7 +13,7 @@ We are building `jig`, a Rust-based system manager for an immutable Arch Linux s
 
 **The Task:**
 Implement a new subcommand: `bootstrap`.
-This command will take a block device (e.g., `/dev/vda`), wipe it, and turn it into a fully bootable "jigOS" system.
+This command will take a block device (e.g., `/dev/vda`), wipe it, and turn it into a fully bootable "CrussellOS" system.
 
 **Requirements & Logic Flow:**
 
@@ -34,7 +34,7 @@ This command will take a block device (e.g., `/dev/vda`), wipe it, and turn it i
       * **Step 2: Formatting:**
 
           * Format P1 with `mkfs.fat -F 32`.
-          * Format P2 with `mkfs.btrfs -L jigos`.
+          * Format P2 with `mkfs.btrfs -L ROOT`.
 
       * **Step 3: Subvolumes:**
 

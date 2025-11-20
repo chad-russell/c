@@ -18,7 +18,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Bootstrap a new JigOS system on a block device (DESTRUCTIVE)
+    /// Bootstrap a new system on a block device (DESTRUCTIVE)
     Bootstrap {
         /// The target block device (e.g., /dev/vda)
         disk: PathBuf,
