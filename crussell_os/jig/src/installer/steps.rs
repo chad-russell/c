@@ -204,7 +204,7 @@ impl InstallerStep for MountHierarchy {
 
         // Create directories
         let dirs = vec![
-            "efi", "home", "var/log", "var/cache", "snapshots", "mnt/vault"
+            "boot", "home", "var/log", "var/cache", "snapshots", "mnt/vault"
         ];
         for dir in dirs {
             fs::create_dir_all(target.join(dir))?;
@@ -229,20 +229,20 @@ impl InstallerStep for MountHierarchy {
             if !status.success() { return Err(anyhow!("Failed to mount {}", subvol)); }
         }
 
-        // Mount EFI
-        info!("Mounting EFI partition");
+        // Mount EFI to /boot (Standard Arch practice for systemd-boot simplicity)
+        info!("Mounting EFI partition to /boot");
         let status = Command::new("mount")
             .arg(&p1)
-            .arg(target.join("efi"))
+            .arg(target.join("boot"))
             .status()?;
-        if !status.success() { return Err(anyhow!("Failed to mount EFI")); }
+        if !status.success() { return Err(anyhow!("Failed to mount EFI to /boot")); }
 
         Ok(())
     }
 
     fn verify(&self) -> Result<()> {
-        if !Path::new("/mnt/efi").exists() {
-            return Err(anyhow!("/mnt/efi does not exist"));
+        if !Path::new("/mnt/boot").exists() {
+            return Err(anyhow!("/mnt/boot does not exist"));
         }
         Ok(())
     }
@@ -357,49 +357,33 @@ impl InstallerStep for InstallBootloader {
         info!("Installing bootctl...");
         let status = Command::new("bootctl")
             .arg("install")
-            .arg("--path=/mnt/efi")
+            .arg("--path=/mnt/boot")
             .status()
             .context("Failed to install bootctl")?;
         if !status.success() { return Err(anyhow!("bootctl install failed")); }
 
         // Loader Entry
+        // We use root=LABEL=ROOT because we formatted the Btrfs partition with that label.
         let entry_content = r#"title   Jig
 linux   /vmlinuz-linux
 initrd  /intel-ucode.img
 initrd  /initramfs-linux.img
-options root="PARTLABEL=primary" rootflags=subvol=@active_a rw
+options root=LABEL=ROOT rootflags=subvol=@active_a rw
 "#;
-        // Note: PARTLABEL=primary might not be set by sfdisk script above unless we added name.
-        // Let's fix the partition step or use device path.
-        // The sfdisk script was: "label: gpt\nsize=1G, type=UEFI\ntype=linux\n"
-        // It didn't set partition labels.
-        // We should probably use PARTUUID or /dev/disk/by-partlabel if we set it.
-        // For now, let's assume the user will fix this or we update the sfdisk script.
-        // BUT, to be safe, let's use the device path for p2.
-        let disk_str = self.disk.to_string_lossy();
-        let p2 = if disk_str.contains("nvme") { format!("{}p2", disk_str) } else { format!("{}2", disk_str) };
-        
-        // We'll use the direct device path for this iteration to ensure it boots in the VM.
-        let entry_content = format!(r#"title   Jig
-linux   /vmlinuz-linux
-initrd  /intel-ucode.img
-initrd  /initramfs-linux.img
-options root={} rootflags=subvol=@active_a rw
-"#, p2);
 
-        let entries_dir = Path::new("/mnt/efi/loader/entries");
+        let entries_dir = Path::new("/mnt/boot/loader/entries");
         fs::create_dir_all(entries_dir)?;
         fs::write(entries_dir.join("arch.conf"), entry_content)?;
 
         // Loader Config
         let loader_conf = "default arch.conf\ntimeout 3\nconsole-mode max\n";
-        fs::write("/mnt/efi/loader/loader.conf", loader_conf)?;
+        fs::write("/mnt/boot/loader/loader.conf", loader_conf)?;
 
         Ok(())
     }
 
     fn verify(&self) -> Result<()> {
-        if !Path::new("/mnt/efi/loader/entries/arch.conf").exists() {
+        if !Path::new("/mnt/boot/loader/entries/arch.conf").exists() {
             return Err(anyhow!("Bootloader entry not found"));
         }
         Ok(())
