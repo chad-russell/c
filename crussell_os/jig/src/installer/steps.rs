@@ -330,6 +330,24 @@ impl InstallerStep for ConfigureSystem {
             .args(&["useradd", "-m", "-G", "wheel", "crussell"])
             .status()?;
 
+        // Set default password "changeme"
+        info!("Setting default password for 'crussell'...");
+        let mut child = Command::new("arch-chroot")
+            .arg("/mnt")
+            .arg("chpasswd")
+            .stdin(Stdio::piped())
+            .spawn()
+            .context("Failed to spawn chpasswd")?;
+        
+        if let Some(mut stdin) = child.stdin.take() {
+            stdin.write_all(b"crussell:changeme").context("Failed to write to chpasswd")?;
+        }
+        
+        let status = child.wait().context("Failed to wait for chpasswd")?;
+        if !status.success() {
+            return Err(anyhow!("Failed to set password"));
+        }
+
         Ok(())
     }
 
