@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use env_logger::Env;
-use log::{info, error};
+use log::info;
 use anyhow::Result;
 use std::path::PathBuf;
 use dialoguer::{Confirm, theme::ColorfulTheme};
@@ -55,7 +55,7 @@ fn main() -> Result<()> {
                 Box::new(steps::MountHierarchy { disk: disk.clone() }),
                 Box::new(steps::Pacstrap),
                 Box::new(steps::ConfigureSystem),
-                Box::new(steps::InstallBootloader { disk: disk.clone() }),
+                Box::new(steps::InstallBootloader),
             ];
 
             run_installer(steps)?;

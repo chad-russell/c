@@ -14,16 +14,16 @@ pub struct PartitionDisk {
 
 impl InstallerStep for PartitionDisk {
     fn name(&self) -> &str {
-        "Partition Disk (GPT 1GB EFI + Rest Btrfs)"
+        "Partition Disk (GPT 3GB EFI + Rest Btrfs)"
     }
 
     fn run(&self) -> Result<()> {
         info!("Partitioning disk: {:?}", self.disk);
         
         // Standard GPT Layout
-        // 1. EFI System (1GB)
+        // 1. EFI System (3GB)
         // 2. Linux Filesystem (Remainder)
-        let script = "label: gpt\nsize=1G, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B\ntype=0FC63DAF-8483-4772-8E79-3D69D8477DE4\n";
+        let script = "label: gpt\nsize=3G, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B\ntype=0FC63DAF-8483-4772-8E79-3D69D8477DE4\n";
 
         let mut child = Command::new("sfdisk")
             .arg(&self.disk)
