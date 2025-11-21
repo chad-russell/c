@@ -1,9 +1,0 @@
-[Unit]
-Description=Karakeep Application Data Volume
-
-[Volume]
-VolumeName=karakeep-app-data
-
-
-
-

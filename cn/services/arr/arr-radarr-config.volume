@@ -1,8 +1,0 @@
-[Unit]
-Description=Radarr Config Volume
-
-[Volume]
-VolumeName=radarr-config
-
-
-

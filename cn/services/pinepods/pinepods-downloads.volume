@@ -1,6 +1,0 @@
-[Unit]
-Description=PinePods Downloads Volume
-
-[Volume]
-VolumeName=pinepods-downloads
-

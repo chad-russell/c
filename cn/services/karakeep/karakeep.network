@@ -1,9 +1,0 @@
-[Unit]
-Description=Karakeep Network
-
-[Network]
-# Creates a custom network for Karakeep services
-# This allows containers to communicate via container names
-NetworkName=karakeep
-
-

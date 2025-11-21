@@ -1,5 +1,0 @@
-[Unit]
-Description=SearXNG Configuration Volume
-
-[Volume]
-VolumeName=searxng-config

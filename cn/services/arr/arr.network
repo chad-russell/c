@@ -1,9 +1,0 @@
-[Unit]
-Description=Arr Stack Network (Sonarr, Radarr, Prowlarr, Jellyseerr)
-
-[Network]
-# Creates a custom network for *arr services to communicate
-NetworkName=arr
-
-
-

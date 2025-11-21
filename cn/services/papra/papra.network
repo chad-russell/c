@@ -1,9 +1,0 @@
-[Unit]
-Description=Papra Network
-
-[Network]
-# Creates a custom network for Papra
-NetworkName=papra
-
-
-

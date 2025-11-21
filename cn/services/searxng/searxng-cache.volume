@@ -1,8 +1,0 @@
-[Unit]
-Description=SearXNG Cache Volume
-
-[Volume]
-VolumeName=searxng-cache
-
-
-
